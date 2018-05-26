@@ -1,0 +1,5 @@
+/doc/tags
+/database/*
+
+!.gitkeep
+
