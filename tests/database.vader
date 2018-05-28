@@ -1,11 +1,6 @@
-Before:
-  let g_database = resolve(expand('<sfile>:h') . '/tasks.vim')
-  let g_tasks = [{'desc': 'task', 'tags': ['test'], 'due': 1527462653}]
+Include: setup.vader
 
-After:
-  call delete(g_database)
-
-==============================================================================
+#----------------------------------------------------------------# Write tasks #
 
 Execute (kronos#database#WriteTasks):
   call kronos#database#WriteTasks(g_database, g_tasks)
@@ -13,7 +8,7 @@ Execute (kronos#database#WriteTasks):
 Then (should write tasks to database):
   Assert filereadable(g_database)
 
-------------------------------------------------------------------------------
+#-----------------------------------------------------------------# Read tasks #
 
 Execute (kronos#database#ReadTasks):
   call kronos#database#WriteTasks(g_database, [])
@@ -22,6 +17,7 @@ Then (should read empty tasks to database):
   AssertEqual
     \ [],
     \ kronos#database#ReadTasks(g_database)
+
 
 Execute (kronos#database#ReadTasks):
   call kronos#database#WriteTasks(g_database, g_tasks)
