@@ -1,0 +1,33 @@
+Before:
+  let g_database = resolve(expand('<sfile>:h') . '/tasks.vim')
+  let g_tasks = [{'desc': 'task', 'tags': ['test'], 'due': 1527462653}]
+
+After:
+  call delete(g_database)
+
+==============================================================================
+
+Execute (kronos#WriteTasks):
+  call kronos#WriteTasks(g_database, g_tasks)
+
+Then (should write tasks to database):
+  Assert filereadable(g_database)
+
+------------------------------------------------------------------------------
+
+Execute (kronos#ReadTasks):
+  call kronos#WriteTasks(g_database, [])
+
+Then (should read empty tasks to database):
+  AssertEqual
+    \ [],
+    \ kronos#ReadTasks(g_database)
+
+Execute (kronos#ReadTasks):
+  call kronos#WriteTasks(g_database, g_tasks)
+
+Then (should read non-empty tasks to database):
+  AssertEqual 
+    \ [{'desc': 'task', 'tags': ['test'], 'due': 1527462653}],
+    \ kronos#ReadTasks(g_database)
+
