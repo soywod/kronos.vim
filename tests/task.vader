@@ -1,0 +1,59 @@
+Include: setup.vader
+#----------------------------------------------------------------# Create task #
+
+Execute (Create):
+  call kronos#task#Create(g_database, g_task)
+
+Then (should insert a task):
+  AssertEqual g_tasks, kronos#database#ReadTasks(g_database)
+
+#------------------------------------------------------------------# Read task #
+
+Execute (Read):
+  call kronos#task#Create(g_database, g_task)
+  let result = kronos#task#Read(g_database, 42)
+
+Then (should get a task by id):
+  AssertEqual g_task, result
+  AssertThrows kronos#task#Read(g_database, 0)
+
+#-------------------------------------------------------------# Read all tasks #
+
+Execute (ReadAll):
+  call kronos#task#Create(g_database, g_task)
+  let result = kronos#task#ReadAll(g_database)
+
+Then (should get all tasks):
+  AssertEqual g_tasks, result
+  AssertEqual kronos#database#ReadTasks(g_database), result
+
+#----------------------------------------------------------------# Update task #
+
+Execute (Update):
+  call kronos#task#Create(g_database, g_task)
+
+  let task_updated = {
+    \ 'id': 42,
+    \ 'desc': 'test kronos updated',
+    \ 'tags': ['test', 'vader', 'kronos', 'update'],
+    \ 'due': 1527462654
+  \}
+
+  let result = kronos#task#Update(g_database, task_updated)
+
+Then (should update a task):
+  Assert result
+  AssertEqual [task_updated], kronos#database#ReadTasks(g_database)
+  AssertThrows kronos#task#Update(g_database, {})
+
+#----------------------------------------------------------------# Delete task #
+
+Execute (Delete):
+  call kronos#task#Create(g_database, g_task)
+  let result = kronos#task#Delete(g_database, 42)
+
+Then (should delete a task by id):
+  Assert result
+  AssertEqual [], kronos#database#ReadTasks(g_database)
+  AssertThrows kronos#task#Delete(g_database, 0)
+

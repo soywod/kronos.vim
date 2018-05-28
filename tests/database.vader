@@ -1,29 +1,21 @@
 Include: setup.vader
-
 #----------------------------------------------------------------# Write tasks #
 
-Execute (kronos#database#WriteTasks):
-  call kronos#database#WriteTasks(g_database, g_tasks)
+Execute (WriteTasks):
+  let result = kronos#database#WriteTasks(g_database, g_tasks)
 
 Then (should write tasks to database):
+  Assert result
   Assert filereadable(g_database)
 
 #-----------------------------------------------------------------# Read tasks #
 
-Execute (kronos#database#ReadTasks):
-  call kronos#database#WriteTasks(g_database, [])
-
-Then (should read empty tasks to database):
-  AssertEqual
-    \ [],
-    \ kronos#database#ReadTasks(g_database)
-
-
-Execute (kronos#database#ReadTasks):
+Execute (ReadTasks):
+  let result_before = kronos#database#ReadTasks(g_database)
   call kronos#database#WriteTasks(g_database, g_tasks)
+  let result_after = kronos#database#ReadTasks(g_database)
 
-Then (should read non-empty tasks to database):
-  AssertEqual 
-    \ [{'desc': 'task', 'tags': ['test'], 'due': 1527462653}],
-    \ kronos#database#ReadTasks(g_database)
+Then (should read tasks from database):
+  AssertEqual [], result_before
+  AssertEqual g_tasks, result_after
 

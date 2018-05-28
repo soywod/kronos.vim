@@ -1,11 +1,15 @@
 function! kronos#database#ReadTasks(database)
   if ! filereadable(a:database)
-    call s:WriteTasks(a:database, [])
+    call kronos#database#WriteTasks(a:database, [])
     return []
   endif
 
-  call execute('source ' . a:database)
-  return g:kronos_tasks
+  try
+    call execute('source ' . a:database)
+    return g:kronos_tasks
+  finally
+    unlet g:kronos_tasks
+  endtry
 endfunction
 
 function! kronos#database#WriteTasks(database, tasks)
@@ -13,5 +17,6 @@ function! kronos#database#WriteTasks(database, tasks)
   let l:cmd = shellescape('let g:kronos_tasks = ' . string(a:tasks))
 
   call system('echo ' . l:cmd . '>' . l:database)
+  return v:true
 endfunction
 

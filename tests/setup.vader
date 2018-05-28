@@ -1,6 +1,14 @@
 Before:
   let g_database = resolve(expand('<sfile>:h') . '/tasks.vim')
-  let g_tasks = [{'desc': 'task', 'tags': ['test'], 'due': 1527462653}]
+
+  let g_task = {
+    \ 'id': 42,
+    \ 'desc': 'test kronos',
+    \ 'tags': ['test', 'vader', 'kronos'],
+    \ 'due': 1527462653
+  \}
+
+  let g_tasks = [g_task]
 
 After:
   call delete(g_database)
