@@ -1,4 +1,26 @@
 Include: setup.vader
+
+#----------------------------------------------------------------# Generate ID #
+
+Execute (GenerateId):
+  let result1 = kronos#task#GenerateId([{'id': 1}, {'id': 2}, {'id': 4}])
+  let result2 = kronos#task#GenerateId([{'id': 2}, {'id': 3}, {'id': 5}])
+  let result3 = kronos#task#GenerateId([{'id': 1}, {'id': 2}, {'id': 3}])
+
+Then (should generate correct id):
+  AssertEqual 3, result1
+  AssertEqual 1, result2
+  AssertEqual 4, result3
+
+#-------------------------------------------------------# Get task index by ID #
+
+Execute (GetTaskIndexById):
+  let result = kronos#task#GetTaskIndexById(g_tasks, 1)
+
+Then (should get task by id):
+  AssertEqual 0, result
+  AssertThrows kronos#task#GetTaskIndexById(g_tasks, 0)
+
 #----------------------------------------------------------------# Create task #
 
 Execute (Create):
@@ -11,11 +33,10 @@ Then (should insert a task):
 
 Execute (Read):
   call kronos#task#Create(g_database, g_task)
-  let result = kronos#task#Read(g_database, 42)
+  let result = kronos#task#Read(g_database, 1)
 
 Then (should get a task by id):
   AssertEqual g_task, result
-  AssertThrows kronos#task#Read(g_database, 0)
 
 #-------------------------------------------------------------# Read all tasks #
 
@@ -33,7 +54,7 @@ Execute (Update):
   call kronos#task#Create(g_database, g_task)
 
   let task_updated = {
-    \ 'id': 42,
+    \ 'id': 1,
     \ 'desc': 'test kronos updated',
     \ 'tags': ['test', 'vader', 'kronos', 'update'],
     \ 'due': 1527462654
@@ -44,16 +65,14 @@ Execute (Update):
 Then (should update a task):
   Assert result
   AssertEqual [task_updated], kronos#database#ReadTasks(g_database)
-  AssertThrows kronos#task#Update(g_database, {})
 
 #----------------------------------------------------------------# Delete task #
 
 Execute (Delete):
   call kronos#task#Create(g_database, g_task)
-  let result = kronos#task#Delete(g_database, 42)
+  let result = kronos#task#Delete(g_database, 1)
 
 Then (should delete a task by id):
   Assert result
   AssertEqual [], kronos#database#ReadTasks(g_database)
-  AssertThrows kronos#task#Delete(g_database, 0)
 

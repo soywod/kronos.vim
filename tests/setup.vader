@@ -2,7 +2,7 @@ Before:
   let g_database = resolve(expand('<sfile>:h') . '/tasks.vim')
 
   let g_task = {
-    \ 'id': 42,
+    \ 'id': 1,
     \ 'desc': 'test kronos',
     \ 'tags': ['test', 'vader', 'kronos'],
     \ 'due': 1527462653
