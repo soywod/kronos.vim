@@ -7,27 +7,27 @@ After:
 
 ==============================================================================
 
-Execute (kronos#WriteTasks):
-  call kronos#WriteTasks(g_database, g_tasks)
+Execute (kronos#database#WriteTasks):
+  call kronos#database#WriteTasks(g_database, g_tasks)
 
 Then (should write tasks to database):
   Assert filereadable(g_database)
 
 ------------------------------------------------------------------------------
 
-Execute (kronos#ReadTasks):
-  call kronos#WriteTasks(g_database, [])
+Execute (kronos#database#ReadTasks):
+  call kronos#database#WriteTasks(g_database, [])
 
 Then (should read empty tasks to database):
   AssertEqual
     \ [],
-    \ kronos#ReadTasks(g_database)
+    \ kronos#database#ReadTasks(g_database)
 
-Execute (kronos#ReadTasks):
-  call kronos#WriteTasks(g_database, g_tasks)
+Execute (kronos#database#ReadTasks):
+  call kronos#database#WriteTasks(g_database, g_tasks)
 
 Then (should read non-empty tasks to database):
   AssertEqual 
     \ [{'desc': 'task', 'tags': ['test'], 'due': 1527462653}],
-    \ kronos#ReadTasks(g_database)
+    \ kronos#database#ReadTasks(g_database)
 
