@@ -1,0 +1,28 @@
+Include: setup.vader
+
+#-----------------------------------------------------------------# Create CLI #
+
+Execute (Create):
+  call kronos#cli#Create(g_database, 'test')
+
+Then (should create basic task):
+  AssertEqual
+    \ [{'id': 1, 'desc': 'test', 'tags': [], 'due': v:null}],
+    \ kronos#database#ReadTasks(g_database)
+
+Execute:
+  call kronos#cli#Create(g_database, '+cli test +a +b-c')
+
+Then (should create task with tags):
+  AssertEqual
+    \ [{'id': 1, 'desc': 'test', 'tags': ['cli', 'a', 'b-c'], 'due': v:null}],
+    \ kronos#database#ReadTasks(g_database)
+
+Execute:
+  call kronos#cli#Create(g_database, 'test :0 42')
+
+Then (should create task with due):
+  AssertEqual
+    \ [{'id': 1, 'desc': 'test 42', 'tags': [], 'due': '0'}],
+    \ kronos#database#ReadTasks(g_database)
+
