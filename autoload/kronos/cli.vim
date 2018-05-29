@@ -14,12 +14,30 @@ function! kronos#cli#Add(database, dateref, args)
     endif
   endfor
 
-  let l:task = {
+  let l:id = kronos#task#Create(a:database, {
     \ 'desc': join(l:desc, ' '),
     \ 'tags': l:tags,
     \ 'due': l:due,
-    \}
+  \})
 
-  call kronos#task#Create(a:database, l:task)
+  echo 'Task [' . l:id . '] added !'
+endfunction
+
+function! kronos#cli#Info(database, id)
+  try
+    let l:task = kronos#task#Read(a:database, a:id)
+
+    for [l:key, l:value] in items(l:task)
+      echo l:key . ': ' . string(l:value)
+    endfor
+  catch 'task-not-found'
+    call s:LogError('Task [' . a:id . '] not found !')
+  endtry
+endfunction
+
+function! s:LogError(msg)
+  echohl ErrorMsg
+  echo a:msg
+  echohl None
 endfunction
 

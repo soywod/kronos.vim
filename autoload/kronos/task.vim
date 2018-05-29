@@ -4,6 +4,8 @@ function! kronos#task#Create(database, task)
 
   call add(l:tasks, a:task)
   call kronos#database#WriteTasks(a:database, l:tasks)
+
+  return a:task.id
 endfunction
 
 function! kronos#task#Read(database, id)

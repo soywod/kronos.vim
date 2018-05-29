@@ -18,10 +18,12 @@ Then (should get task by id):
 #----------------------------------------------------------------# Create task #
 
 Execute (Create):
-  call kronos#task#Create(g_database, g_task)
+  let id = kronos#task#Create(g_database, g_task)
 
 Then (should insert a task):
+  AssertEqual 1, id
   AssertEqual g_tasks, kronos#database#ReadTasks(g_database)
+  unlet id
 
 #------------------------------------------------------------------# Read task #
 

@@ -5,10 +5,10 @@ let g:kronos_database = get(
 \)
 
 command! -nargs=* KronosAdd
-  \ call kronos#cli#Add(g:kronos_database, <q-args>)
+  \ call kronos#cli#Add(g:kronos_database, localtime(), <q-args>)
 
-" command! -nargs=1 KronosInfo
-"   \ call kronos#cli#Info(g:kronos_database, <args>)
+command! -nargs=1 KronosInfo
+  \ call kronos#cli#Info(g:kronos_database, <args>)
 
 " command! -nargs=1 KronosList
 "   \ call kronos#cli#List(g:kronos_database, <args>)
