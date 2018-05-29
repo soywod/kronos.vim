@@ -5,7 +5,7 @@ function! kronos#database#ReadTasks(database)
   endif
 
   try
-    call execute('source ' . a:database)
+    execute 'source ' . a:database
     return g:kronos_tasks
   finally
     unlet g:kronos_tasks
@@ -14,7 +14,8 @@ endfunction
 
 function! kronos#database#WriteTasks(database, tasks)
   let l:database = shellescape(a:database)
-  let l:cmd = shellescape('let g:kronos_tasks = ' . string(a:tasks))
+  let l:basecmd = 'let g:kronos_tasks = '
+  let l:cmd = shellescape(l:basecmd . string(a:tasks))
 
   call system('echo ' . l:cmd . '>' . l:database)
   return 1

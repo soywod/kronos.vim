@@ -2,11 +2,20 @@ let s:MINS_IN_HOUR = 60
 let s:HOURS_IN_DAY = 24
 let s:DAYS_IN_MONTH = 32
 let s:DAYS_IN_YEAR =  366
+
 let s:SECS_IN_MIN = 60
 let s:SECS_IN_HOUR = s:SECS_IN_MIN * s:MINS_IN_HOUR
 let s:SECS_IN_DAY = s:SECS_IN_HOUR * s:HOURS_IN_DAY
 let s:SECS_IN_MONTH = s:SECS_IN_DAY * s:DAYS_IN_MONTH
 let s:SECS_IN_YEAR = s:SECS_IN_DAY * s:DAYS_IN_YEAR
+
+let s:PARSE_DUE_REGEX =
+  \ '^:\(\d\{0,2}\)\(\d\{0,2}\)\(\d\{2}\)\?:\?\(\d\{0,2}\)\(\d\{0,2}\)$'
+
+function! kronos#datetime#ParseDue(dateref, duestr)
+  let l:matches = matchlist(a:duestr, s:PARSE_DUE_REGEX)
+  return kronos#datetime#ParseDueRecursive(a:dateref, 0, l:matches[1:5])
+endfunction
 
 function! kronos#datetime#ParseDueRecursive(dateref, dateapprox, payload)
   let [l:day, l:month, l:year, l:hour, l:min] = a:payload
@@ -53,17 +62,4 @@ function! kronos#datetime#ParseDueRecursive(dateref, dateapprox, payload)
     \ strftime('%M', l:dateapprox),
   \])
 endfunction
-
-" function! kronos#datetime#ToUTC(dateref)
-"   if exists('s:tzdiff') | return a:dateref + s:tzdiff | endif
-
-"   let l:tzstr = strftime('%z')
-"   let l:tzmatches = matchlist(l:tzstr, '^\([+-]\)\(\d\{2}\)\(\d\{2}\)$')
-"   let l:tzsign = l:tzmatches[1] == '-' ? '-' : ''
-"   let l:tzhour = l:tzmatches[2] * s:SECS_IN_HOUR
-"   let l:tzmin = l:tzmatches[3] * s:SECS_IN_MIN
-"   let s:tzdiff = +(l:tzsign . string(l:tzhour + l:tzmin))
-
-"   return a:dateref - s:tzdiff
-" endfunction
 

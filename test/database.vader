@@ -8,6 +8,7 @@ Execute (WriteTasks):
 Then (should write tasks to database):
   Assert result
   Assert filereadable(g_database)
+  unlet result
 
 #-----------------------------------------------------------------# Read tasks #
 
@@ -19,4 +20,5 @@ Execute (ReadTasks):
 Then (should read tasks from database):
   AssertEqual [], result_before
   AssertEqual g_tasks, result_after
+  unlet result_before result_after
 

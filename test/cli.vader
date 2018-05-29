@@ -16,14 +16,15 @@ Execute (ParseDue (date)):
     \ [':140117',  'throw', '14/01/17'],
   \]
 
-Then (should parse date (date ref: 15/05/18)):
+Then (should parse date (date ref: 15/05/18 00:00 UTC)):
   for [due, expected; comment] in scenarios
     if expected == 'throw'
-      AssertThrow kronos#cli#ParseDue(g_dateref, due)
+      AssertThrow kronos#datetime#ParseDue(g_dateref, due)
     else
-      AssertEqual expected, kronos#cli#ParseDue(g_dateref, due)
+      AssertEqual expected, kronos#datetime#ParseDue(g_dateref, due)
     endif
   endfor
+  unlet scenarios
 
 Execute (ParseDue (time)):
   let scenarios = [
@@ -40,10 +41,11 @@ Execute (ParseDue (time)):
     \ ['::2330', 1526427000, '15/05/18 23:30'],
   \]
 
-Then (should parse time (date ref: 15/05/18 15:15)):
+Then (should parse time (date ref: 15/05/18 15:15 UTC)):
   for [due, expected; comment] in scenarios
-    AssertEqual expected, kronos#cli#ParseDue(1526390100, due)
+    AssertEqual expected, kronos#datetime#ParseDue(1526390100, due)
   endfor
+  unlet scenarios
 
 Execute (ParseDue (date&time)):
   let scenarios = [
@@ -54,14 +56,15 @@ Execute (ParseDue (date&time)):
     \ [':100118:1001',    'throw', '10/01/18 10:01'],
   \]
 
-Then (should parse time (date ref: 15/05/18 15:15)):
+Then (should parse time (date ref: 15/05/18 15:15 UTC)):
   for [due, expected; comment] in scenarios
     if expected == 'throw'
-      AssertThrow kronos#cli#ParseDue(1526390100, due)
+      AssertThrow kronos#datetime#ParseDue(1526390100, due)
     else
-      AssertEqual expected, kronos#cli#ParseDue(1526390100, due)
+      AssertEqual expected, kronos#datetime#ParseDue(1526390100, due)
     endif
   endfor
+  unlet scenarios
 
 #---------------------------------------------------------------------# Create #
 

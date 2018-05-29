@@ -12,4 +12,5 @@ Before:
 
 After:
   call delete(g_database)
+  unlet g_database g_dateref g_task g_tasks
 
