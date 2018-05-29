@@ -1,11 +1,11 @@
 Before:
   let g_database = resolve(expand('<sfile>:h') . '/tasks.vim')
-  let g_dateref = 1526335200 "15/05/2018 00:00
+  let g_dateref = 1526342400 "15/05/2018 00:00 UTC
   let g_task = {
     \ 'id': 1,
     \ 'desc': 'test kronos',
     \ 'tags': ['test', 'vader', 'kronos'],
-    \ 'due': 1527462653
+    \ 'due': g_dateref
   \}
 
   let g_tasks = [g_task]

@@ -1,4 +1,4 @@
-language: vim
+language: node
 
 before_script: |
   sudo add-apt-repository ppa:jonathonf/vim -y
@@ -8,10 +8,9 @@ before_script: |
   git clone https://github.com/soywod/kronos.vim.git
 
 script: |
-  vim -Nu <(cat << VIMRC
+  TZ=UTC vim -Nu <(cat << VIMRC
   filetype off
   set rtp+=vader.vim
-  set rtp+=.
   set rtp+=kronos.vim
   set rtp+=.
   set rtp+=after

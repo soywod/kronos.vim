@@ -1,0 +1,13 @@
+{
+  "name": "kronos.vim",
+  "version": "1.0.0",
+  "description": "A simple task and time manager for vim.",
+  "main": "plugin/kronos.vim",
+  "repository": "git@github.com:soywod/kronos.vim.git",
+  "author": "Clément DOUIN <clement.douin@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "test": "TZ=UTC vim '+Vader! test/*'"
+  }
+}
