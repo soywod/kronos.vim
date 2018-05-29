@@ -8,7 +8,7 @@ let s:SECS_IN_DAY = s:SECS_IN_HOUR * s:HOURS_IN_DAY
 let s:SECS_IN_MONTH = s:SECS_IN_DAY * s:DAYS_IN_MONTH
 let s:SECS_IN_YEAR = s:SECS_IN_DAY * s:DAYS_IN_YEAR
 
-function! kronos#cli#Create(database, args)
+function! kronos#cli#Create(database, dateref, args)
   let l:args = split(a:args, ' ')
   let l:desc = []
   let l:due = v:null
@@ -18,7 +18,7 @@ function! kronos#cli#Create(database, args)
     if l:arg =~ '^+\w'
       call add(l:tags, l:arg[1:])
     elseif l:arg =~ '^:\w*'
-      let l:due = l:arg[1:]
+      let l:due = kronos#cli#ParseDue(a:dateref, l:arg)
     else
       call add(l:desc, l:arg)
     endif

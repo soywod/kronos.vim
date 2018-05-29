@@ -1,6 +1,6 @@
 Before:
   let g_database = resolve(expand('<sfile>:h') . '/tasks.vim')
-
+  let g_dateref = 1526335200 "15/05/2018 00:00
   let g_task = {
     \ 'id': 1,
     \ 'desc': 'test kronos',

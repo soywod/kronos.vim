@@ -19,9 +19,9 @@ Execute (ParseDue (date)):
 Then (should parse date (date ref: 15/05/18)):
   for [due, expected; comment] in scenarios
     if expected == 'throw'
-      AssertThrow kronos#cli#ParseDue(1526335200, due)
+      AssertThrow kronos#cli#ParseDue(g_dateref, due)
     else
-      AssertEqual expected, kronos#cli#ParseDue(1526335200, due)
+      AssertEqual expected, kronos#cli#ParseDue(g_dateref, due)
     endif
   endfor
 
@@ -66,7 +66,7 @@ Then (should parse time (date ref: 15/05/18 15:15)):
 #---------------------------------------------------------------------# Create #
 
 Execute (Create):
-  call kronos#cli#Create(g_database, 'test')
+  call kronos#cli#Create(g_database, g_dateref, 'test')
 
 Then (should create basic task):
   AssertEqual
@@ -74,7 +74,7 @@ Then (should create basic task):
     \ kronos#database#ReadTasks(g_database)
 
 Execute:
-  call kronos#cli#Create(g_database, '+cli test +a +b-c')
+  call kronos#cli#Create(g_database, g_dateref, '+cli test +a +b-c')
 
 Then (should create task with tags):
   AssertEqual
@@ -82,10 +82,10 @@ Then (should create task with tags):
     \ kronos#database#ReadTasks(g_database)
 
 Execute:
-  call kronos#cli#Create(g_database, 'test :0 42')
+  call kronos#cli#Create(g_database, g_dateref, 'test :16 42')
 
 Then (should create task with due):
   AssertEqual
-    \ [{'id': 1, 'desc': 'test 42', 'tags': [], 'due': '0'}],
+    \ [{'id': 1, 'desc': 'test 42', 'tags': [], 'due': 1526421600}],
     \ kronos#database#ReadTasks(g_database)
 
