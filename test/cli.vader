@@ -70,7 +70,7 @@ Execute (Create):
 
 Then (should create basic task):
   AssertEqual
-    \ [{'id': 1, 'desc': 'test', 'tags': [], 'due': v:null}],
+    \ [{'id': 1, 'desc': 'test', 'tags': [], 'due': 0}],
     \ kronos#database#ReadTasks(g_database)
 
 Execute:
@@ -78,7 +78,7 @@ Execute:
 
 Then (should create task with tags):
   AssertEqual
-    \ [{'id': 1, 'desc': 'test', 'tags': ['cli', 'a', 'b-c'], 'due': v:null}],
+    \ [{'id': 1, 'desc': 'test', 'tags': ['cli', 'a', 'b-c'], 'due': 0}],
     \ kronos#database#ReadTasks(g_database)
 
 Execute:

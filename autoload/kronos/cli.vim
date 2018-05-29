@@ -11,7 +11,7 @@ let s:SECS_IN_YEAR = s:SECS_IN_DAY * s:DAYS_IN_YEAR
 function! kronos#cli#Create(database, dateref, args)
   let l:args = split(a:args, ' ')
   let l:desc = []
-  let l:due = v:null
+  let l:due = 0
   let l:tags = []
 
   for l:arg in l:args
@@ -47,7 +47,7 @@ function! kronos#cli#ParseDue(dateref, duestr)
 
   return s:ApproximateDateFromDue(
         \ a:dateref,
-        \ v:null,
+        \ 0,
         \ l:daymatch,
         \ l:monthmatch,
         \ l:yearmatch,

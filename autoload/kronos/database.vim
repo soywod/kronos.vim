@@ -17,6 +17,6 @@ function! kronos#database#WriteTasks(database, tasks)
   let l:cmd = shellescape('let g:kronos_tasks = ' . string(a:tasks))
 
   call system('echo ' . l:cmd . '>' . l:database)
-  return v:true
+  return 1
 endfunction
 

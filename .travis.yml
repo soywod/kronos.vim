@@ -1,6 +1,9 @@
 language: vim
 
 before_script: |
+  sudo add-apt-repository ppa:jonathonf/vim -y
+  sudo apt update
+  sudo apt install vim
   git clone https://github.com/junegunn/vader.vim.git
   git clone https://github.com/soywod/kronos.vim.git
 

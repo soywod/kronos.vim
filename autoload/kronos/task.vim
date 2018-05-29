@@ -24,7 +24,7 @@ function! kronos#task#Update(database, task)
   let l:tasks[l:index] = a:task
   call kronos#database#WriteTasks(a:database, l:tasks)
 
-  return v:true
+  return 1
 endfunction
 
 function! kronos#task#Delete(database, id)
@@ -34,7 +34,7 @@ function! kronos#task#Delete(database, id)
   call remove(l:tasks, l:index)
   call kronos#database#WriteTasks(a:database, l:tasks)
 
-  return v:true
+  return 1
 endfunction
 
 "--------------------------------------------------------------------" Helpers "
