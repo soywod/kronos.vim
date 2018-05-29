@@ -1,4 +1,4 @@
-function! kronos#cli#Create(database, dateref, args)
+function! kronos#cli#Add(database, dateref, args)
   let l:args = split(a:args, ' ')
   let l:desc = []
   let l:due = 0

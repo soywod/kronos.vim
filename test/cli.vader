@@ -66,28 +66,28 @@ Then (should parse time (date ref: 15/05/18 15:15 UTC)):
   endfor
   unlet scenarios
 
-#---------------------------------------------------------------------# Create #
+#------------------------------------------------------------------------# Add #
 
-Execute (Create):
-  call kronos#cli#Create(g_database, g_dateref, 'test')
+Execute (Add):
+  call kronos#cli#Add(g_database, g_dateref, 'test')
 
-Then (should create basic task):
+Then (should add basic new task):
   AssertEqual
     \ [{'id': 1, 'desc': 'test', 'tags': [], 'due': 0}],
     \ kronos#database#ReadTasks(g_database)
 
 Execute:
-  call kronos#cli#Create(g_database, g_dateref, '+cli test +a +b-c')
+  call kronos#cli#Add(g_database, g_dateref, '+cli test +a +b-c')
 
-Then (should create task with tags):
+Then (should add new task with tags):
   AssertEqual
     \ [{'id': 1, 'desc': 'test', 'tags': ['cli', 'a', 'b-c'], 'due': 0}],
     \ kronos#database#ReadTasks(g_database)
 
 Execute:
-  call kronos#cli#Create(g_database, g_dateref, 'test :16 42')
+  call kronos#cli#Add(g_database, g_dateref, 'test :16 42')
 
-Then (should create task with due):
+Then (should add new task with due):
   AssertEqual
     \ [{'id': 1, 'desc': 'test 42', 'tags': [], 'due': 1526428800}],
     \ kronos#database#ReadTasks(g_database)
