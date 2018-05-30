@@ -55,6 +55,15 @@ function! kronos#cli#Update(database, dateref, args)
   echo 'Task [' . l:id . '] updated.'
 endfunction
 
+function! kronos#cli#Delete(database, id)
+  try
+    call kronos#task#Delete(a:database, a:id)
+    echo 'Task [' . a:id . '] deleted.'
+  catch 'task-not-found'
+    call s:LogError('Task [' . a:id . '] not found.')
+  endtry
+endfunction
+
 function! s:ParseArgs(dateref, args)
   let l:desc = []
   let l:tags = []

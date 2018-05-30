@@ -50,7 +50,7 @@ Then (should get all tasks):
 #----------------------------------------------------------------# Update task #
 
 Execute (Update):
-  call kronos#task#Create(g_database, g_task2)
+  call kronos#task#Create(g_database, g_task1)
   let taskupdate = {
     \ 'id': 1,
     \ 'desc': 'test kronos updated',
@@ -58,8 +58,9 @@ Execute (Update):
     \ 'due': 1527462654
   \}
 
+  call kronos#task#Update(g_database, 1, taskupdate)
+
 Then (should update a task):
-  Assert kronos#task#Update(g_database, 1, taskupdate)
   AssertEqual [taskupdate], kronos#database#ReadTasks(g_database)
   unlet taskupdate
 
@@ -67,8 +68,8 @@ Then (should update a task):
 
 Execute (Delete):
   call kronos#task#Create(g_database, g_task1)
+  call kronos#task#Delete(g_database, 1)
 
 Then (should delete a task by id):
-  Assert kronos#task#Delete(g_database, 1)
   AssertEqual [], kronos#database#ReadTasks(g_database)
 
