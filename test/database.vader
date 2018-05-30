@@ -3,22 +3,20 @@ Include: setup.vader
 #----------------------------------------------------------------# Write tasks #
 
 Execute (WriteTasks):
-  let result = kronos#database#WriteTasks(g_database, g_tasks)
+  call kronos#database#WriteTasks(g_database, g_tasks)
 
 Then (should write tasks to database):
-  Assert result
   Assert filereadable(g_database)
-  unlet result
 
 #-----------------------------------------------------------------# Read tasks #
 
 Execute (ReadTasks):
-  let result_before = kronos#database#ReadTasks(g_database)
+  let before = kronos#database#ReadTasks(g_database)
   call kronos#database#WriteTasks(g_database, g_tasks)
-  let result_after = kronos#database#ReadTasks(g_database)
+  let after = kronos#database#ReadTasks(g_database)
 
 Then (should read tasks from database):
-  AssertEqual [], result_before
-  AssertEqual g_tasks, result_after
-  unlet result_before result_after
+  AssertEqual [], before
+  AssertEqual g_tasks, after
+  unlet before after
 

@@ -16,7 +16,7 @@ Execute (ParseDue (date)):
     \ [':140117',  'throw', '14/01/17'],
   \]
 
-Then (should parse date (date ref: 15/05/18 00:00 UTC)):
+Then (should parse date (date ref: 15/05/18 15:15 UTC)):
   for [due, expected; comment] in scenarios
     if expected == 'throw'
       AssertThrow kronos#datetime#ParseDue(g_dateref, due)

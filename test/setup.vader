@@ -1,16 +1,24 @@
 Before:
   let g_database = resolve(expand('<sfile>:h') . '/tasks.vim')
-  let g_dateref = 1526342400 "15/05/2018 00:00 UTC
-  let g_task = {
+  let g_dateref = 1526397300 "15/05/2018 15:15 UTC
+
+  let g_task1 = {
     \ 'id': 1,
-    \ 'desc': 'test kronos',
+    \ 'desc': 'test kronos 1',
     \ 'tags': ['test', 'vader', 'kronos'],
-    \ 'due': g_dateref
+    \ 'due': g_dateref + (60 * 60 * 24)
   \}
 
-  let g_tasks = [g_task]
+  let g_task2 = {
+    \ 'id': 3,
+    \ 'desc': 'test kronos 2',
+    \ 'tags': [],
+    \ 'due': 0
+  \}
+
+  let g_tasks = [g_task1, g_task2]
 
 After:
   call delete(g_database)
-  unlet g_database g_dateref g_task g_tasks
+  unlet g_database g_dateref g_task1 g_task2 g_tasks
 
