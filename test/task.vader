@@ -18,12 +18,16 @@ Then (should get task by id):
 #----------------------------------------------------------------# Create task #
 
 Execute (Create):
-  let id = kronos#task#Create(g_database, g_task)
+  let task1 = {'desc': 'task 1', 'tags': [], 'due': 0}
+  let task2 = {'desc': 'task 2', 'tags': ['test'], 'due': 1}
+  let id1 = kronos#task#Create(g_database, task1)
+  let id2 = kronos#task#Create(g_database, task2)
 
-Then (should insert a task):
-  AssertEqual 1, id
-  AssertEqual g_tasks, kronos#database#ReadTasks(g_database)
-  unlet id
+Then (should insert tasks):
+  AssertEqual 1, id1
+  AssertEqual 2, id2
+  AssertEqual [task1, task2], kronos#database#ReadTasks(g_database)
+  unlet task1 task2 id1 id2
 
 #------------------------------------------------------------------# Read task #
 
@@ -48,7 +52,7 @@ Then (should get all tasks):
 
 Execute (Update):
   call kronos#task#Create(g_database, g_task)
-  let task_updated = {
+  let taskupdate = {
     \ 'id': 1,
     \ 'desc': 'test kronos updated',
     \ 'tags': ['test', 'vader', 'kronos', 'update'],
@@ -56,9 +60,9 @@ Execute (Update):
   \}
 
 Then (should update a task):
-  Assert kronos#task#Update(g_database, task_updated)
-  AssertEqual [task_updated], kronos#database#ReadTasks(g_database)
-  unlet task_updated
+  Assert kronos#task#Update(g_database, 1, taskupdate)
+  AssertEqual [taskupdate], kronos#database#ReadTasks(g_database)
+  unlet taskupdate
 
 #----------------------------------------------------------------# Delete task #
 

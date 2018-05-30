@@ -19,9 +19,9 @@ function! kronos#task#ReadAll(database)
   return kronos#database#ReadTasks(a:database)
 endfunction
 
-function! kronos#task#Update(database, task)
+function! kronos#task#Update(database, id, task)
   let l:tasks = kronos#database#ReadTasks(a:database)
-  let l:index = kronos#task#GetTaskIndexById(l:tasks, a:task.id)
+  let l:index = kronos#task#GetTaskIndexById(l:tasks, a:id)
 
   let l:tasks[l:index] = a:task
   call kronos#database#WriteTasks(a:database, l:tasks)
@@ -42,8 +42,10 @@ endfunction
 "--------------------------------------------------------------------" Helpers "
 
 function! kronos#task#GenerateId(tasks)
-  let l:ids = map(a:tasks, 'v:val.id')
   let l:newid = 1
+  let l:ids = copy(a:tasks)
+
+  call map(l:ids, 'v:val.id')
 
   while index(l:ids, l:newid) != -1
     let l:newid += 1

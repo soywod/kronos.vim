@@ -13,8 +13,8 @@ command! -nargs=1 KronosInfo
 command! KronosList
   \ call kronos#cli#List(g:kronos_database)
 
-" command! -nargs=* KronosUpdate
-"   \ call kronos#cli#Update(g:kronos_database, <q-args>)
+command! -nargs=* KronosUpdate
+  \ call kronos#cli#Update(g:kronos_database, localtime(), <q-args>)
 
 " command! -nargs=1 KronosDelete
 "   \ call kronos#cli#Delete(g:kronos_database, <args>)
