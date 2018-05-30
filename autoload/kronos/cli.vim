@@ -35,6 +35,14 @@ function! kronos#cli#Info(database, id)
   endtry
 endfunction
 
+function! kronos#cli#List(database)
+  let l:tasks = kronos#task#ReadAll(a:database)
+
+  for l:task in l:tasks
+    echo '[' . l:task.id . '] ' . l:task.desc
+  endfor
+endfunction
+
 function! s:LogError(msg)
   echohl ErrorMsg
   echo a:msg

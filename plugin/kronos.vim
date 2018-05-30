@@ -10,8 +10,8 @@ command! -nargs=* KronosAdd
 command! -nargs=1 KronosInfo
   \ call kronos#cli#Info(g:kronos_database, <args>)
 
-" command! -nargs=1 KronosList
-"   \ call kronos#cli#List(g:kronos_database, <args>)
+command! KronosList
+  \ call kronos#cli#List(g:kronos_database)
 
 " command! -nargs=* KronosUpdate
 "   \ call kronos#cli#Update(g:kronos_database, <q-args>)
