@@ -13,7 +13,7 @@ Then (should generate correct id):
 Execute (GetTaskIndexById):
 Then (should get task by id):
   AssertEqual 0, kronos#task#GetTaskIndexById(g_tasks, 1)
-  AssertEqual 1, kronos#task#GetTaskIndexById(g_tasks, 3)
+  AssertEqual 1, kronos#task#GetTaskIndexById(g_tasks, 2)
   AssertThrows kronos#task#GetTaskIndexById(g_tasks, 0)
 
 #----------------------------------------------------------------# Create task #

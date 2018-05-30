@@ -1,11 +1,12 @@
 function! kronos#task#Create(database, task)
   let l:tasks = kronos#database#ReadTasks(a:database)
-  let a:task.id = kronos#task#GenerateId(l:tasks)
+  let l:task = copy(a:task)
+  let l:task.id = kronos#task#GenerateId(l:tasks)
 
-  call add(l:tasks, a:task)
+  call add(l:tasks, l:task)
   call kronos#database#WriteTasks(a:database, l:tasks)
 
-  return a:task.id
+  return l:task.id
 endfunction
 
 function! kronos#task#Read(database, id)
@@ -39,9 +40,7 @@ endfunction
 
 function! kronos#task#GenerateId(tasks)
   let l:newid = 1
-  let l:ids = copy(a:tasks)
-
-  call map(l:ids, 'v:val.id')
+  let l:ids = map(copy(a:tasks), 'v:val.id')
 
   while index(l:ids, l:newid) != -1
     let l:newid += 1

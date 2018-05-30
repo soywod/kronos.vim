@@ -1,5 +1,5 @@
 Before:
-  let g_database = resolve(expand('<sfile>:h') . '/tasks.vim')
+  let g_database = resolve(expand('<sfile>:h') . '/kronos')
   let g_dateref = 1526397300 "15/05/2018 15:15 UTC
 
   let g_task1 = {
@@ -10,7 +10,7 @@ Before:
   \}
 
   let g_task2 = {
-    \ 'id': 3,
+    \ 'id': 2,
     \ 'desc': 'test kronos 2',
     \ 'tags': [],
     \ 'due': 0
@@ -19,6 +19,6 @@ Before:
   let g_tasks = [g_task1, g_task2]
 
 After:
-  call delete(g_database)
+  call kronos#database#Purge(g_database)
   unlet g_database g_dateref g_task1 g_task2 g_tasks
 
