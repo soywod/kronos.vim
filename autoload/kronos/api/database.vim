@@ -1,9 +1,13 @@
-function! kronos#database#Purge(database)
+"----------------------------------------------------------------------# Purge #
+
+function! kronos#api#database#Purge(database)
   if exists('s:cache') | unlet s:cache | endif
   if filereadable(a:database) | call delete(a:database) | endif
 endfunction
 
-function! kronos#database#ReadTasks(database)
+"-----------------------------------------------------------------# Read tasks #
+
+function! kronos#api#database#ReadTasks(database)
   if exists('s:cache') | return s:cache | endif
 
   let s:cache = filereadable(a:database)
@@ -13,7 +17,9 @@ function! kronos#database#ReadTasks(database)
   return copy(s:cache)
 endfunction
 
-function! kronos#database#WriteTasks(database, tasks)
+"----------------------------------------------------------------# Write tasks #
+
+function! kronos#api#database#WriteTasks(database, tasks)
   let s:cache = copy(a:tasks)
   let l:data = copy(a:tasks)
 

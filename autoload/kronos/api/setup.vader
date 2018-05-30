@@ -19,6 +19,6 @@ Before:
   let g_tasks = [g_task1, g_task2]
 
 After:
-  call kronos#database#Purge(g_database)
+  call kronos#api#database#Purge(g_database)
   unlet g_database g_dateref g_task1 g_task2 g_tasks
 

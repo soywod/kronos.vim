@@ -1,5 +1,3 @@
 /doc/tags
-/database/*
-
-!.gitkeep
+/database
 

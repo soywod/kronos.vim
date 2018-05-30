@@ -3,7 +3,7 @@ Include: setup.vader
 #----------------------------------------------------------------# Write tasks #
 
 Execute (WriteTasks):
-  call kronos#database#WriteTasks(g_database, g_tasks)
+  call kronos#api#database#WriteTasks(g_database, g_tasks)
 
 Then (should write tasks to database):
   Assert filereadable(g_database)
@@ -11,9 +11,9 @@ Then (should write tasks to database):
 #-----------------------------------------------------------------# Read tasks #
 
 Execute (ReadTasks):
-  let before = kronos#database#ReadTasks(g_database)
-  call kronos#database#WriteTasks(g_database, g_tasks)
-  let after = kronos#database#ReadTasks(g_database)
+  let before = kronos#api#database#ReadTasks(g_database)
+  call kronos#api#database#WriteTasks(g_database, g_tasks)
+  let after = kronos#api#database#ReadTasks(g_database)
 
 Then (should read tasks from database):
   AssertEqual [], before

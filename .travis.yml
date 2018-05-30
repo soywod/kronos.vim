@@ -13,5 +13,5 @@ script: |
   set rtp+=after
   filetype plugin indent on
   syntax enable
-  VIMRC) -c 'Vader! test/*' > /dev/null
+  VIMRC) -c 'Vader! autoload/kronos/**/*.vader' > /dev/null
 

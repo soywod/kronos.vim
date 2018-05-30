@@ -1,3 +1,5 @@
+"------------------------------------------------------------------# Constants #
+
 let s:MINS_IN_HOUR = 60
 let s:HOURS_IN_DAY = 24
 let s:DAYS_IN_MONTH = 32
@@ -12,12 +14,14 @@ let s:SECS_IN_YEAR = s:SECS_IN_DAY * s:DAYS_IN_YEAR
 let s:PARSE_DUE_REGEX =
   \ '^:\(\d\{0,2}\)\(\d\{0,2}\)\(\d\{2}\)\?:\?\(\d\{0,2}\)\(\d\{0,2}\)$'
 
-function! kronos#datetime#ParseDue(dateref, duestr)
+"------------------------------------------------------------------# Parse due #
+
+function! kronos#tool#datetime#ParseDue(dateref, duestr)
   let l:matches = matchlist(a:duestr, s:PARSE_DUE_REGEX)
-  return kronos#datetime#ParseDueRecursive(a:dateref, 0, l:matches[1:5])
+  return kronos#tool#datetime#ParseDueRecursive(a:dateref, 0, l:matches[1:5])
 endfunction
 
-function! kronos#datetime#ParseDueRecursive(dateref, dateapprox, payload)
+function! kronos#tool#datetime#ParseDueRecursive(dateref, dateapprox, payload)
   let [l:day, l:month, l:year, l:hour, l:min] = a:payload
   let [l:dayref, l:monthref, l:yearref, l:hourref, l:minref] = 
     \ split(strftime('%d/%m/%y/%H/%M', a:dateref), '/')
@@ -54,7 +58,7 @@ function! kronos#datetime#ParseDueRecursive(dateref, dateapprox, payload)
   let l:dateapprox += (l:hour - strftime('%H', l:dateapprox)) * s:SECS_IN_HOUR
   if  l:dateapprox == a:dateapprox | return l:dateapprox | endif
 
-  return kronos#datetime#ParseDueRecursive(a:dateref, l:dateapprox, [
+  return kronos#tool#datetime#ParseDueRecursive(a:dateref, l:dateapprox, [
     \ l:day,
     \ strftime('%m', l:dateapprox),
     \ strftime('%y', l:dateapprox),

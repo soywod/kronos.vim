@@ -1,4 +1,11 @@
-Include: setup.vader
+Before:
+  let g_database = resolve(expand('<sfile>:h') . '/kronos')
+  let g_dateref = 1526397300 "15/05/2018 15:15 UTC
+
+After:
+  call kronos#api#database#Purge(g_database)
+  unlet g_database g_dateref
+  if exists('scenarios') | unlet scenarios | endif
 
 #------------------------------------------------------------------# Parse due #
 
@@ -19,12 +26,11 @@ Execute (ParseDue (date)):
 Then (should parse date (date ref: 15/05/18 15:15 UTC)):
   for [due, expected; comment] in scenarios
     if expected == 'throw'
-      AssertThrow kronos#datetime#ParseDue(g_dateref, due)
+      AssertThrow kronos#tool#datetime#ParseDue(g_dateref, due)
     else
-      AssertEqual expected, kronos#datetime#ParseDue(g_dateref, due)
+      AssertEqual expected, kronos#tool#datetime#ParseDue(g_dateref, due)
     endif
   endfor
-  unlet scenarios
 
 Execute (ParseDue (time)):
   let scenarios = [
@@ -43,9 +49,8 @@ Execute (ParseDue (time)):
 
 Then (should parse time (date ref: 15/05/18 15:15 UTC)):
   for [due, expected; comment] in scenarios
-    AssertEqual expected, kronos#datetime#ParseDue(1526390100, due)
+    AssertEqual expected, kronos#tool#datetime#ParseDue(1526390100, due)
   endfor
-  unlet scenarios
 
 Execute (ParseDue (date&time)):
   let scenarios = [
@@ -59,36 +64,9 @@ Execute (ParseDue (date&time)):
 Then (should parse time (date ref: 15/05/18 15:15 UTC)):
   for [due, expected; comment] in scenarios
     if expected == 'throw'
-      AssertThrow kronos#datetime#ParseDue(1526390100, due)
+      AssertThrow kronos#tool#datetime#ParseDue(1526390100, due)
     else
-      AssertEqual expected, kronos#datetime#ParseDue(1526390100, due)
+      AssertEqual expected, kronos#tool#datetime#ParseDue(1526390100, due)
     endif
   endfor
-  unlet scenarios
-
-#------------------------------------------------------------------------# Add #
-
-Execute (Add):
-  call kronos#cli#Add(g_database, g_dateref, 'test')
-
-Then (should add basic new task):
-  AssertEqual
-    \ [{'id': 1, 'desc': 'test', 'tags': [], 'due': 0}],
-    \ kronos#database#ReadTasks(g_database)
-
-Execute:
-  call kronos#cli#Add(g_database, g_dateref, '+cli test +a +b-c')
-
-Then (should add new task with tags):
-  AssertEqual
-    \ [{'id': 1, 'desc': 'test', 'tags': ['cli', 'a', 'b-c'], 'due': 0}],
-    \ kronos#database#ReadTasks(g_database)
-
-Execute:
-  call kronos#cli#Add(g_database, g_dateref, 'test :16 42')
-
-Then (should add new task with due):
-  AssertEqual
-    \ [{'id': 1, 'desc': 'test 42', 'tags': [], 'due': 1526428800}],
-    \ kronos#database#ReadTasks(g_database)
 
