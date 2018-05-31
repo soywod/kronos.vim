@@ -117,6 +117,30 @@ function! kronos#ui#cli#Stop(database, dateref, id)
   call kronos#api#task#Update(a:database, a:id, l:task)
 endfunction
 
+"-----------------------------------------------------------------------# Done #
+
+function! kronos#ui#cli#Done(database, dateref, id)
+  try
+    let l:task = kronos#api#task#Read(a:database, a:id)
+  catch 'task-not-found'
+    return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+  endtry
+
+  if l:task.done
+    return kronos#tool#logging#Error('Task [' . a:id . '] already done.')
+  endif
+
+  if l:task.active
+    let l:task.worktime += (a:dateref - l:task.active)
+    let l:task.active = 0
+    let l:task.lastactive = a:dateref
+  endif
+
+  let l:task.done = a:dateref
+
+  call kronos#api#task#Update(a:database, a:id, l:task)
+endfunction
+
 "--------------------------------------------------------------------# Helpers #
 
 function! s:ParseArgs(dateref, tags, args)

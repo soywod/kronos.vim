@@ -47,6 +47,17 @@ Before:
     \ 'done': 0,
   \}
 
+  let g_taskdone = {
+    \ 'id': 1,
+    \ 'desc': 'test 42',
+    \ 'tags': ['cli', 'a', 'b-c'],
+    \ 'due': g_dueref,
+    \ 'active': 0,
+    \ 'lastactive': g_dateref + 3600 * 2,
+    \ 'worktime': 3600,
+    \ 'done': g_dateref + 3600 * 2,
+  \}
+
 After:
   call kronos#api#database#Purge(g_database)
   unlet g_database g_dateref g_task g_taskupdate g_taskstart g_taskstop
@@ -86,4 +97,14 @@ Execute:
 
 Then (should stop a task):
   AssertEqual [g_taskstop], kronos#api#database#ReadTasks(g_database)
+
+#-----------------------------------------------------------------------# Done #
+
+Execute:
+  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#ui#cli#Start(g_database, g_dateref + 3600, 1)
+  call kronos#ui#cli#Done(g_database, g_dateref + 3600 * 2, 1)
+
+Then (should stop a task):
+  AssertEqual [g_taskdone], kronos#api#database#ReadTasks(g_database)
 
