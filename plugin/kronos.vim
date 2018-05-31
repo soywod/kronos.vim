@@ -27,6 +27,3 @@ command! -nargs=1 KronosStop
 command! -nargs=1 KronosDone
   \ call kronos#ui#cli#Done(g:kronos_database, localtime(), <args>)
 
-" command! -nargs=1 KronosDelete
-"   \ call kronos#ui#cli#Done(g:kronos_database, <args>)
-
