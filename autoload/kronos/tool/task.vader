@@ -1,24 +1,3 @@
-Before:
-  let g_dateref = 1526397300 "15/05/2018 15:15 UTC
-  let g_task1 = {
-    \ 'id': 1,
-    \ 'desc': 'test kronos 1',
-    \ 'tags': ['test', 'vader', 'kronos'],
-    \ 'due': g_dateref + (60 * 60 * 24)
-  \}
-
-  let g_task2 = {
-    \ 'id': 2,
-    \ 'desc': 'test kronos 2',
-    \ 'tags': [],
-    \ 'due': 0
-  \}
-
-  let g_tasks = [g_task1, g_task2]
-
-After:
-  unlet g_dateref g_task1 g_task2 g_tasks
-
 #----------------------------------------------------------------# Generate ID #
 
 Execute (GenerateId):
@@ -30,8 +9,11 @@ Then (should generate correct id):
 #-------------------------------------------------------# Get task index by ID #
 
 Execute (GetTaskIndexById):
+  let tasks = [{'id': 1}, {'id': 2}]
+
 Then (should get task by id):
-  AssertEqual 0, kronos#tool#task#GetTaskIndexById(g_tasks, 1)
-  AssertEqual 1, kronos#tool#task#GetTaskIndexById(g_tasks, 2)
-  AssertThrows kronos#tool#task#GetTaskIndexById(g_tasks, 0)
+  AssertEqual 0, kronos#tool#task#GetTaskIndexById(tasks, 1)
+  AssertEqual 1, kronos#tool#task#GetTaskIndexById(tasks, 2)
+  AssertThrows kronos#tool#task#GetTaskIndexById(tasks, 0)
+  unlet tasks
 

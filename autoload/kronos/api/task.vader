@@ -39,7 +39,10 @@ Execute (Update):
     \ 'id': 1,
     \ 'desc': 'test kronos updated',
     \ 'tags': ['test', 'vader', 'kronos', 'update'],
-    \ 'due': 1527462654
+    \ 'due': 1527462654,
+    \ 'active': 0,
+    \ 'lastactive': 0,
+    \ 'worktime': 0,
   \}
 
   call kronos#api#task#Update(g_database, 1, taskupdate)
