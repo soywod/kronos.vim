@@ -31,6 +31,19 @@ function! kronos#ui#common#Update(database, dateref, args)
   return l:id
 endfunction
 
+"---------------------------------------------------------------------# Delete #
+
+function! kronos#ui#common#Delete(database, id)
+  let l:choice =
+    \input('Do you really want to delete the task [' . a:id . '] (y/N) ? ')
+
+  if l:choice !~? '^y'
+    throw 'operation-canceled'
+  endif
+
+  call kronos#api#task#Delete(a:database, a:id)
+endfunction
+
 "--------------------------------------------------------------------# Helpers #
 
 function! s:ParseArgs(dateref, tags, args)

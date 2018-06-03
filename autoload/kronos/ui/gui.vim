@@ -1,16 +1,33 @@
 "------------------------------------------------------------------------# Add #
 
 function! kronos#ui#gui#Add(database, dateref)
-  let l:args = input('New task string: ')
-  let l:id = kronos#ui#common#Add(a:database, a:dateref, l:args)
+  try
+    let l:args = input('New task string: ')
+    let l:id = kronos#ui#common#Add(a:database, a:dateref, l:args)
+  catch
+    return kronos#tool#logging#Error('Impossible to add task.')
+  endtry
 
-  redraw
-  echon 'Task '
-  echohl Identifier
-  echon '[' . l:id . ']'
-  echohl None
-  echon ' added.'
+  call kronos#tool#logging#Info('Task % added.', l:id)
+  call kronos#ui#gui#Open(a:database)
+endfunction
 
+"---------------------------------------------------------------------# Delete #
+
+function! kronos#ui#gui#Delete(database)
+  try
+    let l:idwidth = kronos#GetConfig().gui.width.id
+    let l:id = +getline('.')[:l:idwidth]
+    call kronos#ui#common#Delete(a:database, l:id)
+  catch 'task-not-found'
+    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+  catch 'operation-canceled'
+    return kronos#tool#logging#Error('Operation canceled.')
+  catch
+    return kronos#tool#logging#Error('Impossible to delete task [' . l:id . '].')
+  endtry
+
+  call kronos#tool#logging#Info('Task % deleted.', l:id)
   call kronos#ui#gui#Open(a:database)
 endfunction
 

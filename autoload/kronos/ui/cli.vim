@@ -47,20 +47,15 @@ endfunction
 "---------------------------------------------------------------------# Delete #
 
 function! kronos#ui#cli#Delete(database, id)
-  let l:choice =
-    \ input('Do you really want to delete the task [' . a:id . '] ? (y/N)')
-
-  if l:choice !~? '^y' | return | endif
-
   try
-    call kronos#api#task#Delete(a:database, a:id)
-    redraw
-    echo 'Task [' . a:id . '] deleted.'
+    call kronos#ui#common#Delete(a:database, a:id)
+    call kronos#tool#logging#Info('Task % deleted.', a:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+    call kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+  catch
+    call kronos#tool#logging#Error('Impossible to delete task [' . a:id . '].')
   endtry
 endfunction
-
 
 "----------------------------------------------------------------------# Start #
 
