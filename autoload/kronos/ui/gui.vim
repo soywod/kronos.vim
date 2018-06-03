@@ -17,17 +17,13 @@ function! kronos#ui#gui#Start(database)
   call map(l:header, function('kronos#ui#gui#FormatHeaderLine'))
   call map(l:tasks, function('kronos#ui#gui#FormatTaskLine'))
 
+  silent! bdelete Kronos
   silent! new Kronos
-  let s:buffer = bufnr('%')
 
   call append(0, l:header + l:tasks)
-  normal! ddggj
+  normal! dd2G
 
-  setlocal buftype=nofile
-  setlocal cursorline
-  setlocal nomodifiable
-  setlocal nowrap
-  setlocal startofline
+  setlocal filetype=kronos
 endfunction
 
 function! kronos#ui#gui#FormatHeaderLine(_, task)
@@ -53,12 +49,11 @@ function! s:FormatTaskProp(prop, maxlen)
 endfunction
 
 function! s:FormatTaskLine(task)
-  let l:idstr = s:FormatTaskProp(a:task.id, s:ID_LEN)
-  let l:descstr = s:FormatTaskProp(a:task.desc, s:DESC_LEN)
-  let l:tagsstr = s:FormatTaskProp(a:task.tags, s:TAGS_LEN)
-  let l:duestr = s:FormatTaskProp(a:task.due, s:DUE_LEN)
-  let l:activestr = s:FormatTaskProp(a:task.active, s:ACTIVE_LEN)
+  let l:config = kronos#GetConfig().gui
 
-  return l:idstr . l:descstr . l:tagsstr . l:duestr . l:activestr
+  return join(map(
+    \ l:config.order,
+    \ 's:FormatTaskProp(a:task[v:val], l:config.width[v:val])',
+  \), '')
 endfunction
 
