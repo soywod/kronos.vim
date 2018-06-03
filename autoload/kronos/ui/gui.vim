@@ -1,59 +1,70 @@
-let s:ID_LEN = 5
-let s:DESC_LEN = 30
-let s:TAGS_LEN = 19
-let s:ACTIVE_LEN = 13
-let s:DUE_LEN = 13
+"------------------------------------------------------------------------# Add #
 
-function! kronos#ui#gui#Start(database)
-  let l:tasks = kronos#api#task#ReadAll(a:database)
-  let l:header = [{
-    \ 'id': 'ID',
-    \ 'desc': 'DESC',
-    \ 'tags': 'TAGS',
-    \ 'due': 'DUE',
-    \ 'active': 'ACTIVE',
-  \}]
+function! kronos#ui#gui#Add(database, dateref)
+  let l:args = input('New task string: ')
+  let l:id = kronos#ui#common#Add(a:database, a:dateref, l:args)
 
-  call map(l:header, function('kronos#ui#gui#FormatHeaderLine'))
-  call map(l:tasks, function('kronos#ui#gui#FormatTaskLine'))
+  redraw
+  echon 'Task '
+  echohl Identifier
+  echon '[' . l:id . ']'
+  echohl None
+  echon ' added.'
+
+  call kronos#ui#gui#Open(a:database)
+endfunction
+
+"-----------------------------------------------------------------------# Open #
+
+function! kronos#ui#gui#Open(database)
+  let l:headers = [copy(kronos#GetConfig().gui.label)]
+  let l:tasks = copy(kronos#api#task#ReadAll(a:database))
+
+  call map(l:headers, function('s:HeaderToString'))
+  call map(l:tasks, function('s:TaskToString'))
 
   silent! bdelete Kronos
   silent! new Kronos
 
-  call append(0, l:header + l:tasks)
+  call append(0, l:headers + l:tasks)
   normal! dd2G
 
   setlocal filetype=kronos
 endfunction
 
-function! kronos#ui#gui#FormatHeaderLine(_, task)
-  return s:FormatTaskLine(a:task)
+"-------------------------------------------------------------------# ToString #
+
+function! kronos#ui#gui#ToString(task)
+  let l:config = copy(kronos#GetConfig().gui)
+
+  return join(map(
+    \l:config.order,
+    \'s:TaskPropToString(a:task[v:val], l:config.width[v:val])',
+  \), '')
 endfunction
 
-function! kronos#ui#gui#FormatTaskLine(_, task)
+"--------------------------------------------------------------------# Helpers #
+
+function! s:HeaderToString(_, header)
+  return kronos#ui#gui#ToString(a:header)
+endfunction
+
+function! s:TaskToString(_, task)
   let l:task = copy(a:task)
+
   let l:task.id = string(l:task.id)
   let l:task.desc = l:task.desc
   let l:task.tags = join(l:task.tags, ' ')
-  let l:task.due = l:task.due
-  let l:task.active = l:task.active
+  let l:task.due = l:task.due ? l:task.due : ''
+  let l:task.active = l:task.active ? l:task.active : ''
 
-  return s:FormatTaskLine(l:task)
+  return kronos#ui#gui#ToString(l:task)
 endfunction
 
-function! s:FormatTaskProp(prop, maxlen)
+function! s:TaskPropToString(prop, maxlen)
   let l:maxlen = a:maxlen - 2
   let l:proplen = strdisplaywidth(a:prop[:l:maxlen])
 
   return a:prop[:l:maxlen] . repeat(' ', a:maxlen - l:proplen)
-endfunction
-
-function! s:FormatTaskLine(task)
-  let l:config = kronos#GetConfig().gui
-
-  return join(map(
-    \ l:config.order,
-    \ 's:FormatTaskProp(a:task[v:val], l:config.width[v:val])',
-  \), '')
 endfunction
 

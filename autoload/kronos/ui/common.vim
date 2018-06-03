@@ -1,0 +1,66 @@
+"------------------------------------------------------------------------# Add #
+
+function! kronos#ui#common#Add(database, dateref, args)
+  let l:args = split(a:args, ' ')
+  let [l:desc, l:tags, l:due] = s:ParseArgs(a:dateref, [], l:args)
+
+  return kronos#api#task#Create(a:database, {
+    \ 'desc': l:desc,
+    \ 'tags': l:tags,
+    \ 'due': l:due,
+    \ 'active': 0,
+    \ 'lastactive': 0,
+    \ 'worktime': 0,
+    \ 'done': 0,
+  \})
+endfunction
+
+"---------------------------------------------------------------------# Update #
+
+function! kronos#ui#common#Update(database, dateref, args)
+  let [l:id; l:args] = split(a:args, ' ')
+  let l:task = kronos#api#task#Read(a:database, l:id)
+  let [l:desc, l:tags, l:due] = s:ParseArgs(a:dateref, l:task.tags, l:args)
+
+  if l:task.desc != l:desc | let l:task.desc = l:desc | endif
+  if l:task.tags != l:tags | let l:task.tags = l:tags | endif
+  if l:task.due != l:due | let l:task.due = l:due | endif
+
+  call kronos#api#task#Update(a:database, l:id, l:task)
+
+  return l:id
+endfunction
+
+"--------------------------------------------------------------------# Helpers #
+
+function! s:ParseArgs(dateref, tags, args)
+  let l:desc = []
+  let l:due = 0
+  let l:tags = copy(a:tags)
+  let l:newtags = []
+  let l:oldtags = []
+
+  for l:arg in a:args
+    if l:arg =~ '^+\w'
+      call add(l:newtags, l:arg[1:])
+    elseif l:arg =~ '^-\w'
+      call add(l:oldtags, l:arg[1:])
+    elseif l:arg =~ '^:\w*'
+      let l:due = kronos#tool#datetime#ParseDue(a:dateref, l:arg)
+    else
+      call add(l:desc, l:arg)
+    endif
+  endfor
+
+  for l:tag in l:newtags
+    if index(l:tags, l:tag) == -1 | call add(l:tags, l:tag) | endif
+  endfor
+
+  for l:tag in l:oldtags
+    let l:index = index(l:tags, l:tag)
+    if l:index != -1 | call remove(l:tags, l:index) | endif
+  endfor
+
+  return [join(l:desc, ' '), l:tags, l:due]
+endfunction
+
