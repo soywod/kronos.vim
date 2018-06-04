@@ -11,16 +11,16 @@ function! kronos#api#database#ReadTasks(database)
   if exists('s:cache') | return s:cache | endif
 
   let s:cache = filereadable(a:database)
-    \ ? map(readfile(a:database), 'eval(v:val)')
-    \ : []
+    \? map(readfile(a:database), 'eval(v:val)')
+    \: []
 
-  return copy(s:cache)
+  return s:cache
 endfunction
 
 "----------------------------------------------------------------# Write tasks #
 
 function! kronos#api#database#WriteTasks(database, tasks)
-  let s:cache = copy(a:tasks)
+  let s:cache = a:tasks
   let l:data = copy(a:tasks)
 
   call map(l:data, 'string(v:val)')
