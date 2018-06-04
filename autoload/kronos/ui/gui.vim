@@ -53,7 +53,7 @@ function! kronos#ui#gui#Open(database)
   call map(l:tasks, function('s:TaskToString'))
 
   silent! bdelete Kronos
-  silent! new Kronos
+  silent! edit Kronos
 
   call append(0, l:headers + l:tasks)
   normal! dd2G
