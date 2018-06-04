@@ -9,9 +9,9 @@ function! s:SetSyntax()
 
   for l:colname in l:config.order
     let l:end = l:start + l:config.width[l:colname] - 1
-    let l:region = 'Kronos' . toupper(l:colname[0]) . l:colname[1:]
+    let l:region = 'region Kronos' . toupper(l:colname[0]) . l:colname[1:]
 
-    execute 'syntax region '.l:region.' start="\%'.l:start.'c" end="\%'.l:end.'c"'
+    execute 'syntax '.l:region.' start=/\%'.l:start.'c/ end=/\%'.l:end.'c/'
     let l:start = l:end + 1
   endfor
 
