@@ -25,6 +25,7 @@ call s:SetSyntax()
 
 highlight default link KronosInfoActive       String
 highlight default link KronosInfoDesc         Comment
+highlight default link KronosInfoDone         Structure
 highlight default link KronosInfoDue          String
 highlight default link KronosInfoId           Identifier
 highlight default link KronosInfoKey          Comment

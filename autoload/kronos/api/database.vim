@@ -20,8 +20,10 @@ endfunction
 "----------------------------------------------------------------# Write tasks #
 
 function! kronos#api#database#WriteTasks(database, tasks)
-  let s:cache = a:tasks
-  let l:data = copy(a:tasks)
+  let l:tasksundone = filter(copy(a:tasks), '! v:val.done')
+  let l:tasksdone   = filter(copy(a:tasks), 'v:val.done')
+  let s:cache       = l:tasksundone + l:tasksdone
+  let l:data        = copy(s:cache)
 
   call map(l:data, 'string(v:val)')
   call writefile(l:data, a:database, 's')

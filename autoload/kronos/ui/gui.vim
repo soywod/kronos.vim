@@ -1,7 +1,7 @@
 let s:CONST = {
   \'INFO': {
     \'COLUMN': ['key', 'value'],
-    \'KEY': ['id', 'desc', 'tags', 'active', 'lastactive', 'due', 'worktime'],
+    \'KEY': ['id', 'desc', 'tags', 'active', 'lastactive', 'due', 'worktime', 'done'],
     \'WIDTH': {
       \'key'  : 15,
       \'value': 65,
@@ -10,6 +10,7 @@ let s:CONST = {
   \'LABEL': {
     \'active'    : 'ACTIVE',
     \'desc'      : 'DESC',
+    \'done'      : 'DONE',
     \'due'       : 'DUE',
     \'id'        : 'ID',
     \'key'       : 'KEY',
@@ -196,8 +197,9 @@ function! kronos#ui#gui#ShowInfo(id)
   let l:headers = [filter(copy(s:CONST.LABEL), 'index(l:columns, v:key) + 1')]
   let l:headers = map(copy(l:headers), function('s:PrintInfoHeader'))
 
-  let l:task = kronos#api#task#Read(g:kronos_database, a:id)
-  let l:task = kronos#ui#gui#PreparePrintTask(l:task)
+  let l:task    = kronos#api#task#Read(g:kronos_database, a:id)
+  let l:task    = kronos#ui#gui#PreparePrintTask(l:task)
+  let l:task.id = a:id
 
   let l:keys = map(
     \copy(l:keys),
@@ -230,11 +232,12 @@ endfunction
 function! kronos#ui#gui#PreparePrintTask(task)
   let l:task = copy(a:task)
 
-  let l:task.id = l:task.done ? '-' : l:task.id
-  let l:task.tags = join(l:task.tags, ' ')
-  let l:task.due = l:task.due ? l:task.due : ''
   let l:task.active = l:task.active ? l:task.active : ''
+  let l:task.done = l:task.done ? l:task.done : ''
+  let l:task.due = l:task.due ? l:task.due : ''
+  let l:task.id = l:task.done ? '-' : l:task.id
   let l:task.lastactive = l:task.lastactive ? l:task.lastactive : ''
+  let l:task.tags = join(l:task.tags, ' ')
   let l:task.worktime = l:task.worktime ? l:task.worktime : ''
 
   return l:task
