@@ -230,6 +230,7 @@ endfunction
 function! kronos#ui#gui#PreparePrintTask(task)
   let l:task = copy(a:task)
 
+  let l:task.id = l:task.done ? '-' : l:task.id
   let l:task.tags = join(l:task.tags, ' ')
   let l:task.due = l:task.due ? l:task.due : ''
   let l:task.active = l:task.active ? l:task.active : ''

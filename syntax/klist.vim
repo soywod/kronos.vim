@@ -18,6 +18,7 @@ function! s:SetSyntax()
   endfor
 
   syntax match KronosSeparator /|/
+  syntax match KronosDone /^-.*$/ contains=KronosSeparator
   syntax match KronosHead /.*\%1l/ contains=KronosSeparator
 endfunction
 
@@ -25,6 +26,7 @@ call s:SetSyntax()
 
 highlight default link KronosActive     String
 highlight default link KronosDesc       Comment
+highlight default link KronosDone       VertSplit
 highlight default link KronosDue        String
 highlight default link KronosId         Identifier
 highlight default link KronosSeparator  VertSplit
