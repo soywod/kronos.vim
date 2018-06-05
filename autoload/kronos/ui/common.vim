@@ -52,6 +52,30 @@ function! kronos#ui#common#Delete(database, id)
   call kronos#api#task#Delete(a:database, a:id)
 endfunction
 
+"----------------------------------------------------------------------# Start #
+
+function! kronos#ui#common#Start(database, dateref, id)
+  let l:task = kronos#api#task#Read(a:database, a:id)
+
+  if  l:task.active | throw 'task-already-active' | endif
+  let l:task.active = a:dateref
+
+  call kronos#api#task#Update(a:database, a:id, l:task)
+endfunction
+
+"-----------------------------------------------------------------------# Stop #
+
+function! kronos#ui#common#Stop(database, dateref, id)
+  let l:task = kronos#api#task#Read(a:database, a:id)
+
+  if  ! l:task.active | throw 'task-already-stopped' | endif
+  let l:task.worktime += (a:dateref - l:task.active)
+  let l:task.active = 0
+  let l:task.lastactive = a:dateref
+
+  call kronos#api#task#Update(a:database, a:id, l:task)
+endfunction
+
 "--------------------------------------------------------------------# Helpers #
 
 function! s:ParseArgs(dateref, tags, args)

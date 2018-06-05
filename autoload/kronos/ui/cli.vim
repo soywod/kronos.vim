@@ -61,38 +61,24 @@ endfunction
 
 function! kronos#ui#cli#Start(database, dateref, id)
   try
-    let l:task = kronos#api#task#Read(a:database, a:id)
+    call kronos#ui#common#Start(a:database, a:dateref, a:id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
-  endtry
-
-  if l:task.active
+  catch 'task-already-active'
     return kronos#tool#logging#Error('Task [' . a:id . '] already active.')
-  endif
-
-  let l:task.active = a:dateref
-
-  call kronos#api#task#Update(a:database, a:id, l:task)
+  endtry
 endfunction
 
 "-----------------------------------------------------------------------# Stop #
 
 function! kronos#ui#cli#Stop(database, dateref, id)
   try
-    let l:task = kronos#api#task#Read(a:database, a:id)
+    call kronos#ui#common#Stop(a:database, a:dateref, a:id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
-  endtry
-
-  if ! l:task.active
+  catch 'task-already-stopped'
     return kronos#tool#logging#Error('Task [' . a:id . '] already stopped.')
-  endif
-
-  let l:task.worktime += (a:dateref - l:task.active)
-  let l:task.active = 0
-  let l:task.lastactive = a:dateref
-
-  call kronos#api#task#Update(a:database, a:id, l:task)
+  endtry
 endfunction
 
 "-----------------------------------------------------------------------# Done #

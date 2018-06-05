@@ -94,6 +94,55 @@ function! kronos#ui#gui#Delete()
   call kronos#ui#gui#ShowList()
 endfunction
 
+"---------------------------------------------------------------------# Toggle #
+
+function! kronos#ui#gui#Toggle()
+  try
+    let l:id   = kronos#ui#gui#GetCurrentLineId()
+    let l:task = kronos#api#task#Read(g:kronos_database, l:id)
+  catch 'task-not-found'
+    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+  endtry
+
+  if l:task.active
+    call kronos#ui#gui#Stop()
+  else
+    call kronos#ui#gui#Start()
+  endif
+endfunction
+
+"----------------------------------------------------------------------# Start #
+
+function! kronos#ui#gui#Start()
+  try
+    let l:id = kronos#ui#gui#GetCurrentLineId()
+    call kronos#ui#common#Start(g:kronos_database, localtime(), l:id)
+  catch 'task-not-found'
+    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+  catch 'task-already-active'
+    return kronos#tool#logging#Error('Task [' . l:id . '] already active.')
+  endtry
+
+  call kronos#tool#logging#Info('Task % started.', l:id)
+  call kronos#ui#gui#ShowList()
+endfunction
+
+"-----------------------------------------------------------------------# Stop #
+
+function! kronos#ui#gui#Stop()
+  try
+    let l:id = kronos#ui#gui#GetCurrentLineId()
+    call kronos#ui#common#Stop(g:kronos_database, localtime(), l:id)
+  catch 'task-not-found'
+    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+  catch 'task-already-stopped'
+    return kronos#tool#logging#Error('Task [' . l:id . '] already stopped.')
+  endtry
+
+  call kronos#tool#logging#Info('Task % stopped.', l:id)
+  call kronos#ui#gui#ShowList()
+endfunction
+
 "-----------------------------------------------------------------------# Open #
 
 function! kronos#ui#gui#ShowList()
