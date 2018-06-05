@@ -15,7 +15,7 @@ endfunction
 
 function! kronos#api#task#Read(database, id)
   let l:tasks = kronos#api#database#ReadTasks(a:database)
-  let l:index = kronos#tool#task#GetTaskIndexById(l:tasks, a:id)
+  let l:index = kronos#tool#task#GetIndexById(l:tasks, a:id)
 
   return copy(l:tasks[l:index])
 endfunction
@@ -30,7 +30,7 @@ endfunction
 
 function! kronos#api#task#Update(database, id, task)
   let l:tasks = kronos#api#database#ReadTasks(a:database)
-  let l:index = kronos#tool#task#GetTaskIndexById(l:tasks, a:id)
+  let l:index = kronos#tool#task#GetIndexById(l:tasks, a:id)
 
   let l:tasks[l:index] = copy(a:task)
   call kronos#api#database#WriteTasks(a:database, l:tasks)
@@ -40,7 +40,7 @@ endfunction
 
 function! kronos#api#task#Delete(database, id)
   let l:tasks = kronos#api#database#ReadTasks(a:database)
-  let l:index = kronos#tool#task#GetTaskIndexById(l:tasks, a:id)
+  let l:index = kronos#tool#task#GetIndexById(l:tasks, a:id)
 
   call remove(l:tasks, l:index)
   call kronos#api#database#WriteTasks(a:database, l:tasks)

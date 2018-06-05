@@ -39,7 +39,7 @@ endfunction
 function! kronos#ui#gui#Add()
   try
     let l:args = input('New task string: ')
-    let l:id = kronos#ui#common#Add(g:kronos_database, localtime(), l:args)
+    let l:id   = kronos#ui#common#Add(g:kronos_database, localtime(), l:args)
   catch
     return kronos#tool#logging#Error('Impossible to add task.')
   endtry
@@ -52,7 +52,7 @@ endfunction
 
 function! kronos#ui#gui#Update()
   try
-    let l:id = kronos#ui#gui#GetCurrentLineId()
+    let l:id   = s:GetFocusedTaskId()
     let l:args = l:id . ' ' . input('Update task string: ')
     call kronos#ui#common#Update(g:kronos_database, localtime(), l:args)
   catch
@@ -67,10 +67,10 @@ endfunction
 
 function! kronos#ui#gui#Info()
   try
-    let l:id = kronos#ui#gui#GetCurrentLineId()
+    let l:id = s:GetFocusedTaskId()
     call kronos#ui#gui#ShowInfo(l:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
   catch
     return kronos#tool#logging#Error('Impossible to show task info.')
   endtry
@@ -80,14 +80,14 @@ endfunction
 
 function! kronos#ui#gui#Delete()
   try
-    let l:id = kronos#ui#gui#GetCurrentLineId()
+    let l:id = s:GetFocusedTaskId()
     call kronos#ui#common#Delete(g:kronos_database, l:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
   catch 'operation-canceled'
     return kronos#tool#logging#Error('Operation canceled.')
   catch
-    return kronos#tool#logging#Error('Impossible to delete task [' . l:id . '].')
+    return kronos#tool#logging#Error('Impossible to delete task.')
   endtry
 
   call kronos#tool#logging#Info('Task % deleted.', l:id)
@@ -98,10 +98,10 @@ endfunction
 
 function! kronos#ui#gui#Toggle()
   try
-    let l:id   = kronos#ui#gui#GetCurrentLineId()
+    let l:id   = s:GetFocusedTaskId()
     let l:task = kronos#api#task#Read(g:kronos_database, l:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
   endtry
 
   if l:task.active
@@ -115,12 +115,12 @@ endfunction
 
 function! kronos#ui#gui#Start()
   try
-    let l:id = kronos#ui#gui#GetCurrentLineId()
+    let l:id = s:GetFocusedTaskId()
     call kronos#ui#common#Start(g:kronos_database, localtime(), l:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
   catch 'task-already-active'
-    return kronos#tool#logging#Error('Task [' . l:id . '] already active.')
+    return kronos#tool#logging#Error('Task already active.')
   endtry
 
   call kronos#tool#logging#Info('Task % started.', l:id)
@@ -131,12 +131,12 @@ endfunction
 
 function! kronos#ui#gui#Stop()
   try
-    let l:id = kronos#ui#gui#GetCurrentLineId()
+    let l:id = s:GetFocusedTaskId()
     call kronos#ui#common#Stop(g:kronos_database, localtime(), l:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
   catch 'task-already-stopped'
-    return kronos#tool#logging#Error('Task [' . l:id . '] already stopped.')
+    return kronos#tool#logging#Error('Task already stopped.')
   endtry
 
   call kronos#tool#logging#Info('Task % stopped.', l:id)
@@ -221,12 +221,6 @@ function! kronos#ui#gui#PreparePrintTask(task)
   return l:task
 endfunction
 
-" TODO ADD TESTS
-function! kronos#ui#gui#GetCurrentLineId()
-  let l:idwidth = s:CONST.LIST.WIDTH.id
-  return +getline('.')[:l:idwidth]
-endfunction
-
 "--------------------------------------------------------------------# Helpers #
 
 function! s:PrintListHeader(_, row)
@@ -252,5 +246,13 @@ function! s:PrintProp(prop, maxlen)
   let l:proplen = strdisplaywidth(a:prop[:l:maxlen]) + 1
 
   return a:prop[:l:maxlen] . repeat(' ', a:maxlen - l:proplen) . '|'
+endfunction
+
+function! s:GetFocusedTaskId()
+  let l:tasks = kronos#api#task#ReadAll(g:kronos_database)
+  let l:index = line('.') - 2
+  if  l:index == -1 | throw 'task-not-found' | endif
+
+  return get(l:tasks, l:index).id
 endfunction
 

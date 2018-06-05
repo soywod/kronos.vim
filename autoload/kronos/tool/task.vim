@@ -13,7 +13,7 @@ endfunction
 
 "-------------------------------------------------------# Get task index by ID #
 
-function! kronos#tool#task#GetTaskIndexById(tasks, id)
+function! kronos#tool#task#GetIndexById(tasks, id)
   let l:index = 0
 
   for l:task in a:tasks
