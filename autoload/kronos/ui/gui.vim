@@ -82,17 +82,23 @@ endfunction
 function! kronos#ui#gui#ShowList(database)
   let l:columns = s:CONST.LIST.COLUMN
   let l:headers = [filter(copy(s:CONST.LABEL), 'index(l:columns, v:key) + 1')]
+  let l:prevpos = getpos('.')
   let l:tasks   = kronos#api#task#ReadAll(a:database)
 
   let l:headers = map(copy(l:headers), function('s:PrintListHeader'))
   let l:tasks   = map(copy(l:tasks), function('s:PrintListTask'))
 
-  silent! bdelete Kronos
+  redir => l:buflist | silent! ls | redir END
   silent! edit Kronos
 
-  call append(0, l:headers + l:tasks)
-  normal! dd2G
+  if match(l:buflist, '"Kronos"') + 1
+    setlocal modifiable
+    execute '0,$d'
+  endif
 
+  call append(0, l:headers + l:tasks)
+  execute '$d'
+  call setpos('.', l:prevpos)
   setlocal filetype=klist
 endfunction
 
@@ -118,7 +124,7 @@ function! kronos#ui#gui#ShowInfo(database, id)
   silent! botright new KronosInfo
 
   call append(0, l:headers + l:keys)
-  normal! dd1G
+  normal! ddgg
 
   setlocal filetype=kinfo
 endfunction
