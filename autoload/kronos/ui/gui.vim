@@ -36,25 +36,41 @@ endfunction
 
 "------------------------------------------------------------------------# Add #
 
-function! kronos#ui#gui#Add(database, dateref)
+function! kronos#ui#gui#Add()
   try
     let l:args = input('New task string: ')
-    let l:id = kronos#ui#common#Add(a:database, a:dateref, l:args)
+    let l:id = kronos#ui#common#Add(g:kronos_database, localtime(), l:args)
   catch
     return kronos#tool#logging#Error('Impossible to add task.')
   endtry
 
   call kronos#tool#logging#Info('Task % added.', l:id)
-  call kronos#ui#gui#ShowList(a:database)
+  call kronos#ui#gui#ShowList()
+endfunction
+
+"---------------------------------------------------------------------# Update #
+
+function! kronos#ui#gui#Update()
+  try
+    let l:id = kronos#ui#gui#GetCurrentLineId()
+    let l:args = l:id . ' ' . input('Update task string: ')
+    call kronos#ui#common#Update(g:kronos_database, localtime(), l:args)
+  catch
+    return kronos#tool#logging#Error('Impossible to update task.')
+  endtry
+
+  call kronos#tool#logging#Info('Task % updated.', l:id)
+  call kronos#ui#gui#ShowList()
 endfunction
 
 "-----------------------------------------------------------------------# Info #
 
-function! kronos#ui#gui#Info(database, id)
+function! kronos#ui#gui#Info()
   try
-    call kronos#ui#gui#ShowInfo(a:database, a:id)
+    let l:id = kronos#ui#gui#GetCurrentLineId()
+    call kronos#ui#gui#ShowInfo(l:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
   catch
     return kronos#tool#logging#Error('Impossible to show task info.')
   endtry
@@ -62,28 +78,29 @@ endfunction
 
 "---------------------------------------------------------------------# Delete #
 
-function! kronos#ui#gui#Delete(database, id)
+function! kronos#ui#gui#Delete()
   try
-    call kronos#ui#common#Delete(a:database, a:id)
+    let l:id = kronos#ui#gui#GetCurrentLineId()
+    call kronos#ui#common#Delete(g:kronos_database, l:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+    return kronos#tool#logging#Error('Task [' . l:id . '] not found.')
   catch 'operation-canceled'
     return kronos#tool#logging#Error('Operation canceled.')
   catch
-    return kronos#tool#logging#Error('Impossible to delete task [' . a:id . '].')
+    return kronos#tool#logging#Error('Impossible to delete task [' . l:id . '].')
   endtry
 
-  call kronos#tool#logging#Info('Task % deleted.', a:id)
-  call kronos#ui#gui#ShowList(a:database)
+  call kronos#tool#logging#Info('Task % deleted.', l:id)
+  call kronos#ui#gui#ShowList()
 endfunction
 
 "-----------------------------------------------------------------------# Open #
 
-function! kronos#ui#gui#ShowList(database)
+function! kronos#ui#gui#ShowList()
   let l:columns = s:CONST.LIST.COLUMN
   let l:headers = [filter(copy(s:CONST.LABEL), 'index(l:columns, v:key) + 1')]
   let l:prevpos = getpos('.')
-  let l:tasks   = kronos#api#task#ReadAll(a:database)
+  let l:tasks   = kronos#api#task#ReadAll(g:kronos_database)
 
   let l:headers = map(copy(l:headers), function('s:PrintListHeader'))
   let l:tasks   = map(copy(l:tasks), function('s:PrintListTask'))
@@ -104,7 +121,7 @@ endfunction
 
 "------------------------------------------------------------------# Open Info #
 
-function! kronos#ui#gui#ShowInfo(database, id)
+function! kronos#ui#gui#ShowInfo(id)
   let l:columns = s:CONST.INFO.COLUMN
   let l:keys    = s:CONST.INFO.KEY
   let l:labels  = s:CONST.LABEL
@@ -112,7 +129,7 @@ function! kronos#ui#gui#ShowInfo(database, id)
   let l:headers = [filter(copy(s:CONST.LABEL), 'index(l:columns, v:key) + 1')]
   let l:headers = map(copy(l:headers), function('s:PrintInfoHeader'))
 
-  let l:task = kronos#api#task#Read(a:database, a:id)
+  let l:task = kronos#api#task#Read(g:kronos_database, a:id)
   let l:task = kronos#ui#gui#PreparePrintTask(l:task)
 
   let l:keys = map(

@@ -22,9 +22,17 @@ function! kronos#ui#common#Update(database, dateref, args)
   let l:task = kronos#api#task#Read(a:database, l:id)
   let [l:desc, l:tags, l:due] = s:ParseArgs(a:dateref, l:task.tags, l:args)
 
-  if l:task.desc != l:desc | let l:task.desc = l:desc | endif
-  if l:task.tags != l:tags | let l:task.tags = l:tags | endif
-  if l:task.due != l:due | let l:task.due = l:due | endif
+  if ! empty(l:desc) && l:task.desc != l:desc
+    let l:task.desc = l:desc
+  endif
+
+  if l:task.tags != l:tags
+    let l:task.tags = l:tags
+  endif
+
+  if l:task.due != l:due
+    let l:task.due = l:due
+  endif
 
   call kronos#api#task#Update(a:database, l:id, l:task)
 

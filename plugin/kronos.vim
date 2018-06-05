@@ -3,7 +3,7 @@ let g:kronos_database = get(
   \ resolve(expand('<sfile>:h:h') . '/database')
 \)
 
-command! Kronos call kronos#ui#gui#ShowList(g:kronos_database)
+command! Kronos call kronos#ui#gui#ShowList()
 
 command! -nargs=* KronosAdd
   \call kronos#ui#cli#Add(g:kronos_database, localtime(), <q-args>)
