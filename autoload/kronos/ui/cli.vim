@@ -15,7 +15,7 @@ function! kronos#ui#cli#Info(database, id)
       echo l:key . ': ' . string(l:value)
     endfor
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
   endtry
 endfunction
 
@@ -51,9 +51,9 @@ function! kronos#ui#cli#Delete(database, id)
     call kronos#ui#common#Delete(a:database, a:id)
     call kronos#tool#logging#Info('Task % deleted.', a:id)
   catch 'task-not-found'
-    call kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+    call kronos#tool#logging#Error('Task not found.')
   catch
-    call kronos#tool#logging#Error('Impossible to delete task [' . a:id . '].')
+    call kronos#tool#logging#Error('Impossible to delete task.')
   endtry
 endfunction
 
@@ -63,9 +63,9 @@ function! kronos#ui#cli#Start(database, dateref, id)
   try
     call kronos#ui#common#Start(a:database, a:dateref, a:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
   catch 'task-already-active'
-    return kronos#tool#logging#Error('Task [' . a:id . '] already active.')
+    return kronos#tool#logging#Error('Task already active.')
   endtry
 endfunction
 
@@ -75,9 +75,9 @@ function! kronos#ui#cli#Stop(database, dateref, id)
   try
     call kronos#ui#common#Stop(a:database, a:dateref, a:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
   catch 'task-already-stopped'
-    return kronos#tool#logging#Error('Task [' . a:id . '] already stopped.')
+    return kronos#tool#logging#Error('Task already stopped.')
   endtry
 endfunction
 
@@ -85,23 +85,11 @@ endfunction
 
 function! kronos#ui#cli#Done(database, dateref, id)
   try
-    let l:task = kronos#api#task#Read(a:database, a:id)
+    call kronos#ui#common#Done(a:database, a:dateref, a:id)
   catch 'task-not-found'
-    return kronos#tool#logging#Error('Task [' . a:id . '] not found.')
+    return kronos#tool#logging#Error('Task not found.')
+  catch 'task-already-done'
+    return kronos#tool#logging#Error('Task already done.')
   endtry
-
-  if l:task.done
-    return kronos#tool#logging#Error('Task [' . a:id . '] already done.')
-  endif
-
-  if l:task.active
-    let l:task.worktime += (a:dateref - l:task.active)
-    let l:task.active = 0
-    let l:task.lastactive = a:dateref
-  endif
-
-  let l:task.done = a:dateref
-
-  call kronos#api#task#Update(a:database, a:id, l:task)
 endfunction
 

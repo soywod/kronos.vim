@@ -94,23 +94,6 @@ function! kronos#ui#gui#Delete()
   call kronos#ui#gui#ShowList()
 endfunction
 
-"---------------------------------------------------------------------# Toggle #
-
-function! kronos#ui#gui#Toggle()
-  try
-    let l:id   = s:GetFocusedTaskId()
-    let l:task = kronos#api#task#Read(g:kronos_database, l:id)
-  catch 'task-not-found'
-    return kronos#tool#logging#Error('Task not found.')
-  endtry
-
-  if l:task.active
-    call kronos#ui#gui#Stop()
-  else
-    call kronos#ui#gui#Start()
-  endif
-endfunction
-
 "----------------------------------------------------------------------# Start #
 
 function! kronos#ui#gui#Start()
@@ -143,7 +126,42 @@ function! kronos#ui#gui#Stop()
   call kronos#ui#gui#ShowList()
 endfunction
 
-"-----------------------------------------------------------------------# Open #
+"---------------------------------------------------------------------# Toggle #
+
+function! kronos#ui#gui#Toggle()
+  try
+    let l:id   = s:GetFocusedTaskId()
+    let l:task = kronos#api#task#Read(g:kronos_database, l:id)
+  catch 'task-not-found'
+    return kronos#tool#logging#Error('Task not found.')
+  endtry
+
+  if l:task.active
+    call kronos#ui#gui#Stop()
+  else
+    call kronos#ui#gui#Start()
+  endif
+endfunction
+
+"-----------------------------------------------------------------------# Done #
+
+function! kronos#ui#gui#Done()
+  try
+    let l:id = s:GetFocusedTaskId()
+    call kronos#ui#common#Done(g:kronos_database, localtime(), l:id)
+  catch 'task-not-found'
+    return kronos#tool#logging#Error('Task not found.')
+  catch 'operation-canceled'
+    return kronos#tool#logging#Error('Operation canceled.')
+  catch 'task-already-done'
+    return kronos#tool#logging#Error('Task already done.')
+  endtry
+
+  call kronos#tool#logging#Info('Task % done.', l:id)
+  call kronos#ui#gui#ShowList()
+endfunction
+
+"------------------------------------------------------------------# Show list #
 
 function! kronos#ui#gui#ShowList()
   let l:columns = s:CONST.LIST.COLUMN
@@ -168,7 +186,7 @@ function! kronos#ui#gui#ShowList()
   setlocal filetype=klist
 endfunction
 
-"------------------------------------------------------------------# Open Info #
+"------------------------------------------------------------------# Show info #
 
 function! kronos#ui#gui#ShowInfo(id)
   let l:columns = s:CONST.INFO.COLUMN
