@@ -70,3 +70,36 @@ Then (should parse time (date ref: 15/05/18 15:15 UTC)):
     endif
   endfor
 
+"-------------------------------------------------------------# Get human diff #
+
+Execute (GetHumanDiff):
+  let min   = kronos#tool#datetime#Const().SECONDE_IN.MIN
+  let hour  = kronos#tool#datetime#Const().SECONDE_IN.HOUR
+  let day   = kronos#tool#datetime#Const().SECONDE_IN.DAY
+  let week  = kronos#tool#datetime#Const().SECONDE_IN.WEEK
+  let month = kronos#tool#datetime#Const().SECONDE_IN.MONTH
+  let year  = kronos#tool#datetime#Const().SECONDE_IN.YEAR
+
+  let scenarios = [
+    \[g_dateref      , g_dateref+42     , 'in 42s'  ],
+    \[g_dateref+42   , g_dateref        , '42s ago' ],
+    \[g_dateref      , g_dateref+min    , 'in 1min' ],
+    \[g_dateref+min  , g_dateref        , '1min ago'],
+    \[g_dateref      , g_dateref+hour-1 , 'in 59min'],
+    \[g_dateref+hour , g_dateref        , '1h ago'  ],
+    \[g_dateref      , g_dateref+day-1  , 'in 23h'  ],
+    \[g_dateref+day  , g_dateref        , '1d ago'  ],
+    \[g_dateref      , g_dateref+week-1 , 'in 6d'   ],
+    \[g_dateref+week , g_dateref        , '1w ago'  ],
+    \[g_dateref      , g_dateref+month-1, 'in 4w'   ],
+    \[g_dateref+month, g_dateref        , '1mo ago' ],
+    \[g_dateref      , g_dateref+year-1 , 'in 11mo' ],
+    \[g_dateref+year , g_dateref        , '1y ago'  ],
+    \[g_dateref      , g_dateref+year*5 , 'in 5y'   ],
+  \]
+
+Then (should print human diff):
+  for [datesrc, datedest, expected] in scenarios
+    AssertEqual expected, kronos#tool#datetime#GetHumanDiff(datesrc, datedest)
+  endfor
+
