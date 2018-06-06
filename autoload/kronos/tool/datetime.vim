@@ -86,10 +86,10 @@ endfunction
 "------------------------------------------------------------------# Parse due #
 
 function! kronos#tool#datetime#ParseDue(dateref, duestr)
-  let Parse = function('kronos#tool#datetime#ParseDueRecursive', [a:dateref, 0])
+  let Parse = function('kronos#tool#datetime#ParseDueRecursive')
 
   let matches = matchlist(a:duestr, s:PARSE_DUE_REGEX)
-  let due  = Parse(l:matches[1:5])
+  let due  = Parse(a:dateref, 0, l:matches[1:5])
   let due -= strftime('%S', due)
 
   return due
