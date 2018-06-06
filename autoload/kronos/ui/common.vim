@@ -5,13 +5,13 @@ function! kronos#ui#common#Add(database, dateref, args)
   let [l:desc, l:tags, l:due] = s:ParseArgs(a:dateref, [], l:args)
 
   return kronos#api#task#Create(a:database, {
-    \ 'desc': l:desc,
-    \ 'tags': l:tags,
-    \ 'due': l:due,
-    \ 'active': 0,
-    \ 'lastactive': 0,
-    \ 'worktime': 0,
-    \ 'done': 0,
+    \'desc'      : l:desc,
+    \'tags'      : l:tags,
+    \'due'       : l:due,
+    \'active'    : 0,
+    \'lastactive': 0,
+    \'worktime'  : 0,
+    \'done'      : 0,
   \})
 endfunction
 
@@ -35,20 +35,12 @@ function! kronos#ui#common#Update(database, dateref, args)
   endif
 
   call kronos#api#task#Update(a:database, l:id, l:task)
-
   return l:id
 endfunction
 
 "---------------------------------------------------------------------# Delete #
 
 function! kronos#ui#common#Delete(database, id)
-  let l:choice =
-    \input('Do you really want to delete the task [' . a:id . '] (y/N) ? ')
-
-  if l:choice !~? '^y'
-    throw 'operation-canceled'
-  endif
-
   call kronos#api#task#Delete(a:database, a:id)
 endfunction
 
@@ -79,7 +71,7 @@ endfunction
 "-----------------------------------------------------------------------# Done #
 
 function! kronos#ui#common#Done(database, dateref, id)
-  let l:task = kronos#api#task#Read(a:database, a:id)
+  let l:task = copy(kronos#api#task#Read(a:database, a:id))
 
   if  l:task.done | throw 'task-already-done' | endif
   if  l:task.active
@@ -97,9 +89,9 @@ endfunction
 "--------------------------------------------------------------------# Helpers #
 
 function! s:ParseArgs(dateref, tags, args)
-  let l:desc = []
-  let l:due = 0
-  let l:tags = copy(a:tags)
+  let l:desc    = []
+  let l:due     = 0
+  let l:tags    = copy(a:tags)
   let l:newtags = []
   let l:oldtags = []
 
@@ -121,7 +113,7 @@ function! s:ParseArgs(dateref, tags, args)
 
   for l:tag in l:oldtags
     let l:index = index(l:tags, l:tag)
-    if l:index != -1 | call remove(l:tags, l:index) | endif
+    if  l:index != -1 | call remove(l:tags, l:index) | endif
   endfor
 
   return [join(l:desc, ' '), l:tags, l:due]

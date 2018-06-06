@@ -5,9 +5,9 @@ function! kronos#api#database#Purge(database)
   if filereadable(a:database) | call delete(a:database) | endif
 endfunction
 
-"-----------------------------------------------------------------# Read tasks #
+"-----------------------------------------------------------------------# Read #
 
-function! kronos#api#database#ReadTasks(database)
+function! kronos#api#database#Read(database)
   if exists('s:cache') | return s:cache | endif
 
   let s:cache = filereadable(a:database)
@@ -17,15 +17,14 @@ function! kronos#api#database#ReadTasks(database)
   return s:cache
 endfunction
 
-"----------------------------------------------------------------# Write tasks #
+"----------------------------------------------------------------------# Write #
 
-function! kronos#api#database#WriteTasks(database, tasks)
-  let l:tasksundone = filter(copy(a:tasks), '! v:val.done')
+function! kronos#api#database#Write(database, tasks)
   let l:tasksdone   = filter(copy(a:tasks), 'v:val.done')
+  let l:tasksundone = filter(copy(a:tasks), '! v:val.done')
   let s:cache       = l:tasksundone + l:tasksdone
-  let l:data        = copy(s:cache)
+  let l:data        = map(copy(s:cache), 'string(v:val)')
 
-  call map(l:data, 'string(v:val)')
   call writefile(l:data, a:database, 's')
 endfunction
 

@@ -41,12 +41,12 @@ function! kronos#ui#gui#Add()
   try
     let l:args = input('New task string: ')
     let l:id   = kronos#ui#common#Add(g:kronos_database, localtime(), l:args)
+    call kronos#tool#logging#Info('Task % added.', l:id)
   catch
     return kronos#tool#logging#Error('Impossible to add task.')
   endtry
 
-  call kronos#tool#logging#Info('Task % added.', l:id)
-  call kronos#ui#gui#ShowList()
+  return kronos#ui#gui#ShowList()
 endfunction
 
 "---------------------------------------------------------------------# Update #
@@ -56,12 +56,14 @@ function! kronos#ui#gui#Update()
     let l:id   = s:GetFocusedTaskId()
     let l:args = l:id . ' ' . input('Update task string: ')
     call kronos#ui#common#Update(g:kronos_database, localtime(), l:args)
+    call kronos#tool#logging#Info('Task % updated.', l:id)
+  catch 'task-not-found'
+    return kronos#tool#logging#Error('Task not found.')
   catch
     return kronos#tool#logging#Error('Impossible to update task.')
   endtry
 
-  call kronos#tool#logging#Info('Task % updated.', l:id)
-  call kronos#ui#gui#ShowList()
+  return kronos#ui#gui#ShowList()
 endfunction
 
 "-----------------------------------------------------------------------# Info #
@@ -69,7 +71,7 @@ endfunction
 function! kronos#ui#gui#Info()
   try
     let l:id = s:GetFocusedTaskId()
-    call kronos#ui#gui#ShowInfo(l:id)
+    return kronos#ui#gui#ShowInfo(l:id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch
@@ -82,7 +84,13 @@ endfunction
 function! kronos#ui#gui#Delete()
   try
     let l:id = s:GetFocusedTaskId()
+
+    let l:choice =
+      \input('Do you really want to delete the task [' . l:id . '] (y/N) ? ')
+    if  l:choice !~? '^y' | throw 'operation-canceled' | endif
+
     call kronos#ui#common#Delete(g:kronos_database, l:id)
+    call kronos#tool#logging#Info('Task % deleted.', l:id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch 'operation-canceled'
@@ -91,8 +99,7 @@ function! kronos#ui#gui#Delete()
     return kronos#tool#logging#Error('Impossible to delete task.')
   endtry
 
-  call kronos#tool#logging#Info('Task % deleted.', l:id)
-  call kronos#ui#gui#ShowList()
+  return kronos#ui#gui#ShowList()
 endfunction
 
 "----------------------------------------------------------------------# Start #
@@ -101,14 +108,14 @@ function! kronos#ui#gui#Start()
   try
     let l:id = s:GetFocusedTaskId()
     call kronos#ui#common#Start(g:kronos_database, localtime(), l:id)
+    call kronos#tool#logging#Info('Task % started.', l:id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch 'task-already-active'
     return kronos#tool#logging#Error('Task already active.')
   endtry
 
-  call kronos#tool#logging#Info('Task % started.', l:id)
-  call kronos#ui#gui#ShowList()
+  return kronos#ui#gui#ShowList()
 endfunction
 
 "-----------------------------------------------------------------------# Stop #
@@ -117,14 +124,14 @@ function! kronos#ui#gui#Stop()
   try
     let l:id = s:GetFocusedTaskId()
     call kronos#ui#common#Stop(g:kronos_database, localtime(), l:id)
+    call kronos#tool#logging#Info('Task % stopped.', l:id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch 'task-already-stopped'
     return kronos#tool#logging#Error('Task already stopped.')
   endtry
 
-  call kronos#tool#logging#Info('Task % stopped.', l:id)
-  call kronos#ui#gui#ShowList()
+  return kronos#ui#gui#ShowList()
 endfunction
 
 "---------------------------------------------------------------------# Toggle #
@@ -138,9 +145,9 @@ function! kronos#ui#gui#Toggle()
   endtry
 
   if l:task.active
-    call kronos#ui#gui#Stop()
+    return kronos#ui#gui#Stop()
   else
-    call kronos#ui#gui#Start()
+    return kronos#ui#gui#Start()
   endif
 endfunction
 
@@ -150,6 +157,7 @@ function! kronos#ui#gui#Done()
   try
     let l:id = s:GetFocusedTaskId()
     call kronos#ui#common#Done(g:kronos_database, localtime(), l:id)
+    call kronos#tool#logging#Info('Task % done.', l:id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch 'operation-canceled'
@@ -158,8 +166,7 @@ function! kronos#ui#gui#Done()
     return kronos#tool#logging#Error('Task already done.')
   endtry
 
-  call kronos#tool#logging#Info('Task % done.', l:id)
-  call kronos#ui#gui#ShowList()
+  return kronos#ui#gui#ShowList()
 endfunction
 
 "------------------------------------------------------------------# Show list #
@@ -217,7 +224,6 @@ endfunction
 
 "----------------------------------------------------------------------# Print #
 
-" TODO ADD TESTS
 function! kronos#ui#gui#PrintRow(type, row)
   let l:columns = s:CONST[a:type].COLUMN
   let l:widths = s:CONST[a:type].WIDTH
@@ -229,6 +235,8 @@ function! kronos#ui#gui#PrintRow(type, row)
 endfunction
 
 " TODO ADD TESTS
+" TODO MOVE TO TOOL
+" TODO IMPROVE DATES
 function! kronos#ui#gui#PreparePrintTask(task)
   let l:task = copy(a:task)
 

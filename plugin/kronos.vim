@@ -1,9 +1,15 @@
+"--------------------------------------------------------------# Configuration #
+
 let g:kronos_database = get(
-  \ g:, 'kronos_database',
-  \ resolve(expand('<sfile>:h:h') . '/database')
+  \g:, 'kronos_database',
+  \resolve(expand('<sfile>:h:h') . '/kronos.db')
 \)
 
+"------------------------------------------------------------------------# GUI #
+
 command! Kronos call kronos#ui#gui#ShowList()
+
+"------------------------------------------------------------------------# CLI #
 
 command! -nargs=* KronosAdd
   \call kronos#ui#cli#Add(g:kronos_database, localtime(), <q-args>)
@@ -25,6 +31,9 @@ command! -nargs=1 KronosStart
 
 command! -nargs=1 KronosStop
   \call kronos#ui#cli#Stop(g:kronos_database, localtime(), <args>)
+
+command! -nargs=1 KronosToggle
+  \call kronos#ui#cli#Toggle(g:kronos_database, localtime(), <args>)
 
 command! -nargs=1 KronosDone
   \call kronos#ui#cli#Done(g:kronos_database, localtime(), <args>)

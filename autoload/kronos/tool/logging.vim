@@ -1,7 +1,7 @@
 function! kronos#tool#logging#Error(msg)
   redraw
   echohl ErrorMsg
-  echo a:msg
+  echon a:msg
   echohl None
 endfunction
 

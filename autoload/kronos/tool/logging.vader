@@ -1,0 +1,23 @@
+After:
+  unlet message
+
+#----------------------------------------------------------------------# Error #
+
+Execute (Error):
+  redir => message
+  call kronos#tool#logging#Error('message')
+  redir END
+  
+Then (should log error message):
+  AssertEqual "message", message
+
+#-----------------------------------------------------------------------# Info #
+
+Execute (Info):
+  redir => message
+  call kronos#tool#logging#Info('message with % id', 1)
+  redir END
+  
+Then (should log error message):
+  AssertEqual "message with [1] id", message
+

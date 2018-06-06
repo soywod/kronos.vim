@@ -1,0 +1,109 @@
+Before:
+  let g_database = resolve(expand('<sfile>:h') . '/kronos.db')
+  let g_dateref  = 1526397300 "15/05/2018 15:15 UTC
+  let g_dueref   = 1526428800 "16/05/2018 00:00 UTC
+
+  let g_task = {
+   \'id': 1,'desc': 'test 42','tags': ['cli', 'a', 'b-c'],'due': g_dueref,
+   \'active': 0,'lastactive': 0,'worktime': 0,'done': 0,
+  \}
+
+  let g_taskupdate = {
+   \'id': 1,'desc': 'test','tags': ['cli', 'b-c', 'c'],
+   \'due': g_dueref + 3600 * 24 * 2,'active': 0,'lastactive': 0,
+   \'worktime': 0,'done': 0,
+  \}
+
+  let g_taskstart = {
+   \'id': 1,'desc': 'test 42','tags': ['cli', 'a', 'b-c'],
+   \'due': g_dueref,'active': g_dateref + 3600,'lastactive': 0,
+   \'worktime': 0,'done': 0,
+  \}
+
+  let g_taskstop = {
+   \'id': 1,'desc': 'test 42','tags': ['cli', 'a', 'b-c'],
+   \'due': g_dueref,'active': 0,'lastactive': g_dateref + 3600 * 2,
+   \'worktime': 3600,'done': 0,
+  \}
+
+  let g_taskdone = {
+   \'id': 1 . (g_dateref + 3600 * 2),'desc': 'test 42',
+   \'tags': ['cli', 'a', 'b-c'],'due': g_dueref,'active': 0,
+   \'lastactive': g_dateref + 3600 * 2,'worktime': 3600,
+   \'done': g_dateref + 3600 * 2,
+  \}
+
+After:
+  call kronos#api#database#Purge(g_database)
+  unlet g_database g_dateref g_task g_taskupdate g_taskstart g_taskstop message
+
+#------------------------------------------------------------------------# Add #
+
+Execute (Add):
+  redir => message
+  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  redir END
+
+Then (should add new task):
+  AssertEqual [g_task], kronos#api#database#Read(g_database)
+  AssertEqual 'Task [1] added.', message
+
+#---------------------------------------------------------------------# Update #
+
+Execute (Update):
+  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+
+  redir => message
+  call kronos#ui#cli#Update(g_database, g_dateref, '1 +cli test :18 -a +b-c +c')
+  redir END
+
+Then (should update a task):
+  AssertEqual [g_taskupdate], kronos#api#database#Read(g_database)
+  AssertEqual 'Task [1] updated.', message
+
+#----------------------------------------------------------------------# Start #
+
+Execute (Start):
+  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+
+  redir => message
+  call kronos#ui#cli#Start(g_database, g_dateref + 3600, 1)
+  redir END
+
+Then (should start a task):
+  AssertEqual [g_taskstart], kronos#api#database#Read(g_database)
+  AssertThrow kronos#ui#cli#Start(g_database, g_dateref, 1)
+  AssertEqual 'Task [1] started.', message
+
+#-----------------------------------------------------------------------# Stop #
+
+Execute (Stop):
+  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#ui#cli#Start(g_database, g_dateref + 3600, 1)
+
+  redir => message
+  call kronos#ui#cli#Stop(g_database, g_dateref + 3600 * 2, 1)
+  redir END
+
+Then (should stop a task):
+  AssertEqual [g_taskstop], kronos#api#database#Read(g_database)
+  AssertThrow kronos#ui#cli#Stop(g_database, g_dateref, 1)
+  AssertEqual 'Task [1] stopped.', message
+
+#-----------------------------------------------------------------------# Done #
+
+Execute (Done):
+  let newid = 1 . (g_dateref + 3600 * 2)
+  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#ui#cli#Start(g_database, g_dateref + 3600, 1)
+
+  redir => message
+  call kronos#ui#cli#Done(g_database, g_dateref + 3600 * 2, 1)
+  redir END
+
+Then (should mark as done a task):
+  AssertEqual [g_taskdone], kronos#api#database#Read(g_database)
+  " AssertThrow kronos#ui#cli#Done(g_database, g_dateref, 1)
+  AssertEqual 'Task [1] done.', message
+  unlet newid
+
