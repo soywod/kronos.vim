@@ -1,3 +1,5 @@
+"------------------------------------------------------------------# Constants #
+
 let s:CONST = {
   \'INFO': {
     \'COLUMN': ['key', 'value'],
@@ -39,9 +41,9 @@ endfunction
 
 function! kronos#ui#gui#Add()
   try
-    let l:args = input('New task string: ')
-    let l:id   = kronos#ui#common#Add(g:kronos_database, localtime(), l:args)
-    call kronos#tool#logging#Info('Task % added.', l:id)
+    let args = input('New task string: ')
+    let id   = kronos#ui#common#Add(g:kronos_database, localtime(), args)
+    call kronos#tool#logging#Info('Task % added.', id)
   catch
     return kronos#tool#logging#Error('Impossible to add task.')
   endtry
@@ -53,10 +55,10 @@ endfunction
 
 function! kronos#ui#gui#Update()
   try
-    let l:id   = s:GetFocusedTaskId()
-    let l:args = l:id . ' ' . input('Update task string: ')
-    call kronos#ui#common#Update(g:kronos_database, localtime(), l:args)
-    call kronos#tool#logging#Info('Task % updated.', l:id)
+    let id   = GetFocusedTaskId()
+    let args = id . ' ' . input('Update task string: ')
+    call kronos#ui#common#Update(g:kronos_database, localtime(), args)
+    call kronos#tool#logging#Info('Task % updated.', id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch
@@ -70,8 +72,8 @@ endfunction
 
 function! kronos#ui#gui#Info()
   try
-    let l:id = s:GetFocusedTaskId()
-    return kronos#ui#gui#ShowInfo(l:id)
+    let id = GetFocusedTaskId()
+    return kronos#ui#gui#ShowInfo(id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch
@@ -83,14 +85,14 @@ endfunction
 
 function! kronos#ui#gui#Delete()
   try
-    let l:id = s:GetFocusedTaskId()
+    let id = GetFocusedTaskId()
 
-    let l:choice =
-      \input('Do you really want to delete the task [' . l:id . '] (y/N) ? ')
-    if  l:choice !~? '^y' | throw 'operation-canceled' | endif
+    let choice =
+      \input('Do you really want to delete the task [' . id . '] (y/N) ? ')
+    if  choice !~? '^y' | throw 'operation-canceled' | endif
 
-    call kronos#ui#common#Delete(g:kronos_database, l:id)
-    call kronos#tool#logging#Info('Task % deleted.', l:id)
+    call kronos#ui#common#Delete(g:kronos_database, id)
+    call kronos#tool#logging#Info('Task % deleted.', id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch 'operation-canceled'
@@ -106,9 +108,9 @@ endfunction
 
 function! kronos#ui#gui#Start()
   try
-    let l:id = s:GetFocusedTaskId()
-    call kronos#ui#common#Start(g:kronos_database, localtime(), l:id)
-    call kronos#tool#logging#Info('Task % started.', l:id)
+    let id = GetFocusedTaskId()
+    call kronos#ui#common#Start(g:kronos_database, localtime(), id)
+    call kronos#tool#logging#Info('Task % started.', id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch 'task-already-active'
@@ -122,9 +124,9 @@ endfunction
 
 function! kronos#ui#gui#Stop()
   try
-    let l:id = s:GetFocusedTaskId()
-    call kronos#ui#common#Stop(g:kronos_database, localtime(), l:id)
-    call kronos#tool#logging#Info('Task % stopped.', l:id)
+    let id = GetFocusedTaskId()
+    call kronos#ui#common#Stop(g:kronos_database, localtime(), id)
+    call kronos#tool#logging#Info('Task % stopped.', id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch 'task-already-stopped'
@@ -138,13 +140,13 @@ endfunction
 
 function! kronos#ui#gui#Toggle()
   try
-    let l:id   = s:GetFocusedTaskId()
-    let l:task = kronos#api#task#Read(g:kronos_database, l:id)
+    let id   = GetFocusedTaskId()
+    let task = kronos#api#task#Read(g:kronos_database, id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   endtry
 
-  if l:task.active
+  if task.active
     return kronos#ui#gui#Stop()
   else
     return kronos#ui#gui#Start()
@@ -155,9 +157,9 @@ endfunction
 
 function! kronos#ui#gui#Done()
   try
-    let l:id = s:GetFocusedTaskId()
-    call kronos#ui#common#Done(g:kronos_database, localtime(), l:id)
-    call kronos#tool#logging#Info('Task % done.', l:id)
+    let id = GetFocusedTaskId()
+    call kronos#ui#common#Done(g:kronos_database, localtime(), id)
+    call kronos#tool#logging#Info('Task % done.', id)
   catch 'task-not-found'
     return kronos#tool#logging#Error('Task not found.')
   catch 'operation-canceled'
@@ -172,51 +174,50 @@ endfunction
 "------------------------------------------------------------------# Show list #
 
 function! kronos#ui#gui#ShowList()
-  let l:columns = s:CONST.LIST.COLUMN
-  let l:headers = [filter(copy(s:CONST.LABEL), 'index(l:columns, v:key) + 1')]
-  let l:prevpos = getpos('.')
-  let l:tasks   = kronos#api#task#ReadAll(g:kronos_database)
+  let columns = s:CONST.LIST.COLUMN
+  let headers = [filter(copy(s:CONST.LABEL), 'index(columns, v:key) + 1')]
+  let prevpos = getpos('.')
+  let tasks   = kronos#api#task#ReadAll(g:kronos_database)
 
-  let l:headers = map(copy(l:headers), function('s:PrintListHeader'))
-  let l:tasks   = map(copy(l:tasks), function('s:PrintListTask'))
+  let headers = map(copy(headers), function('PrintListHeader'))
+  let tasks   = map(copy(tasks), function('PrintListTask'))
 
-  redir => l:buflist | silent! ls | redir END
+  redir => buflist | silent! ls | redir END
   silent! edit Kronos
 
-  if match(l:buflist, '"Kronos"') + 1
+  if match(buflist, '"Kronos"') + 1
     setlocal modifiable
     execute '0,$d'
   endif
 
-  call append(0, l:headers + l:tasks)
+  call append(0, headers + tasks)
   execute '$d'
-  call setpos('.', l:prevpos)
+  call setpos('.', prevpos)
   setlocal filetype=klist
 endfunction
 
 "------------------------------------------------------------------# Show info #
 
 function! kronos#ui#gui#ShowInfo(id)
-  let l:columns = s:CONST.INFO.COLUMN
-  let l:keys    = s:CONST.INFO.KEY
-  let l:labels  = s:CONST.LABEL
+  let columns = s:CONST.INFO.COLUMN
+  let keys    = s:CONST.INFO.KEY
+  let labels  = s:CONST.LABEL
 
-  let l:headers = [filter(copy(s:CONST.LABEL), 'index(l:columns, v:key) + 1')]
-  let l:headers = map(copy(l:headers), function('s:PrintInfoHeader'))
+  let headers = [filter(copy(s:CONST.LABEL), 'index(columns, v:key) + 1')]
+  let headers = map(copy(headers), function('PrintInfoHeader'))
 
-  let l:task    = kronos#api#task#Read(g:kronos_database, a:id)
-  let l:task    = kronos#ui#gui#PreparePrintTask(l:task)
-  let l:task.id = a:id
+  let task = kronos#api#task#Read(g:kronos_database, a:id)
+  let task = kronos#ui#gui#FormatTaskForInfo(task)
 
-  let l:keys = map(
-    \copy(l:keys),
-    \'s:PrintInfoProp(l:labels[v:val], task[v:val])',
+  let keys = map(
+    \copy(keys),
+    \'PrintInfoProp(labels[v:val], task[v:val])',
   \)
 
   silent! bdelete KronosInfo
   silent! botright new KronosInfo
 
-  call append(0, l:headers + l:keys)
+  call append(0, headers + keys)
   normal! ddgg
 
   setlocal filetype=kinfo
@@ -225,64 +226,85 @@ endfunction
 "----------------------------------------------------------------------# Print #
 
 function! kronos#ui#gui#PrintRow(type, row)
-  let l:columns = s:CONST[a:type].COLUMN
-  let l:widths = s:CONST[a:type].WIDTH
+  let columns = s:CONST[a:type].COLUMN
+  let widths = s:CONST[a:type].WIDTH
 
   return join(map(
-    \copy(l:columns),
-    \'s:PrintProp(a:row[v:val], l:widths[v:val])',
+    \copy(columns),
+    \'PrintProp(a:row[v:val], widths[v:val])',
   \), '')[:78] . ' '
 endfunction
 
-" TODO ADD TESTS
-" TODO MOVE TO TOOL
-" TODO IMPROVE DATES
-function! kronos#ui#gui#PreparePrintTask(task)
-  let l:task = copy(a:task)
+"-------------------------------------------------------# Format task for list #
 
-  let l:task.active = l:task.active ? l:task.active : ''
-  let l:task.done = l:task.done ? l:task.done : ''
-  let l:task.due = l:task.due ? l:task.due : ''
-  let l:task.id = l:task.done ? '-' : l:task.id
-  let l:task.lastactive = l:task.lastactive ? l:task.lastactive : ''
-  let l:task.tags = join(l:task.tags, ' ')
-  let l:task.worktime = l:task.worktime ? l:task.worktime : ''
+function! kronos#ui#gui#FormatTaskForList(task)
+  let DateDiff = function('kronos#tool#datetime#GetHumanDiff', [localtime()])
 
-  return l:task
+  let task      = copy(a:task)
+  let task.id   = task.done ? '-' : task.id
+  let task.tags = join(task.tags, ' ')
+
+  let task.active     = task.active     ? DateDiff(task.active)    : ''
+  let task.done       = task.done       ? DateDiff(task.done)      : ''
+  let task.due        = task.due        ? DateDiff(task.due)       : ''
+  let task.lastactive = task.lastactive ? DateDiff(task.lastactive): ''
+  let task.worktime   = task.worktime   ? task.worktime            : ''
+
+  return task
+endfunction
+
+"-------------------------------------------------------# Format task for info #
+
+function! kronos#ui#gui#FormatTaskForInfo(task)
+  let Date = function('kronos#tool#datetime#GetHumanDate')
+
+  let task      = copy(a:task)
+  let task.tags = join(task.tags, ' ')
+
+  let task.active     = task.active     ? Date(task.active)    : ''
+  let task.done       = task.done       ? Date(task.done)      : ''
+  let task.due        = task.due        ? Date(task.due)       : ''
+  let task.lastactive = task.lastactive ? Date(task.lastactive): ''
+  let task.worktime   = task.worktime   ? task.worktime        : ''
+
+  return task
 endfunction
 
 "--------------------------------------------------------------------# Helpers #
 
-function! s:PrintListHeader(_, row)
+function! PrintListHeader(_, row)
   return kronos#ui#gui#PrintRow('LIST', a:row)
 endfunction
 
-function! s:PrintListTask(_, task)
-  let l:task = copy(kronos#ui#gui#PreparePrintTask(a:task))
-  return kronos#ui#gui#PrintRow('LIST', l:task)
+function! PrintListTask(_, task)
+  let FormatTask = function('kronos#ui#gui#FormatTaskForList')
+  let PrintTask  = function('kronos#ui#gui#PrintRow', ['LIST'])
+
+  let task = copy(FormatTask(a:task))
+  return PrintTask(task)
 endfunction
 
-function! s:PrintInfoHeader(_, row)
+function! PrintInfoHeader(_, row)
   return kronos#ui#gui#PrintRow('INFO', a:row)
 endfunction
 
-function! s:PrintInfoProp(key, value)
-  let l:row = {'key': a:key, 'value': a:value}
-  return kronos#ui#gui#PrintRow('INFO', l:row)
+function! PrintInfoProp(key, value)
+  let row = {'key': a:key, 'value': a:value}
+  return kronos#ui#gui#PrintRow('INFO', row)
 endfunction
 
-function! s:PrintProp(prop, maxlen)
-  let l:maxlen = a:maxlen - 2
-  let l:proplen = strdisplaywidth(a:prop[:l:maxlen]) + 1
+function! PrintProp(prop, maxlen)
+  let maxlen = a:maxlen - 2
+  let proplen = strdisplaywidth(a:prop[:maxlen]) + 1
 
-  return a:prop[:l:maxlen] . repeat(' ', a:maxlen - l:proplen) . '|'
+  return a:prop[:maxlen] . repeat(' ', a:maxlen - proplen) . '|'
 endfunction
 
-function! s:GetFocusedTaskId()
-  let l:tasks = kronos#api#task#ReadAll(g:kronos_database)
-  let l:index = line('.') - 2
-  if  l:index == -1 | throw 'task-not-found' | endif
+function! GetFocusedTaskId()
+  let tasks = kronos#api#task#ReadAll(g:kronos_database)
+  let index = line('.') - 2
+  if  index == -1 | throw 'task-not-found' | endif
 
-  return get(l:tasks, l:index).id
+  return get(tasks, index).id
 endfunction
 

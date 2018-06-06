@@ -12,6 +12,7 @@ let s:PARSE_DUE_REGEX =
   \'^:\(\d\{0,2}\)\(\d\{0,2}\)\(\d\{2}\)\?:\?\(\d\{0,2}\)\(\d\{0,2}\)$'
 
 let s:CONST = {
+  \'DATE_FORMAT': '%c',
   \'SECONDE_IN': {
     \'SEC'  : s:SECS_IN_SEC,
     \'MIN'  : s:SECS_IN_MIN,
@@ -47,6 +48,12 @@ function! kronos#tool#datetime#Const()
   return s:CONST
 endfunction
 
+"-------------------------------------------------------------# Get human date #
+
+function! kronos#tool#datetime#GetHumanDate(date)
+  return strftime(s:CONST.DATE_FORMAT, a:date)
+endfunction
+
 "-------------------------------------------------------------# Get human diff #
 
 function! kronos#tool#datetime#GetHumanDiff(datesrc, datedest)
@@ -71,7 +78,7 @@ function! kronos#tool#datetime#GetHumanDiff(datesrc, datedest)
 
     if l:datediff < l:secmax || l:min == 'YEAR'
       let l:label = s:CONST.LABEL[l:format][l:min]
-      return printf(l:label, l:datediff / l:secmin)
+      return printf(l:label, l:datediff / l:secmin + 1)
     endif
   endfor
 endfunction
@@ -79,8 +86,13 @@ endfunction
 "------------------------------------------------------------------# Parse due #
 
 function! kronos#tool#datetime#ParseDue(dateref, duestr)
-  let l:matches = matchlist(a:duestr, s:PARSE_DUE_REGEX)
-  return kronos#tool#datetime#ParseDueRecursive(a:dateref, 0, l:matches[1:5])
+  let Parse = function('kronos#tool#datetime#ParseDueRecursive', [a:dateref, 0])
+
+  let matches = matchlist(a:duestr, s:PARSE_DUE_REGEX)
+  let due  = Parse(l:matches[1:5])
+  let due -= strftime('%S', due)
+
+  return due
 endfunction
 
 function! kronos#tool#datetime#ParseDueRecursive(dateref, dateapprox, payload)
