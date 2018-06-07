@@ -23,24 +23,17 @@ let s:CONST = {
     \'YEAR' : s:SECS_IN_MIN * s:MINS_IN_HOUR * s:HOURS_IN_DAY * s:DAYS_IN_YEAR,
   \},
   \'LABEL': {
-    \'AGO': {
-      \'SEC'  : '%ds ago',
-      \'MIN'  : '%dmin ago',
-      \'HOUR' : '%dh ago',
-      \'DAY'  : '%dd ago',
-      \'WEEK' : '%dw ago',
-      \'MONTH': '%dmo ago',
-      \'YEAR' : '%dy ago',
+    \'AGO': '%s ago',
+    \'IN': 'in %s',
+    \'UNIT': {
+      \'SEC'  : '%ds',
+      \'MIN'  : '%dmin',
+      \'HOUR' : '%dh',
+      \'DAY'  : '%dd',
+      \'WEEK' : '%dw',
+      \'MONTH': '%dmo',
+      \'YEAR' : '%dy',
     \},
-    \'IN': {
-      \'SEC'  : 'in %ds',
-      \'MIN'  : 'in %dmin',
-      \'HOUR' : 'in %dh',
-      \'DAY'  : 'in %dd',
-      \'WEEK' : 'in %dw',
-      \'MONTH': 'in %dmo',
-      \'YEAR' : 'in %dy',
-    \}
   \},
 \}
 
@@ -54,31 +47,54 @@ function! kronos#tool#datetime#GetHumanDate(date)
   return strftime(s:CONST.DATE_FORMAT, a:date)
 endfunction
 
+"--------------------------------------------------------# Get full human diff #
+
+function! kronos#tool#datetime#GetFullHumanDiff(datesrc, datedest)
+  let diffarr  = []
+  let datediff = abs(a:datesrc - a:datedest)
+  let units    = ['YEAR', 'MONTH', 'WEEK', 'DAY', 'HOUR', 'MIN', 'SEC']
+
+  for unit in units
+    let nbsec = s:CONST.SECONDE_IN[unit]
+    let ratio = datediff / nbsec
+
+    if ratio != 0
+      let unitfmt   = s:CONST.LABEL.UNIT[unit]
+      let unitstr   = printf(unitfmt, ratio)
+      let diffarr  += [unitstr]
+      let datediff -= (ratio * nbsec)
+    endif
+  endfor
+
+  return join(diffarr, ' ')
+endfunction
+
 "-------------------------------------------------------------# Get human diff #
 
 function! kronos#tool#datetime#GetHumanDiff(datesrc, datedest)
-  let l:datediff = abs(a:datesrc - a:datedest)
-  let l:format   = a:datesrc < a:datedest ? 'IN' : 'AGO'
-  let l:labels   = s:CONST.LABEL
-
-  let l:intervals = [
+  let datediff  = abs(a:datesrc - a:datedest)
+  let difffmt   = s:CONST.LABEL[a:datesrc < a:datedest ? 'IN' : 'AGO']
+  let intervals = [
     \['SEC'  , 'MIN'  ],
     \['MIN'  , 'HOUR' ],
     \['HOUR' , 'DAY'  ],
-    \['DAY'  , 'WEEK' ],
     \['DAY'  , 'WEEK' ],
     \['WEEK' , 'MONTH'],
     \['MONTH', 'YEAR' ],
     \['YEAR' , 'YEAR' ],
   \]
 
-  for [l:min, l:max] in l:intervals
-    let l:secmin = s:CONST.SECONDE_IN[l:min]
-    let l:secmax = s:CONST.SECONDE_IN[l:max]
+  for [min, max] in intervals
+    let secmin = s:CONST.SECONDE_IN[min]
+    let secmax = s:CONST.SECONDE_IN[max]
 
-    if l:datediff < l:secmax || l:min == 'YEAR'
-      let l:label = s:CONST.LABEL[l:format][l:min]
-      return printf(l:label, l:datediff / l:secmin + 1)
+    if datediff < secmax || min == 'YEAR'
+      let value   = datediff / secmin + 1
+      let unitfmt = s:CONST.LABEL.UNIT[min]
+      let unitstr = printf(unitfmt, value)
+      let diffstr = printf(difffmt, unitstr)
+
+      return diffstr
     endif
   endfor
 endfunction

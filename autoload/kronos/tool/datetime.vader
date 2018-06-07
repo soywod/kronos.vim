@@ -1,6 +1,7 @@
 Before:
   let g_database = resolve(expand('<sfile>:h') . '/kronos.db')
   let g_dateref = 1526397300 "15/05/2018 15:15 UTC
+  
 
 After:
   call kronos#api#database#Purge(g_database)
@@ -68,6 +69,24 @@ Then (should parse time (date ref: 15/05/18 15:15 UTC)):
     else
       AssertEqual expected, kronos#tool#datetime#ParseDue(1526390100, due)
     endif
+  endfor
+
+"--------------------------------------------------------# Get full human diff #
+
+Execute (GetFullHumanDiff):
+  let FullDiff = function('kronos#tool#datetime#GetFullHumanDiff')
+  let d = kronos#tool#datetime#Const().SECONDE_IN
+
+  let scenarios = [
+    \['1h 1min 1s', FullDiff(0, d.HOUR   + d.MIN    + d.SEC)  ],
+    \['1y 1mo 2d',  FullDiff(0, d.YEAR   + d.MONTH  + d.DAY*2)],
+    \['1d 5h 2s',   FullDiff(0, d.DAY    + d.HOUR*5 + d.SEC*2)],
+    \['3w 55s',     FullDiff(0, d.WEEK*3 + d.SEC*55)          ],
+  \]
+
+Then (should print full human diff):
+  for [expected, got] in scenarios
+    AssertEqual expected, got
   endfor
 
 "-------------------------------------------------------------# Get human diff #
