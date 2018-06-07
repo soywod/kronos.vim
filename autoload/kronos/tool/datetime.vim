@@ -43,35 +43,35 @@ endfunction
 
 "-------------------------------------------------------------# Get human date #
 
-function! kronos#tool#datetime#GetHumanDate(date)
+function! kronos#tool#datetime#PrintDate(date)
   return strftime(s:CONST.DATE_FORMAT, a:date)
 endfunction
 
-"--------------------------------------------------------# Get full human diff #
+"-----------------------------------------------------------# Print human time #
 
-function! kronos#tool#datetime#GetFullHumanDiff(datesrc, datedest)
+function! kronos#tool#datetime#PrintInterval(interval)
   let diffarr  = []
-  let datediff = abs(a:datesrc - a:datedest)
+  let interval = a:interval
   let units    = ['YEAR', 'MONTH', 'WEEK', 'DAY', 'HOUR', 'MIN', 'SEC']
 
   for unit in units
     let nbsec = s:CONST.SECONDE_IN[unit]
-    let ratio = datediff / nbsec
+    let ratio = interval / nbsec
 
     if ratio != 0
       let unitfmt   = s:CONST.LABEL.UNIT[unit]
       let unitstr   = printf(unitfmt, ratio)
       let diffarr  += [unitstr]
-      let datediff -= (ratio * nbsec)
+      let interval -= (ratio * nbsec)
     endif
   endfor
 
   return join(diffarr, ' ')
 endfunction
 
-"-------------------------------------------------------------# Get human diff #
+"-----------------------------------------------------------------# Print diff #
 
-function! kronos#tool#datetime#GetHumanDiff(datesrc, datedest)
+function! kronos#tool#datetime#PrintDiff(datesrc, datedest)
   let datediff  = abs(a:datesrc - a:datedest)
   let difffmt   = s:CONST.LABEL[a:datesrc < a:datedest ? 'IN' : 'AGO']
   let intervals = [

@@ -238,17 +238,18 @@ endfunction
 "-------------------------------------------------------# Format task for list #
 
 function! kronos#ui#gui#FormatTaskForList(task)
-  let DateDiff = function('kronos#tool#datetime#GetHumanDiff', [localtime()])
+  let task = copy(a:task)
 
-  let task      = copy(a:task)
-  let task.id   = task.done ? '-' : task.id
+  let DateDiff = function('kronos#tool#datetime#PrintDiff', [localtime()])
+  let Interval = function('kronos#tool#datetime#PrintInterval')
+
+  let task.id         = task.done       ? '-'                       : task.id
+  let task.active     = task.active     ? DateDiff(task.active)     : ''
+  let task.done       = task.done       ? DateDiff(task.done)       : ''
+  let task.due        = task.due        ? DateDiff(task.due)        : ''
+  let task.lastactive = task.lastactive ? DateDiff(task.lastactive) : ''
+  let task.worktime   = task.worktime   ? Interval(task.worktime)   : ''
   let task.tags = join(task.tags, ' ')
-
-  let task.active     = task.active     ? DateDiff(task.active)    : ''
-  let task.done       = task.done       ? DateDiff(task.done)      : ''
-  let task.due        = task.due        ? DateDiff(task.due)       : ''
-  let task.lastactive = task.lastactive ? DateDiff(task.lastactive): ''
-  let task.worktime   = task.worktime   ? task.worktime            : ''
 
   return task
 endfunction
@@ -256,16 +257,17 @@ endfunction
 "-------------------------------------------------------# Format task for info #
 
 function! kronos#ui#gui#FormatTaskForInfo(task)
-  let Date = function('kronos#tool#datetime#GetHumanDate')
+  let task = copy(a:task)
 
-  let task      = copy(a:task)
-  let task.tags = join(task.tags, ' ')
+  let Date     = function('kronos#tool#datetime#PrintDate')
+  let Interval = function('kronos#tool#datetime#PrintInterval')
 
-  let task.active     = task.active     ? Date(task.active)    : ''
-  let task.done       = task.done       ? Date(task.done)      : ''
-  let task.due        = task.due        ? Date(task.due)       : ''
-  let task.lastactive = task.lastactive ? Date(task.lastactive): ''
-  let task.worktime   = task.worktime   ? task.worktime        : ''
+  let task.active     = task.active     ? Date(task.active)       : ''
+  let task.done       = task.done       ? Date(task.done)         : ''
+  let task.due        = task.due        ? Date(task.due)          : ''
+  let task.lastactive = task.lastactive ? Date(task.lastactive)   : ''
+  let task.worktime   = task.worktime   ? Interval(task.worktime) : ''
+  let task.tags       = join(task.tags, ' ')
 
   return task
 endfunction
