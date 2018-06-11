@@ -249,7 +249,7 @@ function! kronos#ui#gui#FormatTaskForList(task)
   let task.due        = task.due        ? DateDiff(task.due)        : ''
   let task.lastactive = task.lastactive ? DateDiff(task.lastactive) : ''
   let task.worktime   = task.worktime   ? Interval(task.worktime)   : ''
-  let task.tags = join(task.tags, ' ')
+  let task.tags       = join(task.tags, ' ')
 
   return task
 endfunction
@@ -262,11 +262,16 @@ function! kronos#ui#gui#FormatTaskForInfo(task)
   let Date     = function('kronos#tool#datetime#PrintDate')
   let Interval = function('kronos#tool#datetime#PrintInterval')
 
+  let wtimestr = task.active
+    \? Interval(task.worktime + localtime() - task.active)
+    \: task.worktime ? Interval(task.worktime) : ''
+
   let task.active     = task.active     ? Date(task.active)       : ''
   let task.done       = task.done       ? Date(task.done)         : ''
   let task.due        = task.due        ? Date(task.due)          : ''
   let task.lastactive = task.lastactive ? Date(task.lastactive)   : ''
-  let task.worktime   = task.worktime   ? Interval(task.worktime) : ''
+
+  let task.worktime   = wtimestr
   let task.tags       = join(task.tags, ' ')
 
   return task
