@@ -9,6 +9,8 @@ let g:kronos_database = get(
 
 command! Kronos call kronos#ui#gui#ShowList()
 
+command! -nargs=* K call kronos#EntryPoint(<q-args>)
+
 "------------------------------------------------------------------------# CLI #
 
 command! -nargs=* KronosAdd
