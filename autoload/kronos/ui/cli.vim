@@ -116,3 +116,10 @@ function! kronos#ui#cli#Done(database, dateref, id)
   endtry
 endfunction
 
+"-------------------------------------------------------------------# Worktime #
+
+function! kronos#ui#cli#Worktime(database, dateref, args)
+  let  worktime = kronos#ui#common#Worktime(a:database, a:dateref, a:args)
+  echo kronos#tool#datetime#PrintInterval(worktime)
+endfunction
+

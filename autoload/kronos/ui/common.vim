@@ -41,7 +41,7 @@ endfunction
 "---------------------------------------------------------------------# Delete #
 
 function! kronos#ui#common#Delete(database, id)
-  call kronos#api#task#Delete(a:database, a:id)
+  return kronos#api#task#Delete(a:database, a:id)
 endfunction
 
 "----------------------------------------------------------------------# Start #
@@ -65,7 +65,7 @@ function! kronos#ui#common#Stop(database, dateref, id)
   let l:task.active = 0
   let l:task.lastactive = a:dateref
 
-  call kronos#api#task#Update(a:database, a:id, l:task)
+  return kronos#api#task#Update(a:database, a:id, l:task)
 endfunction
 
 "-----------------------------------------------------------------------# Done #
@@ -83,17 +83,37 @@ function! kronos#ui#common#Done(database, dateref, id)
   let l:task.done = a:dateref
   let l:task.id   = a:id . a:dateref
 
-  call kronos#api#task#Update(a:database, a:id, l:task)
+  return kronos#api#task#Update(a:database, a:id, l:task)
+endfunction
+
+"-------------------------------------------------------------------# Worktime #
+
+function! kronos#ui#common#Worktime(database, dateref, args)
+  let args = split(a:args, ' ')
+  let [desc, tags, due] = s:ParseArgs(a:dateref, [], args)
+
+  let tasks = kronos#api#task#ReadAll(a:database)
+  let worktime = 0
+
+  for task in tasks
+    let matchtags = filter(copy(tags), 'index(task.tags, v:val) + 1')
+
+    if matchtags == tags
+      let worktime += task.worktime
+    endif
+  endfor
+
+  return worktime
 endfunction
 
 "--------------------------------------------------------------------# Helpers #
 
 function! s:ParseArgs(dateref, tags, args)
+  let l:due = 0
   let l:desc    = []
-  let l:due     = 0
-  let l:tags    = copy(a:tags)
-  let l:newtags = []
   let l:oldtags = []
+  let l:newtags = []
+  let l:tags    = copy(a:tags)
 
   for l:arg in a:args
     if l:arg =~ '^+\w'

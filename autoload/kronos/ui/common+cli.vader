@@ -89,3 +89,26 @@ Then (should mark as done a task):
   AssertThrow kronos#ui#cli#Done(g_database, g_dateref, 1)
   unlet newid
 
+#-------------------------------------------------------------------# Worktime #
+
+Execute (Worktime):
+  call kronos#api#database#Write(g_database, [
+    \{'id': 1, 'done': 0               , 'tags': []        , 'worktime': 30},
+    \{'id': 2, 'done': g_dateref       , 'tags': ['a']     , 'worktime': 0 },
+    \{'id': 3, 'done': g_dateref + 3600, 'tags': ['a', 'b'], 'worktime': 60},
+  \])
+
+  let scenarios = [
+    \[90, ''     ],
+    \[60, '+a'   ],
+    \[60, '+b'   ],
+    \[60, '+a +b'],
+  \]
+
+Then (should calculate worktime):
+  for [expected, tags] in scenarios
+    AssertEqual expected, kronos#ui#common#Worktime(g_database, g_dateref, tags)
+  endfor
+
+  unlet scenarios
+
