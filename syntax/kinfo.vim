@@ -1,24 +1,25 @@
-if exists("b:current_syntax")
+if exists('b:current_syntax')
   finish
 endif
 
 function! s:SetSyntax()
-  let l:keys = kronos#ui#gui#Const().INFO.KEY
-  let l:labels = kronos#ui#gui#Const().LABEL
+  let keys   = kronos#ui#gui#Const().INFO.KEY
+  let labels = kronos#ui#gui#Const().LABEL
 
-  for l:key in l:keys
-    let l:contains = 'contains=KronosInfoSeparator,KronosInfoKey'
-    let l:end = 'end=/$/'
-    let l:label = l:labels[l:key]
-    let l:region = 'region KronosInfo' . toupper(l:key[0]) . l:key[1:]
-    let l:start = 'start=/^' . l:label . '\s*[^\s]/hs=e+1'
+  for key in keys
+    let label    = labels[key]
+    let end      = 'end=/$/'
+    let start    = 'start=/^' . label . '\s*[^\s]/hs=e+1'
+    let contains = 'contains=KronosInfoSeparator,KronosInfoKey'
+    let region   = 'region KronosInfo' . toupper(key[0]) . key[1:]
 
-    execute join(['syntax', l:region, l:start, l:end, l:contains], ' ')
+    execute join(['syntax', region, start, end, contains], ' ')
   endfor
 
   syntax match KronosInfoSeparator /|/
-  syntax match KronosInfoHead /.*\%1l/ contains=KronosInfoSeparator
-  execute 'syntax keyword KronosInfoKey contained ' . join(values(l:labels), ' ')
+  syntax match KronosInfoHead      /.*\%1l/ contains=KronosInfoSeparator
+
+  execute 'syntax keyword KronosInfoKey contained ' . join(values(labels), ' ')
 endfunction
 
 call s:SetSyntax()
@@ -36,5 +37,5 @@ highlight default link KronosInfoWorktime     String
 
 highlight KronosInfoHead term=bold,underline cterm=bold,underline
 
-let b:current_syntax = "kinfo"
+let b:current_syntax = 'kinfo'
 
