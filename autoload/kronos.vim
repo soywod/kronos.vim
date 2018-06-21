@@ -1,4 +1,4 @@
-"---------------------------------------------------------------------# Action #
+" ------------------------------------------------------------------- # Action #
 
 function! s:Actions(dateref, args)
   return [
@@ -15,7 +15,7 @@ function! s:Actions(dateref, args)
   \]
 endfunction
 
-"----------------------------------------------------------------# Entry point #
+" -------------------------------------------------------------- # Entry point #
 
 function! kronos#EntryPoint(args)
   if a:args =~? '^ *$' | return kronos#ui#gui#ShowList() | endif
@@ -30,7 +30,7 @@ function! kronos#EntryPoint(args)
   return kronos#tool#logging#Error('Command not found.')
 endfunction
 
-"---------------------------------------------------------------------# Helper #
+" ------------------------------------------------------------------- # Helper #
 
 function! s:Trigger(action, params)
   let params = empty(a:params) ? '' : ', ' . join(a:params, ', ')
