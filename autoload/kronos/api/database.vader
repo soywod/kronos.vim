@@ -14,7 +14,7 @@ After:
   call kronos#api#database#Purge(g_database)
   unlet g_database g_tasks
 
-#----------------------------------------------------------------------# Write #
+# -------------------------------------------------------------------- # Write #
 
 Execute (Write):
   call kronos#api#database#Write(g_database, g_tasks)
@@ -22,7 +22,7 @@ Execute (Write):
 Then (should write to database):
   Assert filereadable(g_database)
 
-#-----------------------------------------------------------------------# Read #
+# --------------------------------------------------------------------- # Read #
 
 Execute (Read):
   let before = kronos#api#database#Read(g_database)
@@ -32,5 +32,6 @@ Execute (Read):
 Then (should read from database):
   AssertEqual [], before
   AssertEqual g_tasks, after
+
   unlet before after
 
