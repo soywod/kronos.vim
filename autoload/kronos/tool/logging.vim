@@ -6,14 +6,26 @@ function! kronos#tool#logging#Error(msg)
 endfunction
 
 function! kronos#tool#logging#Info(format, id)
-  let l:id = '[' . a:id . ']'
-  let [l:leftstr, l:rightstr] = split(a:format, '%')
+  try
+    let [leftstr, rightstr] = split(a:format, '%')
+  catch
+    let leftstr  = ''
+    let rightstr = a:format =~? '^%' ? a:format[1:] : a:format
+  endtry
 
-  redraw
-  echon l:leftstr
-  echohl Identifier
-  echon l:id
   echohl None
-  echon l:rightstr
+  echon leftstr
+
+  if (a:id + 1)
+    echohl Comment
+    echon '['
+    echohl Identifier
+    echon a:id + 1 ? a:id : ''
+    echohl Comment
+    echon ']'
+  endif
+
+  echohl None
+  echon rightstr
 endfunction
 

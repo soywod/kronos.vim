@@ -1,32 +1,39 @@
+"---------------------------------------------------------------------# Action #
+
+function! s:Actions(dateref, args)
+  return [
+    \['^li\?s\?t\?$'            , 'List'    , []],
+    \['^in\?f\?o\?$'            , 'Info'    , [a:args]],
+    \['^dele\?t\?e\?$'          , 'Delete'  , [a:args]],
+    \['^ad\?d\?$'               , 'Add'     , [a:dateref, a:args]],
+    \['^up\?d\?a\?t\?e\?$'      , 'Update'  , [a:dateref, a:args]],
+    \['^sta\?r\?t\?$'           , 'Start'   , [a:dateref, a:args]],
+    \['^sto\?p\?$'              , 'Stop'    , [a:dateref, a:args]],
+    \['^[st]$'                  , 'Toggle'  , [a:dateref, a:args]],
+    \['^do\?n\?e\?$'            , 'Done'    , [a:dateref, a:args]],
+    \['^wo\?r\?k\?t\?i\?m\?e\?$', 'Worktime', [a:dateref, a:args]],
+  \]
+endfunction
+
+"----------------------------------------------------------------# Entry point #
+
 function! kronos#EntryPoint(args)
   if a:args =~? '^ *$' | return kronos#ui#gui#ShowList() | endif
 
   let farg = split(a:args, ' ')[0]
   let args = a:args[len(farg) + 1:]
 
-  let database = g:kronos_database
-  let now      = localtime()
+  for [regex, action, params] in s:Actions(localtime(), args)
+    if farg =~? regex | return s:Trigger(action, params) | endif
+  endfor
 
-  if farg =~? '^ad\?d\?$'
-    return kronos#ui#cli#Add(database, now, args)
-  elseif farg =~? '^in\?f\?o\?$'
-    return kronos#ui#cli#Info(database, args)
-  elseif farg =~? '^li\?s\?t\?$'
-    return kronos#ui#cli#List(database)
-  elseif farg =~? '^up\?d\?a\?t\?e\?$'
-    return kronos#ui#cli#Update(database, now, args)
-  elseif farg =~? '^dele\?t\?e\?$'
-    return kronos#ui#cli#Delete(database, args)
-  elseif farg =~? '^sta\?r\?t\?$'
-    return kronos#ui#cli#Start(database, now, args)
-  elseif farg =~? '^sto\?p\?$'
-    return kronos#ui#cli#Stop(database, now, args)
-  elseif farg =~? '^[st]$'
-    return kronos#ui#cli#Toggle(database, now, args)
-  elseif farg =~? '^do\?n\?e\?$'
-    return kronos#ui#cli#Done(database, now, args)
-  elseif farg =~? '^wo\?r\?k\?t\?i\?m\?e\?$'
-    return kronos#ui#cli#Worktime(database, now, args)
-  endif
+  return kronos#tool#logging#Error('Command not found.')
+endfunction
+
+"---------------------------------------------------------------------# Helper #
+
+function! s:Trigger(action, params)
+  let params = empty(a:params) ? '' : ', ' . join(a:params, ', ')
+  execute 'call kronos#ui#cli#' . a:action . '(g:kronos_database' . params . ')'
 endfunction
 

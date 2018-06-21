@@ -26,6 +26,7 @@ function! kronos#ui#cli#List(database)
 
   for l:task in l:tasks
     call kronos#tool#logging#Info('% ' . l:task.desc, l:task.id)
+    echo ''
   endfor
 endfunction
 
