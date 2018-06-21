@@ -20,7 +20,7 @@ After:
   call kronos#api#database#Purge(g_database)
   unlet g_database g_task1 g_task2 g_tasks
 
-#----------------------------------------------------------------# Create task #
+# ------------------------------------------------------------------- # Create #
 
 Execute (Create):
   let id1 = kronos#api#task#Create(g_database, g_task1)
@@ -32,7 +32,7 @@ Then (should insert tasks):
   AssertEqual g_tasks, kronos#api#database#Read(g_database)
   unlet id1 id2
 
-#------------------------------------------------------------------# Read task #
+# --------------------------------------------------------------------- # Read #
 
 Execute (Read):
   call kronos#api#task#Create(g_database, g_task1)
@@ -40,7 +40,7 @@ Execute (Read):
 Then (should get a task by id):
   AssertEqual g_task1, kronos#api#task#Read(g_database, 1)
 
-#-------------------------------------------------------------# Read all tasks #
+# ----------------------------------------------------------------- # Read all #
 
 Execute (ReadAll):
   call kronos#api#task#Create(g_database, g_task1)
@@ -52,7 +52,7 @@ Then (should get all tasks):
   AssertEqual kronos#api#database#Read(g_database), tasks
   unlet tasks
 
-#----------------------------------------------------------------# Update task #
+# ------------------------------------------------------------------- # Update #
 
 Execute (Update):
   call kronos#api#task#Create(g_database, g_task1)
@@ -68,7 +68,7 @@ Then (should update a task):
   AssertEqual [taskupdate], kronos#api#database#Read(g_database)
   unlet taskupdate
 
-#----------------------------------------------------------------# Delete task #
+# ------------------------------------------------------------------- # Delete #
 
 Execute (Delete):
   call kronos#api#task#Create(g_database, g_task1)

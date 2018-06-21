@@ -1,47 +1,48 @@
-"----------------------------------------------------------------# Create task #
+" ------------------------------------------------------------------- # Create #
 
 function! kronos#api#task#Create(database, task)
-  let l:tasks    = kronos#api#database#Read(a:database)
-  let l:task     = copy(a:task)
-  let l:task.id  = kronos#tool#task#GenerateId(l:tasks)
-  let l:newtasks = add(copy(l:tasks), l:task)
+  let tasks   = kronos#api#database#Read(a:database)
+  let task    = copy(a:task)
+  let task.id = kronos#tool#task#GenerateId(tasks)
 
-  call kronos#api#database#Write(a:database, l:newtasks)
-  return l:task.id
+  let newtasks = add(copy(tasks), task)
+  call kronos#api#database#Write(a:database, newtasks)
+
+  return task.id
 endfunction
 
-"------------------------------------------------------------------# Read task #
+" --------------------------------------------------------------------- # Read #
 
 function! kronos#api#task#Read(database, id)
-  let l:tasks = copy(kronos#api#database#Read(a:database))
-  let l:index = kronos#tool#task#GetIndexById(l:tasks, a:id)
+  let tasks = copy(kronos#api#database#Read(a:database))
+  let index = kronos#tool#task#GetIndexById(tasks, a:id)
 
-  return l:tasks[l:index]
+  return tasks[index]
 endfunction
 
-"-------------------------------------------------------------# Read all tasks #
+" ----------------------------------------------------------------- # Read all #
 
 function! kronos#api#task#ReadAll(database)
   return kronos#api#database#Read(a:database)
 endfunction
 
-"----------------------------------------------------------------# Update task #
+" ------------------------------------------------------------------- # Update #
 
 function! kronos#api#task#Update(database, id, task)
-  let l:newtasks          = copy(kronos#api#database#Read(a:database))
-  let l:index             = kronos#tool#task#GetIndexById(l:newtasks, a:id)
-  let l:newtasks[l:index] = copy(a:task)
+  let newtasks = copy(kronos#api#database#Read(a:database))
+  let index    = kronos#tool#task#GetIndexById(newtasks, a:id)
 
-  call kronos#api#database#Write(a:database, l:newtasks)
+  let newtasks[index] = copy(a:task)
+  call kronos#api#database#Write(a:database, newtasks)
 endfunction
 
-"----------------------------------------------------------------# Delete task #
+" ------------------------------------------------------------------- # Delete #
 
 function! kronos#api#task#Delete(database, id)
-  let l:newtasks = copy(kronos#api#database#Read(a:database))
-  let l:index    = kronos#tool#task#GetIndexById(l:newtasks, a:id)
+  let newtasks = copy(kronos#api#database#Read(a:database))
+  let index    = kronos#tool#task#GetIndexById(newtasks, a:id)
 
-  call remove(l:newtasks, l:index)
-  call kronos#api#database#Write(a:database, l:newtasks)
+  call remove(newtasks, index)
+  call kronos#api#database#Write(a:database, newtasks)
 endfunction
 
