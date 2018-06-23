@@ -41,7 +41,7 @@ Kronos comes with a unique command and its alias:
 >
   :Kronos <command> <args>
   :K      <command> <args>
->
+<
 Here the list of all available commands with their alias:
 >
   :K(ronos)                        | Start the GUI
@@ -55,18 +55,18 @@ Here the list of all available commands with their alias:
   :K(ronos) t(oggle)   <id>        | Start or stop a task
   :K(ronos) d(one)     <id>        | Mark as done a task
   :K(ronos) w(orktime) <id>        | Show the total worktime for a task
->
+<
 ==============================================================================
 ADD                                                               *kronos-add*
 
-The command to add a new task:
+To add a new task:
 >
   :K(ronos) a(dd) <desc> <tags> <due>
->
+<
 A {tag} must start by *+* and should not contain any space. Eg:
 >
   :K a +tag +tag-2 +tag_3
->
+<
 A {due} must start by *:* and should contain numbers only.
 The full format of a valid due is *:DDMMYY:HHMM* but almost everything can be
 omitted. Here some example to understand better the concept:
@@ -126,17 +126,23 @@ end up with the same result:
 ==============================================================================
 UPDATE                                                         *kronos-update*
 
-The command to update a task:
+To update a task:
 >
   :K(ronos) u(pdate) <id> <desc> <tags> <due>
->
+<
 Same usage as |kronos-add|, exept for {tags}. You can remove an existing tag by
 prefixing it with a *-* .
 
 For eg., to remove *oldtag* and add *newtag* to task *42* :
 >
   :K u 42 -oldtag +newtag
->
+<
+==============================================================================
+MAPPINGS                                                     *kronos-mappings*
 
+To start the GUI mode:
+>
+  :K(ronos)
+<
 vim:tw=78:ts=4:ft=help:norl:
 
