@@ -35,7 +35,6 @@ it, feel free to contribute (see |kronos-contributing|).
 
 ==============================================================================
 USAGE                                                           *kronos-usage*
-------------------------------------------------------------------------------
 GENERAL                                                 *kronos-usage-general*
 
 Kronos comes with a unique command and its alias:
@@ -43,7 +42,7 @@ Kronos comes with a unique command and its alias:
   :Kronos <command> <args>
   :K      <command> <args>
 >
-Here the list of all available commands:
+Here the list of all available commands with their alias:
 >
   :K(ronos)                        | Start the GUI
   :K(ronos) l(ist)                 | List all tasks
@@ -57,7 +56,7 @@ Here the list of all available commands:
   :K(ronos) d(one)     <id>        | Mark as done a task
   :K(ronos) w(orktime) <id>        | Show the total worktime for a task
 >
-------------------------------------------------------------------------------
+==============================================================================
 ADD                                                               *kronos-add*
 
 The command to add a new task:
@@ -76,40 +75,40 @@ omitted. Here some example to understand better the concept:
 *<month>* means the current month
 *<year>*  means the current year
 
-Full due
+Full due:
 >
   :K a :100518:1200 | 10th of May 2018, 12h00
 <
-If minutes omitted, set to *00*
+If minutes omitted, set to *00* :
 >
   :K a :100518:12   | 10th of May 2018, 12h00
 <
-If hours omitted, set to *00*
+If hours omitted, set to *00* :
 >
   :K a :100518      | 10th of May 2018, 00h00
 <
 If years omitted, try first the current year. If the final date is exceeded,
-try with the next year
+try with the next year:
 >
   :K a :1005        | 10th of May <year> or <year>+1, 00h00
 <
 If months omitted, try first the current month. If the final date is exceeded,
-try with the next month
+try with the next month:
 >
   :K a :10          | 10th of <month> or <month>+1 <year>, 00h00
 <
 If days omitted, try first the current day. If the final date is exceeded try
-with the next day
+with the next day:
 >
   :K a :            | <day> or <day>+1 of <month> <year>, 00h00
   :K a ::8          | <day> or <day>+1 of <month> <year>, 08h00
 <
-All together
+All together:
 >
   Command executed on 1st of March, 2018 at 21h21
   :K a my awesome task +firstTask :3:18 +awesome
 <
-will result in
+will result in:
 >
   {
     desc: my awesome task
@@ -124,8 +123,20 @@ end up with the same result:
   :K a my awesome task +firstTask :3:18 +awesome
   :K a my +awesame awesome :3:18 +firstTask task
 <
-------------------------------------------------------------------------------
+==============================================================================
 UPDATE                                                         *kronos-update*
+
+The command to update a task:
+>
+  :K(ronos) u(pdate) <id> <desc> <tags> <due>
+>
+Same usage as |kronos-add|, exept for {tags}. You can remove an existing tag by
+prefixing it with a *-* .
+
+For eg., to remove *oldtag* and add *newtag* to task *42* :
+>
+  :K u 42 -oldtag +newtag
+>
 
 vim:tw=78:ts=4:ft=help:norl:
 
