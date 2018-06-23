@@ -36,8 +36,7 @@ to be more simple (focusing on what it's really needed). I hope you will enjoy
 it, feel free to contribute (see |kronos-contributing|).
 
 ==============================================================================
-USAGE                                                           *kronos-usage*
-GENERAL                                                 *kronos-usage-general*
+USAGE                                    *kronos-usage* *kronos-usage-general*
 
 Kronos comes with a unique command and its alias:
 >
@@ -58,7 +57,7 @@ Here the list of all available commands with their alias:
   :K(ronos) d(one)     <id>        | Mark as done a task
   :K(ronos) w(orktime) <id>        | Show the total worktime for a task
 <
-==============================================================================
+------------------------------------------------------------------------------
 ADD                                                               *kronos-add*
 
 To add a new task:
@@ -125,7 +124,7 @@ end up with the same result:
   :K a my awesome task +firstTask :3:18 +awesome
   :K a my +awesame awesome :3:18 +firstTask task
 <
-==============================================================================
+------------------------------------------------------------------------------
 UPDATE                                                         *kronos-update*
 
 To update a task:
@@ -150,7 +149,7 @@ There is 2 different types of buffer (filetype): *klist* and *kinfo* (for
 tasks list and task info). When you start the GUI mode, you arrive on the
 *klist* buffer.
 
-==============================================================================
+------------------------------------------------------------------------------
 KLIST                                                           *kronos-klist*
 
 Add       <a>                     You will be prompted args (see |kronos-add|)
@@ -164,10 +163,28 @@ Done      <D>                                 Mark task under cursor as done
 Refresh   <r>                                            Refresh all the GUI
 Quit      <q>                                              Quit the GUI mode
 
-==============================================================================
+------------------------------------------------------------------------------
 KINFO                                                           *kronos-kinfo*
 
 Quit      <q>, <i>, <Escape>                          Quit the GUI info mode
+
+==============================================================================
+CONFIGURATION                                                  *kronos-config*
+
+==============================================================================
+LICENCE                                                       *kronos-licence*
+
+==============================================================================
+BUGS                                                             *kronos-bugs*
+
+==============================================================================
+CONTRIBUTING                                             *kronos-contributing*
+
+==============================================================================
+CHANGELOG                                                   *kronos-changelog*
+
+==============================================================================
+CREDITS                                                       *kronos-credits*
 
 vim:tw=78:ts=4:ft=help:norl:
 
