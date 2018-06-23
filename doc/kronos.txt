@@ -1,10 +1,10 @@
 *kronos.txt* - A simple task and time manager for vim.
 
-         _/    _/  _/_/_/      _/_/    _/      _/    _/_/      _/_/_/   
-        _/  _/    _/    _/  _/    _/  _/_/    _/  _/    _/  _/          
-       _/_/      _/_/_/    _/    _/  _/  _/  _/  _/    _/    _/_/       
-      _/  _/    _/    _/  _/    _/  _/    _/_/  _/    _/        _/      
-     _/    _/  _/    _/    _/_/    _/      _/    _/_/    _/_/_/         
+           _/    _/  _/_/_/      _/_/    _/      _/    _/_/      _/_/_/   
+          _/  _/    _/    _/  _/    _/  _/_/    _/  _/    _/  _/          
+         _/_/      _/_/_/    _/    _/  _/  _/  _/  _/    _/    _/_/       
+        _/  _/    _/    _/  _/    _/  _/    _/_/  _/    _/        _/      
+       _/    _/  _/    _/    _/_/    _/      _/    _/_/    _/_/_/         
                                                                    
 ==============================================================================
 CONTENTS                                                     *kronos-contents*
@@ -18,6 +18,40 @@ CONTENTS                                                     *kronos-contents*
   7. Contributing ...................................... |kronos-contributing|
   8. Changelog ............................................ |kronos-changelog|
   9. Credits ................................................ |kronos-credits|
+
+==============================================================================
+INTRODUCTION                                                          *kronos*
+
+Kronos is a simple task and time manager for vim, inspired by {Taskwarrior}
+and {Timewarrior} (see |kronos-credits| for more details).
+
+{Taskwarrior} and {Timewarrior} are very good and complete tools, but complex
+and not so easy to understand. {Kronos} aims to unify both tools in one, and
+to be more simple (focusing on what it's really needed). I hope you will
+enjoy it, feel free to contribute (see |kronos-contributing|).
+
+==============================================================================
+USAGE                                                           *kronos-usage*
+
+Kronos comes with a unique command and its alias:
+>
+  :Kronos <command> <args>
+  :K      <command> <args>
+>
+Here the list of all available commands:
+>
+  :K                        | Start the GUI
+  :K l(ist)                 | List all tasks
+  :K i(nfo)     <id>        | Show task informations
+  :K del(ete)   <id>        | Delete a task
+  :K a(dd)      <args>      | Add a new task
+  :K u(pdate)   <id> <args> | Update a task
+  :K sta(rt)    <id>        | Start a task
+  :K sto(p)     <id>        | Stop a task
+  :K t(oggle)   <id>        | Start or stop a task
+  :K d(one)     <id>        | Mark as done a task
+  :K w(orktime) <id>        | Show the total worktime for a task
+>
 
 vim:tw=78:ts=4:ft=help:norl:
 
