@@ -34,65 +34,65 @@ Before:
   \}
 
 After:
-  call kronos#api#database#Purge(g_database)
+  call kronos#core#database#Purge(g_database)
   unlet g_database g_dateref g_task g_taskupdate g_taskstart g_taskstop
 
-#------------------------------------------------------------------------# Add #
+# ---------------------------------------------------------------------- # Add #
 
 Execute (Add):
-  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#core#ui#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
 
 Then (should add new task):
-  AssertEqual [g_task], kronos#api#database#Read(g_database)
+  AssertEqual [g_task], kronos#core#database#Read(g_database)
 
-#---------------------------------------------------------------------# Update #
+# ------------------------------------------------------------------- # Update #
 
 Execute (Update):
-  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
-
-  call kronos#ui#cli#Update(g_database, g_dateref, '1 +cli test :18 -a +b-c +c')
+  call kronos#core#ui#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#core#ui#Update(g_database, g_dateref, '1 +cli test :18 -a +b-c +c')
 
 Then (should update a task):
-  AssertEqual [g_taskupdate], kronos#api#database#Read(g_database)
+  AssertEqual [g_taskupdate], kronos#core#database#Read(g_database)
 
-#----------------------------------------------------------------------# Start #
+# -------------------------------------------------------------------- # Start #
 
 Execute (Start):
-  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
-  call kronos#ui#cli#Start(g_database, g_dateref + 3600, 1)
+  call kronos#core#ui#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#core#ui#Start(g_database, g_dateref + 3600, 1)
 
 Then (should start a task):
-  AssertEqual [g_taskstart], kronos#api#database#Read(g_database)
-  AssertThrow kronos#ui#cli#Start(g_database, g_dateref, 1)
+  AssertEqual [g_taskstart], kronos#core#database#Read(g_database)
+  AssertThrow kronos#core#ui#Start(g_database, g_dateref, 1)
 
-#-----------------------------------------------------------------------# Stop #
+# --------------------------------------------------------------------- # Stop #
 
 Execute (Stop):
-  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
-  call kronos#ui#cli#Start(g_database, g_dateref + 3600, 1)
-  call kronos#ui#cli#Stop(g_database, g_dateref + 3600 * 2, 1)
+  call kronos#core#ui#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#core#ui#Start(g_database, g_dateref + 3600, 1)
+  call kronos#core#ui#Stop(g_database, g_dateref + 3600 * 2, 1)
 
 Then (should stop a task):
-  AssertEqual [g_taskstop], kronos#api#database#Read(g_database)
-  AssertThrow kronos#ui#cli#Stop(g_database, g_dateref, 1)
+  AssertEqual [g_taskstop], kronos#core#database#Read(g_database)
+  AssertThrow kronos#core#ui#Stop(g_database, g_dateref, 1)
 
-#-----------------------------------------------------------------------# Done #
+# --------------------------------------------------------------------- # Done #
 
 Execute (Done):
   let newid = 1 . (g_dateref + 3600 * 2)
-  call kronos#ui#cli#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
-  call kronos#ui#cli#Start(g_database, g_dateref + 3600, 1)
-  call kronos#ui#cli#Done(g_database, g_dateref + 3600 * 2, 1)
+  call kronos#core#ui#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#core#ui#Start(g_database, g_dateref + 3600, 1)
+  call kronos#core#ui#Done(g_database, g_dateref + 3600 * 2, 1)
 
 Then (should mark as done a task):
-  AssertEqual [g_taskdone], kronos#api#database#Read(g_database)
-  AssertThrow kronos#ui#cli#Done(g_database, g_dateref, 1)
+  AssertEqual [g_taskdone], kronos#core#database#Read(g_database)
+  AssertThrow kronos#core#ui#Done(g_database, g_dateref, 1)
+
   unlet newid
 
-#-------------------------------------------------------------------# Worktime #
+# ----------------------------------------------------------------- # Worktime #
 
 Execute (Worktime):
-  call kronos#api#database#Write(g_database, [
+  call kronos#core#database#Write(g_database, [
     \{'id': 1, 'done': 0               , 'tags': []        , 'worktime': 30},
     \{'id': 2, 'done': g_dateref       , 'tags': ['a']     , 'worktime': 0 },
     \{'id': 3, 'done': g_dateref + 3600, 'tags': ['a', 'b'], 'worktime': 60},
@@ -107,7 +107,7 @@ Execute (Worktime):
 
 Then (should calculate worktime):
   for [expected, tags] in scenarios
-    AssertEqual expected, kronos#ui#common#Worktime(g_database, g_dateref, tags)
+    AssertEqual expected, kronos#core#ui#Worktime(g_database, g_dateref, tags)
   endfor
 
   unlet scenarios

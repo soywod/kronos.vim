@@ -11,13 +11,13 @@ Before:
   \}]
 
 After:
-  call kronos#api#database#Purge(g_database)
+  call kronos#core#database#Purge(g_database)
   unlet g_database g_tasks
 
 # -------------------------------------------------------------------- # Write #
 
 Execute (Write):
-  call kronos#api#database#Write(g_database, g_tasks)
+  call kronos#core#database#Write(g_database, g_tasks)
 
 Then (should write to database):
   Assert filereadable(g_database)
@@ -25,9 +25,9 @@ Then (should write to database):
 # --------------------------------------------------------------------- # Read #
 
 Execute (Read):
-  let before = kronos#api#database#Read(g_database)
-  call kronos#api#database#Write(g_database, g_tasks)
-  let after = kronos#api#database#Read(g_database)
+  let before = kronos#core#database#Read(g_database)
+  call kronos#core#database#Write(g_database, g_tasks)
+  let after = kronos#core#database#Read(g_database)
 
 Then (should read from database):
   AssertEqual [], before

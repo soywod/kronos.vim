@@ -1,12 +1,12 @@
-"------------------------------------------------------------------# Constants #
+" ---------------------------------------------------------------- # Constants #
 
-let s:SECS_IN_SEC    = 1
-let s:SECS_IN_MIN    = 60
-let s:MINS_IN_HOUR   = 60
-let s:HOURS_IN_DAY   = 24
-let s:DAYS_IN_WEEK   = 7
-let s:DAYS_IN_MONTH  = 32
-let s:DAYS_IN_YEAR   = 366
+let s:SECS_IN_SEC   = 1
+let s:SECS_IN_MIN   = 60
+let s:MINS_IN_HOUR  = 60
+let s:HOURS_IN_DAY  = 24
+let s:DAYS_IN_WEEK  = 7
+let s:DAYS_IN_MONTH = 32
+let s:DAYS_IN_YEAR  = 366
 
 let s:PARSE_DUE_REGEX =
   \'^:\(\d\{0,2}\)\(\d\{0,2}\)\(\d\{2}\)\?:\?\(\d\{0,2}\)\(\d\{0,2}\)$'
@@ -41,20 +41,19 @@ function! kronos#tool#datetime#Const()
   return s:CONST
 endfunction
 
-"-------------------------------------------------------------# Get human date #
+" ----------------------------------------------------------- # Get human date #
 
 function! kronos#tool#datetime#PrintDate(date)
   return strftime(s:CONST.DATE_FORMAT, a:date)
 endfunction
 
-"-----------------------------------------------------------# Print human time #
+" --------------------------------------------------------- # Print human time #
 
 function! kronos#tool#datetime#PrintInterval(interval)
-  let diffarr  = []
   let interval = a:interval
-  let units    = ['YEAR', 'MONTH', 'WEEK', 'DAY', 'HOUR', 'MIN', 'SEC']
+  let diffarr  = []
 
-  for unit in units
+  for unit in ['YEAR', 'MONTH', 'WEEK', 'DAY', 'HOUR', 'MIN', 'SEC']
     let nbsec = s:CONST.SECONDE_IN[unit]
     let ratio = interval / nbsec
 
@@ -69,7 +68,7 @@ function! kronos#tool#datetime#PrintInterval(interval)
   return join(diffarr, ' ')
 endfunction
 
-"-----------------------------------------------------------------# Print diff #
+" --------------------------------------------------------------- # Print diff #
 
 function! kronos#tool#datetime#PrintDiff(datesrc, datedest)
   let datediff  = abs(a:datesrc - a:datedest)
@@ -99,66 +98,64 @@ function! kronos#tool#datetime#PrintDiff(datesrc, datedest)
   endfor
 endfunction
 
-"------------------------------------------------------------------# Parse due #
+" ---------------------------------------------------------------- # Parse due #
 
 function! kronos#tool#datetime#ParseDue(dateref, duestr)
-  let Parse = function('kronos#tool#datetime#ParseDueRecursive')
-
   let matches = matchlist(a:duestr, s:PARSE_DUE_REGEX)
-  let due  = Parse(a:dateref, 0, l:matches[1:5])
+  let due  = kronos#tool#datetime#ParseDueRecursive(a:dateref, 0, matches[1:5])
   let due -= strftime('%S', due)
 
   return due
 endfunction
 
 function! kronos#tool#datetime#ParseDueRecursive(dateref, dateapprox, payload)
-  let [l:day, l:month, l:year, l:hour, l:min] = a:payload
-  let [l:dayref, l:monthref, l:yearref, l:hourref, l:minref] = split(
+  let [day, month, year, hour, min] = a:payload
+  let [dayref, monthref, yearref, hourref, minref] = split(
     \strftime('%d/%m/%y/%H/%M', a:dateref),
     \'/',
   \)
 
-  let l:daymatch   = l:day   == '' ? l:dayref   : +l:day
-  let l:monthmatch = l:month == '' ? l:monthref : +l:month
-  let l:yearmatch  = l:year  == '' ? l:yearref  : +l:year
-  let l:hourmatch  = l:hour  == '' ? l:hourref  : +l:hour
-  let l:minmatch   = l:min   == '' ? 0          : +l:min
+  let daymatch   = day   == '' ? dayref   : +day
+  let monthmatch = month == '' ? monthref : +month
+  let yearmatch  = year  == '' ? yearref  : +year
+  let hourmatch  = hour  == '' ? hourref  : +hour
+  let minmatch   = min   == '' ? 0        : +min
 
-  let l:daydiff   = (l:daymatch - l:dayref)     * s:CONST.SECONDE_IN.DAY
-  let l:monthdiff = (l:monthmatch - l:monthref) * s:CONST.SECONDE_IN.MONTH
-  let l:yeardiff  = (l:yearmatch - l:yearref)   * s:CONST.SECONDE_IN.YEAR
-  let l:hourdiff  = (l:hourmatch - l:hourref)   * s:CONST.SECONDE_IN.HOUR
-  let l:mindiff   = (l:minmatch - l:minref)     * s:CONST.SECONDE_IN.MIN
+  let daydiff   = (daymatch - dayref)     * s:CONST.SECONDE_IN.DAY
+  let monthdiff = (monthmatch - monthref) * s:CONST.SECONDE_IN.MONTH
+  let yeardiff  = (yearmatch - yearref)   * s:CONST.SECONDE_IN.YEAR
+  let hourdiff  = (hourmatch - hourref)   * s:CONST.SECONDE_IN.HOUR
+  let mindiff   = (minmatch - minref)     * s:CONST.SECONDE_IN.MIN
 
-  let l:diff = l:daydiff + l:monthdiff + l:yeardiff + l:mindiff + l:hourdiff
-  if  l:diff == 0 | return a:dateref | endif
+  let diff = daydiff + monthdiff + yeardiff + mindiff + hourdiff
+  if  diff == 0 | return a:dateref | endif
 
-  if l:diff < 0
-    if     l:yeardiff  < 0 | throw 'invalid-date'
-    elseif l:monthdiff < 0 | let l:diff += s:CONST.SECONDE_IN.YEAR
-    elseif l:daydiff   < 0 | let l:diff += s:CONST.SECONDE_IN.MONTH
-    elseif l:hourdiff  < 0 | let l:diff += s:CONST.SECONDE_IN.DAY
-    elseif l:mindiff   < 0 | let l:diff += s:CONST.SECONDE_IN.DAY
+  if diff < 0
+    if     yeardiff  < 0 | throw 'invalid-date'
+    elseif monthdiff < 0 | let diff += s:CONST.SECONDE_IN.YEAR
+    elseif daydiff   < 0 | let diff += s:CONST.SECONDE_IN.MONTH
+    elseif hourdiff  < 0 | let diff += s:CONST.SECONDE_IN.DAY
+    elseif mindiff   < 0 | let diff += s:CONST.SECONDE_IN.DAY
     endif
   endif
 
-  let l:dateapprox = a:dateref + l:diff
+  let dateapprox = a:dateref + diff
 
-  if l:day != ''
-    let l:delta       = l:day - strftime('%d', l:dateapprox)
-    let l:dateapprox += l:delta * s:CONST.SECONDE_IN.DAY
+  if day != ''
+    let delta       = day - strftime('%d', dateapprox)
+    let dateapprox += delta * s:CONST.SECONDE_IN.DAY
   endif
 
-  let l:delta       = l:hour - strftime('%H', l:dateapprox)
-  let l:dateapprox += l:delta * s:CONST.SECONDE_IN.HOUR
-  if  l:dateapprox == a:dateapprox | return l:dateapprox | endif
+  let delta       = hour - strftime('%H', dateapprox)
+  let dateapprox += delta * s:CONST.SECONDE_IN.HOUR
+  if  dateapprox == a:dateapprox | return dateapprox | endif
 
-  return kronos#tool#datetime#ParseDueRecursive(a:dateref, l:dateapprox, [
-    \l:day,
-    \strftime('%m', l:dateapprox),
-    \strftime('%y', l:dateapprox),
-    \l:hour,
-    \strftime('%M', l:dateapprox),
+  return kronos#tool#datetime#ParseDueRecursive(a:dateref, dateapprox, [
+    \day,
+    \strftime('%m', dateapprox),
+    \strftime('%y', dateapprox),
+    \hour,
+    \strftime('%M', dateapprox),
   \])
 endfunction
 

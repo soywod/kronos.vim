@@ -3,8 +3,8 @@ if exists('b:current_syntax')
 endif
 
 function! s:SetSyntax()
-  let columns = kronos#ui#gui#Const().LIST.COLUMN
-  let widths  = kronos#ui#gui#Const().LIST.WIDTH
+  let columns = kronos#gui#Const().LIST.COLUMN
+  let widths  = kronos#gui#Const().LIST.WIDTH
 
   let end   = 0
   let start = 1

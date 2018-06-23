@@ -17,63 +17,63 @@ Before:
   let g_tasks = [g_task1, g_task2]
 
 After:
-  call kronos#api#database#Purge(g_database)
+  call kronos#core#database#Purge(g_database)
   unlet g_database g_task1 g_task2 g_tasks
 
 # ------------------------------------------------------------------- # Create #
 
 Execute (Create):
-  let id1 = kronos#api#task#Create(g_database, g_task1)
-  let id2 = kronos#api#task#Create(g_database, g_task2)
+  let id1 = kronos#core#task#Create(g_database, g_task1)
+  let id2 = kronos#core#task#Create(g_database, g_task2)
 
 Then (should insert tasks):
   AssertEqual 1, id1
   AssertEqual 2, id2
-  AssertEqual g_tasks, kronos#api#database#Read(g_database)
+  AssertEqual g_tasks, kronos#core#database#Read(g_database)
   unlet id1 id2
 
 # --------------------------------------------------------------------- # Read #
 
 Execute (Read):
-  call kronos#api#task#Create(g_database, g_task1)
+  call kronos#core#task#Create(g_database, g_task1)
 
 Then (should get a task by id):
-  AssertEqual g_task1, kronos#api#task#Read(g_database, 1)
+  AssertEqual g_task1, kronos#core#task#Read(g_database, 1)
 
 # ----------------------------------------------------------------- # Read all #
 
 Execute (ReadAll):
-  call kronos#api#task#Create(g_database, g_task1)
-  call kronos#api#task#Create(g_database, g_task2)
-  let tasks = kronos#api#task#ReadAll(g_database)
+  call kronos#core#task#Create(g_database, g_task1)
+  call kronos#core#task#Create(g_database, g_task2)
+  let tasks = kronos#core#task#ReadAll(g_database)
 
 Then (should get all tasks):
   AssertEqual g_tasks, tasks
-  AssertEqual kronos#api#database#Read(g_database), tasks
+  AssertEqual kronos#core#database#Read(g_database), tasks
   unlet tasks
 
 # ------------------------------------------------------------------- # Update #
 
 Execute (Update):
-  call kronos#api#task#Create(g_database, g_task1)
+  call kronos#core#task#Create(g_database, g_task1)
   let taskupdate = {
     \'id': 1, 'desc': 'test kronos updated',
     \'tags': ['test', 'vader', 'kronos', 'update'], 'due': 1527462654,
     \'active': 0, 'lastactive': 0, 'worktime': 0, 'done': 0,
   \}
 
-  call kronos#api#task#Update(g_database, 1, taskupdate)
+  call kronos#core#task#Update(g_database, 1, taskupdate)
 
 Then (should update a task):
-  AssertEqual [taskupdate], kronos#api#database#Read(g_database)
+  AssertEqual [taskupdate], kronos#core#database#Read(g_database)
   unlet taskupdate
 
 # ------------------------------------------------------------------- # Delete #
 
 Execute (Delete):
-  call kronos#api#task#Create(g_database, g_task1)
-  call kronos#api#task#Delete(g_database, 1)
+  call kronos#core#task#Create(g_database, g_task1)
+  call kronos#core#task#Delete(g_database, 1)
 
 Then (should delete a task by id):
-  AssertEqual [], kronos#api#database#Read(g_database)
+  AssertEqual [], kronos#core#database#Read(g_database)
 

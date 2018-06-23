@@ -1,4 +1,4 @@
-"----------------------------------------------------------------# Generate ID #
+" -------------------------------------------------------------- # Generate ID #
 
 function! kronos#tool#task#GenerateId(tasks)
   let l:newid = 1
@@ -11,7 +11,7 @@ function! kronos#tool#task#GenerateId(tasks)
   return l:newid
 endfunction
 
-"------------------------------------------------------------# Get index by ID #
+" ---------------------------------------------------------- # Get index by ID #
 
 function! kronos#tool#task#GetIndexById(tasks, id)
   let l:index = 0

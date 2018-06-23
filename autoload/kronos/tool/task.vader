@@ -1,4 +1,4 @@
-#----------------------------------------------------------------# Generate ID #
+# -------------------------------------------------------------- # Generate ID #
 
 Execute (GenerateId):
 Then (should generate correct id):
@@ -6,7 +6,7 @@ Then (should generate correct id):
   AssertEqual 1, kronos#tool#task#GenerateId([{'id': 2}, {'id': 3}, {'id': 5}])
   AssertEqual 4, kronos#tool#task#GenerateId([{'id': 1}, {'id': 2}, {'id': 3}])
 
-#------------------------------------------------------------# Get index by ID #
+# ---------------------------------------------------------- # Get index by ID #
 
 Execute (GetIndexById):
   let tasks = [{'id': 1}, {'id': 2}]
@@ -15,5 +15,6 @@ Then (should get task index by id):
   AssertEqual 0, kronos#tool#task#GetIndexById(tasks, 1)
   AssertEqual 1, kronos#tool#task#GetIndexById(tasks, 2)
   AssertThrows kronos#tool#task#GetIndexById(tasks, 0)
+
   unlet tasks
 

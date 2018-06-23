@@ -3,8 +3,8 @@ if exists('b:current_syntax')
 endif
 
 function! s:SetSyntax()
-  let keys   = kronos#ui#gui#Const().INFO.KEY
-  let labels = kronos#ui#gui#Const().LABEL
+  let keys   = kronos#gui#Const().INFO.KEY
+  let labels = kronos#gui#Const().LABEL
 
   for key in keys
     let label    = labels[key]
