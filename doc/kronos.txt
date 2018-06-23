@@ -11,6 +11,9 @@ CONTENTS                                                     *kronos-contents*
 
   1. Introduction ................................................... |kronos|
   2. Usage .................................................... |kronos-usage|
+    a. General ........................................ |kronos-usage-general|
+    b. Add ...................................................... |kronos-add|
+    c. Update ................................................ |kronos-update|
   3. Mappings ...............................................|kronos-mappings|
   4. Configuration ........................................... |kronos-config|
   5. Licence ................................................ |kronos-licence|
@@ -27,11 +30,13 @@ and {Timewarrior} (see |kronos-credits| for more details).
 
 {Taskwarrior} and {Timewarrior} are very good and complete tools, but complex
 and not so easy to understand. {Kronos} aims to unify both tools in one, and
-to be more simple (focusing on what it's really needed). I hope you will
-enjoy it, feel free to contribute (see |kronos-contributing|).
+to be more simple (focusing on what it's really needed). I hope you will enjoy
+it, feel free to contribute (see |kronos-contributing|).
 
 ==============================================================================
 USAGE                                                           *kronos-usage*
+------------------------------------------------------------------------------
+GENERAL                                                 *kronos-usage-general*
 
 Kronos comes with a unique command and its alias:
 >
@@ -40,18 +45,87 @@ Kronos comes with a unique command and its alias:
 >
 Here the list of all available commands:
 >
-  :K                        | Start the GUI
-  :K l(ist)                 | List all tasks
-  :K i(nfo)     <id>        | Show task informations
-  :K del(ete)   <id>        | Delete a task
-  :K a(dd)      <args>      | Add a new task
-  :K u(pdate)   <id> <args> | Update a task
-  :K sta(rt)    <id>        | Start a task
-  :K sto(p)     <id>        | Stop a task
-  :K t(oggle)   <id>        | Start or stop a task
-  :K d(one)     <id>        | Mark as done a task
-  :K w(orktime) <id>        | Show the total worktime for a task
+  :K(ronos)                        | Start the GUI
+  :K(ronos) l(ist)                 | List all tasks
+  :K(ronos) i(nfo)     <id>        | Show task informations
+  :K(ronos) del(ete)   <id>        | Delete a task
+  :K(ronos) a(dd)      <args>      | Add a new task
+  :K(ronos) u(pdate)   <id> <args> | Update a task
+  :K(ronos) sta(rt)    <id>        | Start a task
+  :K(ronos) sto(p)     <id>        | Stop a task
+  :K(ronos) t(oggle)   <id>        | Start or stop a task
+  :K(ronos) d(one)     <id>        | Mark as done a task
+  :K(ronos) w(orktime) <id>        | Show the total worktime for a task
 >
+------------------------------------------------------------------------------
+ADD                                                               *kronos-add*
+
+The command to add a new task:
+>
+  :K(ronos) a(dd) <desc> <tags> <due>
+>
+A {tag} must start by *+* and should not contain any space. Eg:
+>
+  :K a +tag +tag-2 +tag_3
+>
+A {due} must start by *:* and should contain numbers only.
+The full format of a valid due is *:DDMMYY:HHMM* but almost everything can be
+omitted. Here some example to understand better the concept:
+
+*<day>*   means the current day (day when the command is executed)
+*<month>* means the current month
+*<year>*  means the current year
+
+Full due
+>
+  :K a :100518:1200 | 10th of May 2018, 12h00
+<
+If minutes omitted, set to *00*
+>
+  :K a :100518:12   | 10th of May 2018, 12h00
+<
+If hours omitted, set to *00*
+>
+  :K a :100518      | 10th of May 2018, 00h00
+<
+If years omitted, try first the current year. If the final date is exceeded,
+try with the next year
+>
+  :K a :1005        | 10th of May <year> or <year>+1, 00h00
+<
+If months omitted, try first the current month. If the final date is exceeded,
+try with the next month
+>
+  :K a :10          | 10th of <month> or <month>+1 <year>, 00h00
+<
+If days omitted, try first the current day. If the final date is exceeded try
+with the next day
+>
+  :K a :            | <day> or <day>+1 of <month> <year>, 00h00
+  :K a ::8          | <day> or <day>+1 of <month> <year>, 08h00
+<
+All together
+>
+  Command executed on 1st of March, 2018 at 21h21
+  :K a my awesome task +firstTask :3:18 +awesome
+<
+will result in
+>
+  {
+    desc: my awesome task
+    tags: [firstTask, awesome]
+    due : 3rd of March 2018, 18h00
+  }
+<
+The order is not important, tags can be everywhere, and due as well. The desc
+is the remaining of text present after removing tags and due. Both examples
+end up with the same result:
+>
+  :K a my awesome task +firstTask :3:18 +awesome
+  :K a my +awesame awesome :3:18 +firstTask task
+<
+------------------------------------------------------------------------------
+UPDATE                                                         *kronos-update*
 
 vim:tw=78:ts=4:ft=help:norl:
 
