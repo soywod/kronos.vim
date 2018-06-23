@@ -74,7 +74,7 @@ function! kronos#gui#Info()
     return kronos#tool#log#Error('Error while reading task.')
   endtry
 
-  let task = kronos#gui#FormatTaskForInfo(task)
+  let task = kronos#tool#task#ToInfoString(task)
   let keys = map(
         \copy(keys),
         \'PrintInfoProp(labels[v:val], task[v:val])',
@@ -232,49 +232,6 @@ function! kronos#gui#PrintRow(type, row)
   \), '')[:78] . ' '
 endfunction
 
-" ----------------------------------------------------- # Format task for list #
-
-function! kronos#gui#FormatTaskForList(task)
-  let task = copy(a:task)
-
-  let DateDiff = function('kronos#tool#datetime#PrintDiff', [localtime()])
-  let Interval = function('kronos#tool#datetime#PrintInterval')
-
-  let task.id         = task.done       ? '-'                       : task.id
-  let task.active     = task.active     ? DateDiff(task.active)     : ''
-  let task.done       = task.done       ? DateDiff(task.done)       : ''
-  let task.due        = task.due        ? DateDiff(task.due)        : ''
-  let task.lastactive = task.lastactive ? DateDiff(task.lastactive) : ''
-  let task.worktime   = task.worktime   ? Interval(task.worktime)   : ''
-
-  let task.tags = join(task.tags, ' ')
-
-  return task
-endfunction
-
-" ----------------------------------------------------- # Format task for info #
-
-function! kronos#gui#FormatTaskForInfo(task)
-  let task = copy(a:task)
-
-  let Date     = function('kronos#tool#datetime#PrintDate')
-  let Interval = function('kronos#tool#datetime#PrintInterval')
-
-  let wtimestr = task.active
-    \? Interval(task.worktime + localtime() - task.active)
-    \: task.worktime ? Interval(task.worktime) : ''
-
-  let task.active     = task.active     ? Date(task.active)     : ''
-  let task.done       = task.done       ? Date(task.done)       : ''
-  let task.due        = task.due        ? Date(task.due)        : ''
-  let task.lastactive = task.lastactive ? Date(task.lastactive) : ''
-
-  let task.worktime   = wtimestr
-  let task.tags       = join(task.tags, ' ')
-
-  return task
-endfunction
-
 " ------------------------------------------------------------------ # Helpers #
 
 function! PrintListHeader(_, row)
@@ -282,7 +239,7 @@ function! PrintListHeader(_, row)
 endfunction
 
 function! PrintListTask(_, task)
-  let task = copy(kronos#gui#FormatTaskForList(a:task))
+  let task = copy(kronos#tool#task#ToListString(a:task))
   return kronos#gui#PrintRow('LIST', task)
 endfunction
 

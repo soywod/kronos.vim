@@ -24,3 +24,46 @@ function! kronos#tool#task#GetIndexById(tasks, id)
   throw 'task-not-found'
 endfunction
 
+" ----------------------------------------------------- # Format task for info #
+
+function! kronos#tool#task#ToInfoString(task)
+  let task = copy(a:task)
+
+  let Date     = function('kronos#tool#datetime#PrintDate')
+  let Interval = function('kronos#tool#datetime#PrintInterval')
+
+  let wtimestr = task.active
+    \? Interval(task.worktime + localtime() - task.active)
+    \: task.worktime ? Interval(task.worktime) : ''
+
+  let task.active     = task.active     ? Date(task.active)     : ''
+  let task.done       = task.done       ? Date(task.done)       : ''
+  let task.due        = task.due        ? Date(task.due)        : ''
+  let task.lastactive = task.lastactive ? Date(task.lastactive) : ''
+
+  let task.worktime   = wtimestr
+  let task.tags       = join(task.tags, ' ')
+
+  return task
+endfunction
+
+" ----------------------------------------------------- # Format task for list #
+
+function! kronos#tool#task#ToListString(task)
+  let task = copy(a:task)
+
+  let DateDiff = function('kronos#tool#datetime#PrintDiff', [localtime()])
+  let Interval = function('kronos#tool#datetime#PrintInterval')
+
+  let task.id         = task.done       ? '-'                       : task.id
+  let task.active     = task.active     ? DateDiff(task.active)     : ''
+  let task.done       = task.done       ? DateDiff(task.done)       : ''
+  let task.due        = task.due        ? DateDiff(task.due)        : ''
+  let task.lastactive = task.lastactive ? DateDiff(task.lastactive) : ''
+  let task.worktime   = task.worktime   ? Interval(task.worktime)   : ''
+
+  let task.tags = join(task.tags, ' ')
+
+  return task
+endfunction
+

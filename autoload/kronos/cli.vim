@@ -12,11 +12,12 @@ endfunction
 
 function! kronos#cli#Info(id)
   try
-    let tasks     = kronos#core#task#Read(g:kronos_database, a:id)
-    let maxkeylen = max(map(copy(keys(tasks)), 'strdisplaywidth(v:val)'))
+    let task = kronos#core#task#Read(g:kronos_database, a:id)
+    let task = kronos#tool#task#ToInfoString(task)
+    let maxkeylen = max(map(copy(keys(task)), 'strdisplaywidth(v:val)'))
 
     for key in kronos#gui#Const().INFO.KEY
-      let value   = string(tasks[key])
+      let value   = string(task[key])
       let spaces  = repeat(' ', maxkeylen - strdisplaywidth(key))
       let message = key . spaces . ': ' . value
 
