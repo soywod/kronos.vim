@@ -15,6 +15,8 @@ CONTENTS                                                     *kronos-contents*
     b. Add ...................................................... |kronos-add|
     c. Update ................................................ |kronos-update|
   3. Mappings ...............................................|kronos-mappings|
+    a. Tasks list ............................................. |kronos-klist|
+    b. Task info .............................................. |kronos-kinfo|
   4. Configuration ........................................... |kronos-config|
   5. Licence ................................................ |kronos-licence|
   6. Bugs ...................................................... |kronos-bugs|
@@ -144,5 +146,28 @@ To start the GUI mode:
 >
   :K(ronos)
 <
+There is 2 different types of buffer (filetype): *klist* and *kinfo* (for
+tasks list and task info). When you start the GUI mode, you arrive on the
+*klist* buffer.
+
+==============================================================================
+KLIST                                                           *kronos-klist*
+
+Add       <a>                     You will be prompted args (see |kronos-add|)
+Show info <i>              You will enter in *kinfo* buffer (see |kronos-kinfo|)
+Update    <u>                  You will be prompted args (see |kronos-update|)
+Delete    <Backspace>, <Del>                   Confirmation will be prompted
+Start     <s>                                    Start the task under cursor
+Stop      <S>                                     Stop the task under cursor
+Toggle    <Enter>, <t>       Start the task if not stared, otherwise stop it
+Done      <D>                                 Mark task under cursor as done
+Refresh   <r>                                            Refresh all the GUI
+Quit      <q>                                              Quit the GUI mode
+
+==============================================================================
+KINFO                                                           *kronos-kinfo*
+
+Quit      <q>, <i>, <Escape>                          Quit the GUI info mode
+
 vim:tw=78:ts=4:ft=help:norl:
 
