@@ -8,6 +8,7 @@ function! s:SetSyntax()
 
   let end   = 0
   let start = 1
+  let due   = 79 - widths['due']
 
   for column in columns
     let end    = start + widths[column] - 1
@@ -18,8 +19,9 @@ function! s:SetSyntax()
   endfor
 
   syntax match KronosSeparator /|/
-  syntax match KronosDone      /^-.*$/  contains=KronosSeparator
-  syntax match KronosHead      /.*\%1l/ contains=KronosSeparator
+  syntax match KronosDone      /^-.*$/     contains=KronosSeparator
+  syntax match KronosHead      /.*\%1l/    contains=KronosSeparator
+  syntax match KronosDueAlert  /.*ago\s*$/ contains=KronosSeparator
 endfunction
 
 call s:SetSyntax()
@@ -27,7 +29,8 @@ call s:SetSyntax()
 highlight default link KronosActive     String
 highlight default link KronosDesc       Comment
 highlight default link KronosDone       VertSplit
-highlight default link KronosDue        String
+highlight default link KronosDue        Structure
+highlight default link KronosDueAlert   Error
 highlight default link KronosId         Identifier
 highlight default link KronosSeparator  VertSplit
 highlight default link KronosTags       Tag
