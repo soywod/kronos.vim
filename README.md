@@ -157,7 +157,7 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 | Done | `<D>` | Mark task under cursor as done |
 | Refresh | `<r>` | Refresh all the GUI |
 | Toggle hide done | `<H>` | Show or hide done tasks |
-| Quit | `<q>` | Quit the GUI mode |
+| Quit | `<q>`, `<Esc>` | Quit the GUI mode |
 
 ### kinfo
 

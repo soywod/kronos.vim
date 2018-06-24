@@ -5,6 +5,7 @@ setlocal nowrap
 setlocal startofline
 
 nnoremap <silent> <buffer> q     :bdelete                          <cr>
+nnoremap <silent> <buffer> <esc> :bdelete                          <cr>
 nnoremap <silent> <buffer> a     :call kronos#gui#Add()            <cr>
 nnoremap <silent> <buffer> D     :call kronos#gui#Done()           <cr>
 nnoremap <silent> <buffer> i     :call kronos#gui#Info()           <cr>

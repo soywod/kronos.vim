@@ -162,12 +162,12 @@ Toggle           <cr>, <t>               Start or stop the task under cursor
 Done             <D>                          Mark task under cursor as done
 Refresh          <r>                                     Refresh all the GUI
 Toggle hide done <H>                                 Show or hide done tasks
-Quit             <q>                                       Quit the GUI mode
+Quit             <q>, <esc>                                Quit the GUI mode
 
 ------------------------------------------------------------------------------
 KINFO                                                           *kronos-kinfo*
 
-Quit      <q>, <i>, <Escape>                          Quit the GUI info mode
+Quit      <q>, <i>, <esc>                             Quit the GUI info mode
 
 ==============================================================================
 CONFIGURATION                                                  *kronos-config*
