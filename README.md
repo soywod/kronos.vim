@@ -1,10 +1,16 @@
 # Kronos.vim [![Build Status](https://travis-ci.org/soywod/kronos.vim.svg?branch=master)](https://travis-ci.org/soywod/kronos.vim)
 
+A simple task and time manager for vim.
+
+<p align="center">
+<img  width="1068" src="https://user-images.githubusercontent.com/10437171/41814954-1a80cba8-775d-11e8-9b9e-10d4c604aab3.png"></img>
+</p>
+
 ## Introduction
 
 Kronos is a simple task and time manager for vim, inspired by [Taskwarrior](https://taskwarrior.org) and [Timewarrior](https://taskwarrior.org/docs/timewarrior).
 
-Taskwarrior and Timewarrior are very good and complete tools, but complex and not so easy to understand.  [Kronos](https://github.com/soywod/kronos.vim) aims to unify both tools in one, and to be more simple (focusing on what it's really needed).
+[Taskwarrior](https://taskwarrior.org) and [Timewarrior](https://taskwarrior.org/docs/timewarrior) are very good and complete tools, but complex and not so easy to understand.  [Kronos](https://github.com/soywod/kronos.vim) aims to unify both tools in one, and to be more simple (focusing on what it's really needed).
 
 ## Usage
 
@@ -140,7 +146,7 @@ There is 2 different types of buffer (filetype): *klist* and *kinfo* (for tasks 
 ### klist
 
 | Action | Mapping | Info |
-| --- | :---: | ---: |
+| --- | :---: | --- |
 | Add | `<a>` | Args will be prompted (see [kronos-add](#add)) |
 | Show info | `<i>` | Open the **kinfo** buffer (see [kronos-kinfo](#kinfo)) |
 | Update | `<u>` | Args will be prompted (see [kronos-update](#update)) |
@@ -155,7 +161,7 @@ There is 2 different types of buffer (filetype): *klist* and *kinfo* (for tasks 
 ### kinfo
 
 | Action | Mapping | Info |
-| --- | :---: | ---: |
+| --- | :---: | --- |
 | Quit | `<q>`, `<i>`, `<Escape>` | Quit the GUI info mode |
 
 ## Configuration
@@ -170,25 +176,20 @@ Default: `<KRONOS_ROOT_DIR>/kronos.db`
 
 ## Contributing
 
-  1. Git commit messages follow the [Angular Convention](https://gist.github.com/stephenparish/9941e89d80e2bc58a153), but contain only a subject.
+ Git commit messages follow the [Angular Convention](https://gist.github.com/stephenparish/9941e89d80e2bc58a153), but contain only a subject.
 
-  > Use imperative, present tense: “change” not “changed” nor “changes”
+  > Use imperative, present tense: “change” not “changed” nor “changes”<br>Don't capitalize first letter<br>No dot (.) at the end
 
-  > Don't capitalize first letter
+Vim code should be as clean as possible, variables use the lowercase abbreviation convention, functions use camel case and constants the uppercase snake case. A line should never contain more than `80` characters.
 
-  > No dot (.) at the end
-
-  2. Vim code should be as clean as possible, variables use the lowercase abbreviation convention, functions use camel case and constants the uppercase snake case. A line should never contain more than 80 characters.
-
-  3. Tests should be added for each new functionality. Be sure to run tests before proposing a pull request (via the script `run-tests.sh`)
+Tests should be added for each new functionality. Be sure to run tests before proposing a pull request (via the script `run-tests.sh`)
 
 ## Changelog
 
-  - *Jun. 24, 2018* - Init changelog
+  - **Jun. 24, 2018** - Init changelog
 
 ## Credits
 
   - [Taskwarrior](https://taskwarrior.org), a task manager
   - [Timewarrior](https://taskwarrior.org/docs/timewarrior), a time manager
   - [vim-taskwarrior](https://github.com/blindFS/vim-taskwarrior), a very good Taskwarrior wrapper for vim
-
