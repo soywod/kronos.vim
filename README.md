@@ -3,14 +3,14 @@
 A simple task and time manager for vim.
 
 <p align="center">
-<img  width="1068" src="https://user-images.githubusercontent.com/10437171/41814954-1a80cba8-775d-11e8-9b9e-10d4c604aab3.png"></img>
+<img width="1068" src="https://user-images.githubusercontent.com/10437171/41814954-1a80cba8-775d-11e8-9b9e-10d4c604aab3.png"></img>
 </p>
 
 ## Introduction
 
 Kronos is a simple task and time manager for vim, inspired by [Taskwarrior](https://taskwarrior.org) and [Timewarrior](https://taskwarrior.org/docs/timewarrior).
 
-[Taskwarrior](https://taskwarrior.org) and [Timewarrior](https://taskwarrior.org/docs/timewarrior) are very good and complete tools, but complex and not so easy to understand.  [Kronos](https://github.com/soywod/kronos.vim) aims to unify both tools in one, and to be more simple (focusing on what it's really needed).
+[Taskwarrior](https://taskwarrior.org) and [Timewarrior](https://taskwarrior.org/docs/timewarrior) are very good and complete tools, but complex and not so easy to understand. [Kronos](https://github.com/soywod/kronos.vim) aims to unify both tools in one, and to be more simple (focusing on what it's really needed).
 
 ## Usage
 
@@ -125,9 +125,9 @@ To update a task:
 :Kronos update <id> <desc> <tags> <due>
 ```
 
-Same usage as [kronos-add](#add), except for *tags*. You can remove an existing tag by prefixing it with a `-`.
+Same usage as [kronos-add](#add), except for **tags**. You can remove an existing tag by prefixing it with a `-`.
 
-For eg., to remove *oldtag* and add *newtag* to task *42*:
+For eg., to remove **oldtag** and add **newtag** to task **42**:
 
 ```vim
 :K u 42 -oldtag +newtag
@@ -141,7 +141,7 @@ To start the GUI mode:
 :Kronos " or simply :K
 ```
 
-There is 2 different types of buffer (filetype): *klist* and *kinfo* (for tasks list and task info). When you start the GUI mode, you arrive on the *klist* buffer.
+There is 2 different types of buffer (filetype): **klist** and **kinfo** (for tasks list and task info). When you start the GUI mode, you arrive on the **klist** buffer.
 
 ### klist
 
