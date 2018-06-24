@@ -50,6 +50,7 @@ Then (should add new task):
 Execute (Update):
   call kronos#core#ui#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
   call kronos#core#ui#Update(g_database, g_dateref, '1 +cli test :18 -a +b-c +c')
+  call kronos#core#ui#Update(g_database, g_dateref, '1')
 
 Then (should update a task):
   AssertEqual [g_taskupdate], kronos#core#database#Read(g_database)

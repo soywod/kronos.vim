@@ -2,7 +2,7 @@
 
 function! kronos#core#ui#Add(database, dateref, args)
   let args = split(a:args, ' ')
-  let [desc, tags, due] = s:ParseArgs(a:dateref, [], args)
+  let [desc, tags, due] = s:ParseArgs(a:dateref, args, {})
   let id = kronos#core#task#Create(a:database, {
     \'desc'      : desc,
     \'tags'      : tags,
@@ -23,7 +23,7 @@ endfunction
 function! kronos#core#ui#Update(database, dateref, args)
   let [id; args] = split(a:args, ' ')
   let task = kronos#core#task#Read(a:database, id)
-  let [desc, tags, due] = s:ParseArgs(a:dateref, task.tags, args)
+  let [desc, tags, due] = s:ParseArgs(a:dateref, args, task)
 
   if ! empty(desc) && task.desc != desc | let task.desc = desc | endif
 
@@ -119,7 +119,7 @@ endfunction
 
 function! kronos#core#ui#Worktime(database, dateref, args)
   let args = split(a:args, ' ')
-  let [desc, tags, due] = s:ParseArgs(a:dateref, [], args)
+  let [desc, tags, due] = s:ParseArgs(a:dateref, args, {})
 
   let tasks = kronos#core#task#ReadAll(a:database)
   let worktime = 0
@@ -137,12 +137,18 @@ endfunction
 
 " ------------------------------------------------------------------- # Helper #
 
-function! s:ParseArgs(dateref, tags, args)
-  let due = 0
+function! s:ParseArgs(dateref, args, task)
   let desc    = []
   let oldtags = []
   let newtags = []
-  let tags    = copy(a:tags)
+
+  if len(a:task)
+    let due  = a:task.due
+    let tags = copy(a:task.tags)
+  else
+    let due  = 0
+    let tags = []
+  endif
 
   for arg in a:args
     if arg =~ '^+\w'
