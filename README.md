@@ -153,7 +153,7 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 | Delete | `<Backspace>`, `<Del>` | Confirmation will be prompted |
 | Start | `<s>` | Start the task under cursor |
 | Stop | `<S>` | Stop the task under cursor |
-| Toggle | `<Enter>`, `<t>` |  Start the task if not stared, otherwise stop it |
+| Toggle | `<Enter>`, `<t>` |  Start the task if not started, otherwise stop it |
 | Done | `<D>` | Mark task under cursor as done |
 | Refresh | `<r>` | Refresh all the GUI |
 | Toggle hide done | `<H>` | Show or hide done tasks |
