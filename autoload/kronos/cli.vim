@@ -32,7 +32,7 @@ endfunction
 
 " --------------------------------------------------------------------- # List #
 
-function! kronos#cli#List()
+function! kronos#cli#List(args)
   try
     let tasks     = kronos#core#task#ReadAll(g:kronos_database)
     let maxkeylen = max(map(copy(tasks), 'strdisplaywidth(v:val.id)'))

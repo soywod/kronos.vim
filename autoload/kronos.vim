@@ -33,6 +33,6 @@ endfunction
 " ------------------------------------------------------------------- # Helper #
 
 function! s:Trigger(action, args)
-  execute 'call kronos#cli#' . a:action . '(' . a:args . ')'
+  execute 'call kronos#cli#' . a:action . '("' . a:args . '")'
 endfunction
 
