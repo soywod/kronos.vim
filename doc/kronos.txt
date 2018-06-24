@@ -210,6 +210,25 @@ Not yet :p
 ==============================================================================
 CONTRIBUTING                                             *kronos-contributing*
 
+Report any bugs here: https://github.com/soywod/kronos.vim/issues
+Feel free to submit pull requests: https://github.com/soywod/kronos.vim/pulls
+
+1) Git commit messages follow the Angular Convention{1}, but contain only a
+subject.
+>
+  - Use imperative, present tense: “change” not “changed” nor “changes”
+  - Don't capitalize first letter
+  - No dot (.) at the end
+<
+2) Vim code should be as clean as possible, variables use the lowercase
+abbreviation convention, functions use camel case and constants the uppercase
+snake case. A line should never contain more than 80 characters.
+
+3) Tests should be added for each new functionality. Be sure to run tests
+before proposing a pull request (via the script `run-tests.sh`)
+
+                https://gist.github.com/stephenparish/9941e89d80e2bc58a153 {1}
+
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
