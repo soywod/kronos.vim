@@ -34,7 +34,12 @@ endfunction
 
 function! kronos#cli#List(args)
   try
-    let tasks     = kronos#core#task#ReadAll(g:kronos_database)
+    let tasks = kronos#core#task#ReadAll(g:kronos_database)
+
+    if (g:kronos_hide_done)
+      let tasks = filter(copy(tasks), 'v:val.done == 0')
+    endif
+
     let maxkeylen = max(map(copy(tasks), 'strdisplaywidth(v:val.id)'))
 
     for task in tasks

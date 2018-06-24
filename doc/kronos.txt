@@ -152,16 +152,17 @@ tasks list and task info). When you start the GUI mode, you arrive on the
 ------------------------------------------------------------------------------
 KLIST                                                           *kronos-klist*
 
-Add       <a>                         Args will be prompted (see |kronos-add|)
-Show info <i>                       Open the *kinfo* buffer (see |kronos-kinfo|)
-Update    <u>                      Args will be prompted (see |kronos-update|)
-Delete    <Backspace>, <Del>                   Confirmation will be prompted
-Start     <s>                                    Start the task under cursor
-Stop      <S>                                     Stop the task under cursor
-Toggle    <Enter>, <t>       Start the task if not stared, otherwise stop it
-Done      <D>                                 Mark task under cursor as done
-Refresh   <r>                                            Refresh all the GUI
-Quit      <q>                                              Quit the GUI mode
+Add              <a>                  Args will be prompted (see |kronos-add|)
+Show info        <i>                Open the *kinfo* buffer (see |kronos-kinfo|)
+Update           <u>               Args will be prompted (see |kronos-update|)
+Delete           <bs>, <del>                   Confirmation will be prompted
+Start            <s>                             Start the task under cursor
+Stop             <S>                              Stop the task under cursor
+Toggle           <cr>, <t>               Start or stop the task under cursor
+Done             <D>                          Mark task under cursor as done
+Refresh          <r>                                     Refresh all the GUI
+Toggle hide done <H>                                 Show or hide done tasks
+Quit             <q>                                       Quit the GUI mode
 
 ------------------------------------------------------------------------------
 KINFO                                                           *kronos-kinfo*
@@ -170,6 +171,12 @@ Quit      <q>, <i>, <Escape>                          Quit the GUI info mode
 
 ==============================================================================
 CONFIGURATION                                                  *kronos-config*
+
+Hide done tasks by default:
+>
+  g:kronos_hide_done = <boolean>
+<
+Default: `1`
 
 Path to the database file:
 >
@@ -232,7 +239,8 @@ before proposing a pull request (via the script `run-tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
-  `Jun. 24, 2018` - Init changelog
+  `Jun. 24, 2018` - Add option to show or hide done tasks
+  `Jun. 23, 2018` - Init changelog
 
 ==============================================================================
 CREDITS                                                       *kronos-credits*

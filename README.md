@@ -103,11 +103,11 @@ All together:
 will result in:
 
 ```json
-  {
-    "desc": "my awesome task",
-    "tags": ["firstTask", "awesome"],
-    "due": "3rd of March 2018, 18h00"
-  }
+{
+  "desc": "my awesome task",
+  "tags": ["firstTask", "awesome"],
+  "due": "3rd of March 2018, 18h00"
+}
 ```
 
 The order is not important, tags can be everywhere, and due as well. The desc is the remaining of text present after removing tags and due. Both examples end up with the same result:
@@ -156,6 +156,7 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 | Toggle | `<Enter>`, `<t>` |  Start the task if not stared, otherwise stop it |
 | Done | `<D>` | Mark task under cursor as done |
 | Refresh | `<r>` | Refresh all the GUI |
+| Toggle hide done | `<H>` | Show or hide done tasks |
 | Quit | `<q>` | Quit the GUI mode |
 
 ### kinfo
@@ -165,6 +166,14 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 | Quit | `<q>`, `<i>`, `<Escape>` | Quit the GUI info mode |
 
 ## Configuration
+
+Hide done tasks by default:
+
+```vim
+g:kronos_hide_done = <boolean>
+```
+
+Default: `1`
 
 Path to the database file:
 
@@ -186,10 +195,12 @@ Tests should be added for each new functionality. Be sure to run tests before pr
 
 ## Changelog
 
-  - **Jun. 24, 2018** - Init changelog
+  - **Jun. 24, 2018** - Add option to show or hide done tasks
+  - **Jun. 23, 2018** - Init changelog
 
 ## Credits
 
   - [Taskwarrior](https://taskwarrior.org), a task manager
   - [Timewarrior](https://taskwarrior.org/docs/timewarrior), a time manager
   - [vim-taskwarrior](https://github.com/blindFS/vim-taskwarrior), a very good Taskwarrior wrapper for vim
+

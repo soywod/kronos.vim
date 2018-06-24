@@ -97,6 +97,10 @@ function! kronos#gui#List()
   let prevpos = getpos('.')
   let tasks   = kronos#core#task#ReadAll(g:kronos_database)
 
+  if (g:kronos_hide_done)
+    let tasks = filter(copy(tasks), 'v:val.done == 0')
+  endif
+
   let headers = map(copy(headers), function('PrintListHeader'))
   let tasks   = map(copy(tasks), function('PrintListTask'))
 
@@ -217,6 +221,13 @@ function! kronos#gui#Done()
     return kronos#tool#log#Error('Error while marking task as done.')
   endtry
 
+  call kronos#gui#List()
+endfunction
+
+" --------------------------------------------------------- # Toggle hide done #
+
+function! kronos#gui#ToggleHideDone()
+  let g:kronos_hide_done = ! g:kronos_hide_done
   call kronos#gui#List()
 endfunction
 

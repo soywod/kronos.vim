@@ -1,8 +1,9 @@
 " ------------------------------------------------------------ # Configuration #
 
-let g:kronos_database = get(
+let g:kronos_hide_done = get(g:, 'kronos_hide_done', 1)
+let g:kronos_database  = get(
   \g:, 'kronos_database',
-  \resolve(expand('<sfile>:h:h') . '/kronos.db')
+  \resolve(expand('<sfile>:h:h') . '/kronos.db'),
 \)
 
 " ------------------------------------------------------------------ # Command #
