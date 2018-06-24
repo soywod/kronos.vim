@@ -18,7 +18,7 @@ CONTENTS                                                     *kronos-contents*
     a. Tasks list ............................................. |kronos-klist|
     b. Task info .............................................. |kronos-kinfo|
   4. Configuration ........................................... |kronos-config|
-  5. Licence ................................................ |kronos-licence|
+  5. License ................................................ |kronos-license|
   6. Bugs ...................................................... |kronos-bugs|
   7. Contributing ...................................... |kronos-contributing|
   8. Changelog ............................................ |kronos-changelog|
@@ -152,9 +152,9 @@ tasks list and task info). When you start the GUI mode, you arrive on the
 ------------------------------------------------------------------------------
 KLIST                                                           *kronos-klist*
 
-Add       <a>                     You will be prompted args (see |kronos-add|)
-Show info <i>              You will enter in *kinfo* buffer (see |kronos-kinfo|)
-Update    <u>                  You will be prompted args (see |kronos-update|)
+Add       <a>                         Args will be prompted (see |kronos-add|)
+Show info <i>                       Open the *kinfo* buffer (see |kronos-kinfo|)
+Update    <u>                      Args will be prompted (see |kronos-update|)
 Delete    <Backspace>, <Del>                   Confirmation will be prompted
 Start     <s>                                    Start the task under cursor
 Stop      <S>                                     Stop the task under cursor
@@ -178,7 +178,7 @@ Path to the database file:
 Default: `<KRONOS_ROOT_DIR>/kronos.db`
 
 ==============================================================================
-LICENCE                                                       *kronos-licence*
+LICENSE                                                       *kronos-license*
 
 MIT License
 

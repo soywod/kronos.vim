@@ -1,4 +1,194 @@
 # Kronos.vim [![Build Status](https://travis-ci.org/soywod/kronos.vim.svg?branch=master)](https://travis-ci.org/soywod/kronos.vim)
 
-Kronos is a simple task and time manager for vim, inspired by [Taskwarrior](https://taskwarrior.org/) and [Timewarrior](https://taskwarrior.org/docs/timewarrior/).
+## Introduction
+
+Kronos is a simple task and time manager for vim, inspired by [Taskwarrior](https://taskwarrior.org) and [Timewarrior](https://taskwarrior.org/docs/timewarrior).
+
+Taskwarrior and Timewarrior are very good and complete tools, but complex and not so easy to understand.  [Kronos](https://github.com/soywod/kronos.vim) aims to unify both tools in one, and to be more simple (focusing on what it's really needed).
+
+## Usage
+
+Kronos comes with a unique command and its alias:
+
+```vim
+:Kronos <command> <args>
+:K      <command> <args>
+```
+
+Here the list of all available commands with their alias:
+
+```vim
+:Kronos                        " Start the GUI
+:Kronos l(ist)                 " List all tasks
+:Kronos i(nfo)     <id>        " Show task informations
+:Kronos del(ete)   <id>        " Delete a task
+:Kronos a(dd)      <args>      " Add a new task
+:Kronos u(pdate)   <id> <args> " Update a task
+:Kronos sta(rt)    <id>        " Start a task
+:Kronos sto(p)     <id>        " Stop a task
+:Kronos t(oggle)   <id>        " Start or stop a task
+:Kronos d(one)     <id>        " Mark as done a task
+:Kronos w(orktime) <id>        " Show the total worktime for a task
+```
+
+### Add
+
+To add a new task:
+
+```vim
+:Kronos add <desc> <tags> <due>
+```
+
+A **tag** must start by `+` and should not contain any space. Eg:
+
+```vim
+:K a +tag +tag-2 +tag_3
+```
+
+A **due** must start by `:` and should contain numbers only.  The full format of a valid due is `:DDMMYY:HHMM` but almost everything can be omitted. Here some example to understand better the concept:
+
+  - *\<day\>   means the current day (day when the command is executed)*
+  - *\<month\> means the current month*
+  - *\<year\>  means the current year*
+
+Full due:
+
+```vim
+:K a :100518:1200 " 10th of May 2018, 12h00
+```
+
+If minutes omitted, set to `00`:
+
+```vim
+:K a :100518:12   " 10th of May 2018, 12h00
+```
+If hours omitted, set to `00`:
+
+```vim
+:K a :100518      " 10th of May 2018, 00h00
+```
+
+If years omitted, try first the current year. If the final date is exceeded, try with the next year:
+
+```vim
+:K a :1005        " 10th of May <year> or <year>+1, 00h00
+```
+
+If months omitted, try first the current month. If the final date is exceeded, try with the next month:
+
+```vim
+:K a :10          " 10th of <month> or <month>+1 <year>, 00h00
+```
+
+If days omitted, try first the current day. If the final date is exceeded try with the next day:
+
+```vim
+:K a :            " <day> or <day>+1 of <month> <year>, 00h00
+:K a ::8          " <day> or <day>+1 of <month> <year>, 08h00
+```
+
+All together:
+
+```vim
+" Command executed on 1st of March, 2018 at 21h21
+:K a my awesome task +firstTask :3:18 +awesome
+```
+
+will result in:
+
+```json
+  {
+    "desc": "my awesome task",
+    "tags": ["firstTask", "awesome"],
+    "due": "3rd of March 2018, 18h00"
+  }
+```
+
+The order is not important, tags can be everywhere, and due as well. The desc is the remaining of text present after removing tags and due. Both examples end up with the same result:
+
+```vim
+:K a my awesome task +firstTask :3:18 +awesome
+:K a my +awesame awesome :3:18 +firstTask task
+```
+
+### Update
+
+To update a task:
+
+```vim
+:Kronos update <id> <desc> <tags> <due>
+```
+
+Same usage as [kronos-add](#add), except for *tags*. You can remove an existing tag by prefixing it with a `-`.
+
+For eg., to remove *oldtag* and add *newtag* to task *42*:
+
+```vim
+:K u 42 -oldtag +newtag
+```
+
+## Mappings
+
+To start the GUI mode:
+
+```vim
+:Kronos " or simply :K
+```
+
+There is 2 different types of buffer (filetype): *klist* and *kinfo* (for tasks list and task info). When you start the GUI mode, you arrive on the *klist* buffer.
+
+### klist
+
+| Action | Mapping | Info |
+| --- | :---: | ---: |
+| Add | `<a>` | Args will be prompted (see [kronos-add](#add)) |
+| Show info | `<i>` | Open the **kinfo** buffer (see [kronos-kinfo](#kinfo)) |
+| Update | `<u>` | Args will be prompted (see [kronos-update](#update)) |
+| Delete | `<Backspace>`, `<Del>` | Confirmation will be prompted |
+| Start | `<s>` | Start the task under cursor |
+| Stop | `<S>` | Stop the task under cursor |
+| Toggle | `<Enter>`, `<t>` |  Start the task if not stared, otherwise stop it |
+| Done | `<D>` | Mark task under cursor as done |
+| Refresh | `<r>` | Refresh all the GUI |
+| Quit | `<q>` | Quit the GUI mode |
+
+### kinfo
+
+| Action | Mapping | Info |
+| --- | :---: | ---: |
+| Quit | `<q>`, `<i>`, `<Escape>` | Quit the GUI info mode |
+
+## Configuration
+
+Path to the database file:
+
+```vim
+g:kronos_database = <path>
+```
+
+Default: `<KRONOS_ROOT_DIR>/kronos.db`
+
+## Contributing
+
+  1. Git commit messages follow the [Angular Convention](https://gist.github.com/stephenparish/9941e89d80e2bc58a153), but contain only a subject.
+
+  > Use imperative, present tense: “change” not “changed” nor “changes”
+
+  > Don't capitalize first letter
+
+  > No dot (.) at the end
+
+  2. Vim code should be as clean as possible, variables use the lowercase abbreviation convention, functions use camel case and constants the uppercase snake case. A line should never contain more than 80 characters.
+
+  3. Tests should be added for each new functionality. Be sure to run tests before proposing a pull request (via the script `run-tests.sh`)
+
+## Changelog
+
+  - *Jun. 24, 2018* - Init changelog
+
+## Credits
+
+  - [Taskwarrior](https://taskwarrior.org), a task manager
+  - [Timewarrior](https://taskwarrior.org/docs/timewarrior), a time manager
+  - [vim-taskwarrior](https://github.com/blindFS/vim-taskwarrior), a very good Taskwarrior wrapper for vim
 

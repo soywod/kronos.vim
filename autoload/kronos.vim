@@ -7,9 +7,9 @@ function! s:Actions(dateref, args)
     \['^dele\?t\?e\?$'          , 'Delete'  ],
     \['^ad\?d\?$'               , 'Add'     ],
     \['^up\?d\?a\?t\?e\?$'      , 'Update'  ],
-    \['^sta\?r\?t\?$'           , 'Start'   ],
-    \['^sto\?p\?$'              , 'Stop'    ],
-    \['^[st]$'                  , 'Toggle'  ],
+    \['^star\?t\?$'             , 'Start'   ],
+    \['^stop\?$'                , 'Stop'    ],
+    \['^to\?g\?g\?l\?e\?$'      , 'Toggle'  ],
     \['^do\?n\?e\?$'            , 'Done'    ],
     \['^wo\?r\?k\?t\?i\?m\?e\?$', 'Worktime'],
   \]
