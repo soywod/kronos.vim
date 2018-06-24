@@ -133,6 +133,20 @@ For eg., to remove **oldtag** and add **newtag** to task **42**:
 :K u 42 -oldtag +newtag
 ```
 
+### Worktime
+
+To print the total worktime for a tag:
+
+```vim
+:Kronos worktime <tags>
+```
+
+Eg., to print the total worktime for tags **tag1** and **tag2**:
+
+```vim
+:K w +tag1 +tag2
+```
+
 ## Mappings
 
 To start the GUI mode:
@@ -153,7 +167,7 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 | Delete | `<Backspace>`, `<Del>` | Confirmation will be prompted |
 | Start | `<s>` | Start the task under cursor |
 | Stop | `<S>` | Stop the task under cursor |
-| Toggle | `<Enter>`, `<t>` |  Start the task if not started, otherwise stop it |
+| Toggle | `<Enter>`, `<t>` |  Start or stop the task under cursor |
 | Done | `<D>` | Mark task under cursor as done |
 | Refresh | `<r>` | Refresh all the GUI |
 | Toggle hide done | `<H>` | Show or hide done tasks |

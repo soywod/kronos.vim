@@ -14,6 +14,7 @@ CONTENTS                                                     *kronos-contents*
     a. General ........................................ |kronos-usage-general|
     b. Add ...................................................... |kronos-add|
     c. Update ................................................ |kronos-update|
+    d. Worktime ............................................ |kronos-worktime|
   3. Mappings ...............................................|kronos-mappings|
     a. Tasks list ............................................. |kronos-klist|
     b. Task info .............................................. |kronos-kinfo|
@@ -138,6 +139,17 @@ For eg., to remove *oldtag* and add *newtag* to task *42* :
 >
   :K u 42 -oldtag +newtag
 <
+------------------------------------------------------------------------------
+WORKTIME                                                     *kronos-worktime*
+
+To print the total worktime for a tag:
+>
+  :Kronos worktime <tags>
+<
+Eg., to print the total worktime for tags *tag1* and *tag2* :
+>
+  :K w +tag1 +tag2
+>
 ==============================================================================
 MAPPINGS                                                     *kronos-mappings*
 
