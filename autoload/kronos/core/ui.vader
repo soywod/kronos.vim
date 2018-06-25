@@ -1,4 +1,6 @@
 Before:
+  let g:kronos_enable_gist = 0
+
   let g_database = resolve(expand('<sfile>:h') . '/kronos.db')
   let g_dateref  = 1526397300 "15/05/2018 15:15 UTC
   let g_dueref   = 1526428800 "16/05/2018 00:00 UTC
