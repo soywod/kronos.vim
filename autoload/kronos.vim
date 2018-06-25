@@ -19,18 +19,24 @@ endfunction
 " -------------------------------------------------------------- # Entry point #
 
 function! kronos#EntryPoint(args)
-  if g:kronos_enable_gist | call kronos#tool#gist#Init() | endif
+  if g:kronos_enable_gist
+    call kronos#integration#gist#Init()
+  endif
 
-  if a:args =~? '^ *$' | return kronos#gui#List() | endif
+  if a:args =~? '^ *$'
+    return kronos#gui#List()
+  endif
 
   let farg = split(a:args, ' ')[0]
   let args = a:args[len(farg) + 1:]
 
   for [regex, action] in s:Actions(localtime(), args)
-    if farg =~? regex | return s:Trigger(action, args) | endif
+    if farg =~? regex
+      return s:Trigger(action, args)
+    endif
   endfor
 
-  return kronos#tool#logging#Error('Command not found.')
+  return kronos#tool#log#Error('Command not found.')
 endfunction
 
 " ------------------------------------------------------------------- # Helper #

@@ -24,7 +24,7 @@ function! kronos#core#database#Write(database, tasks)
   call writefile(data, a:database, 's')
 
   if g:kronos_enable_gist
-    call kronos#tool#gist#Write(join(data, "\n"))
+    call kronos#integration#gist#Write(join(data, "\n"))
   endif
 endfunction
 
