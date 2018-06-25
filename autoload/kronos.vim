@@ -19,6 +19,8 @@ endfunction
 " -------------------------------------------------------------- # Entry point #
 
 function! kronos#EntryPoint(args)
+  call kronos#tool#gist#Init()
+
   if a:args =~? '^ *$' | return kronos#gui#List() | endif
 
   let farg = split(a:args, ' ')[0]
