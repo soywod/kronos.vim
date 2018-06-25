@@ -210,7 +210,7 @@ Tests should be added for each new functionality. Be sure to run tests before pr
 
 ## Changelog
 
-  - **Jun. 25, 2018** - Tasks can now be undone
+  - **Jun. 25, 2018** - Add ability to mark tasks as undone
   - **Jun. 24, 2018** - Add option to show or hide done tasks
   - **Jun. 23, 2018** - Init changelog
 
