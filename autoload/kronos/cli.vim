@@ -137,11 +137,11 @@ function! kronos#cli#Done(id)
   endtry
 endfunction
 
-" ------------------------------------------------------------------- # UnDone #
+" ------------------------------------------------------------------- # Undone #
 
-function! kronos#cli#UnDone(id)
+function! kronos#cli#Undone(id)
   try
-    call kronos#core#ui#UnDone(g:kronos_database, a:id)
+    call kronos#core#ui#Undone(g:kronos_database, a:id)
   catch 'task-not-found'
     return kronos#tool#log#Error('Task not found.')
   catch 'task-not-done'

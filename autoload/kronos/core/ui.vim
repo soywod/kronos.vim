@@ -115,9 +115,9 @@ function! kronos#core#ui#Done(database, dateref, id)
   call kronos#tool#log#Info(message)
 endfunction
 
-" ------------------------------------------------------------------- # UnDone #
+" ------------------------------------------------------------------- # Undone #
 
-function! kronos#core#ui#UnDone(database, id)
+function! kronos#core#ui#Undone(database, id)
   let tasks = kronos#core#database#Read(a:database)
   let l:task = copy(kronos#core#task#Read(a:database, a:id))
   if  ! l:task.done | throw 'task-not-done' | endif

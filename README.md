@@ -169,7 +169,7 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 | Stop | `<S>` | Stop the task under cursor |
 | Toggle | `<Enter>`, `<t>` |  Start or stop the task under cursor |
 | Done | `<D>` | Mark task under cursor as done |
-| UnDone | `<U>` | Mark task under cursor as undone |
+| Undone | `<U>` | Mark task under cursor as undone |
 | Refresh | `<r>` | Refresh all the GUI |
 | Toggle hide done | `<H>` | Show or hide done tasks |
 | Quit | `<q>`, `<Esc>` | Quit the GUI mode |

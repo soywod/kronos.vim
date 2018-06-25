@@ -97,18 +97,18 @@ Then (should mark as done a task):
 
   unlet newid
 
-# ------------------------------------------------------------------- # UnDone #
+# ------------------------------------------------------------------- # Undone #
 
-Execute (UnDone):
+Execute (Undone):
   let newid = 1 . (g_dateref + 3600 * 2)
   call kronos#core#ui#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
   call kronos#core#ui#Start(g_database, g_dateref + 3600, 1)
   call kronos#core#ui#Done(g_database, g_dateref + 3600 * 2, 1)
-  call kronos#core#ui#UnDone(g_database, newid)
+  call kronos#core#ui#Undone(g_database, newid)
 
 Then (should mark as undone a task):
   AssertEqual [g_taskundone], kronos#core#database#Read(g_database)
-  AssertThrow kronos#core#ui#UnDone(g_database, 1)
+  AssertThrow kronos#core#ui#Undone(g_database, 1)
 
   unlet newid
 

@@ -11,7 +11,7 @@ function! s:Actions(dateref, args)
     \['^stop\?$'                , 'Stop'    ],
     \['^to\?g\?g\?l\?e\?$'      , 'Toggle'  ],
     \['^do\?n\?e\?$'            , 'Done'    ],
-    \['^und\?o\?n\?e\?$'        , 'UnDone'  ],
+    \['^und\?o\?n\?e\?$'        , 'Undone'  ],
     \['^wo\?r\?k\?t\?i\?m\?e\?$', 'Worktime'],
   \]
 endfunction

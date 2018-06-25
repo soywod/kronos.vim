@@ -224,12 +224,12 @@ function! kronos#gui#Done()
   call kronos#gui#List()
 endfunction
 
-" ------------------------------------------------------------------- # UnDone #
+" ------------------------------------------------------------------- # Undone #
 
-function! kronos#gui#UnDone()
+function! kronos#gui#Undone()
   try
     let id = GetFocusedTaskId()
-    call kronos#core#ui#UnDone(g:kronos_database, id)
+    call kronos#core#ui#Undone(g:kronos_database, id)
   catch 'task-not-found'
     return kronos#tool#log#Error('Task not found.')
   catch 'task-not-done'
