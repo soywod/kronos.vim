@@ -137,6 +137,20 @@ function! kronos#cli#Done(id)
   endtry
 endfunction
 
+" ------------------------------------------------------------------- # Undone #
+
+function! kronos#cli#Undone(id)
+  try
+    call kronos#core#ui#Undone(g:kronos_database, a:id)
+  catch 'task-not-found'
+    return kronos#tool#log#Error('Task not found.')
+  catch 'task-not-done'
+    return kronos#tool#log#Error('Task not done.')
+  catch
+    return kronos#tool#log#Error('Error while marking task as undone.')
+  endtry
+endfunction
+
 " ----------------------------------------------------------------- # Worktime #
 
 function! kronos#cli#Worktime(args)

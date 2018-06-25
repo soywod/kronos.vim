@@ -17,5 +17,6 @@ nnoremap <silent> <buffer> <del> :call kronos#gui#Delete()         <cr>
 nnoremap <silent> <buffer> t     :call kronos#gui#Toggle()         <cr>
 nnoremap <silent> <buffer> <cr>  :call kronos#gui#Toggle()         <cr>
 nnoremap <silent> <buffer> u     :call kronos#gui#Update()         <cr>
+nnoremap <silent> <buffer> U     :call kronos#gui#Undone()         <cr>
 nnoremap <silent> <buffer> H     :call kronos#gui#ToggleHideDone() <cr>
 

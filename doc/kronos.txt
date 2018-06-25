@@ -56,6 +56,7 @@ Here the list of all available commands with their alias:
   :K(ronos) sto(p)     <id>        | Stop a task
   :K(ronos) t(oggle)   <id>        | Start or stop a task
   :K(ronos) d(one)     <id>        | Mark as done a task
+  :K(ronos) un(done)   <id>        | Mark as undone a task
   :K(ronos) w(orktime) <id>        | Show the total worktime for a task
 <
 ------------------------------------------------------------------------------
@@ -172,6 +173,7 @@ Start            <s>                             Start the task under cursor
 Stop             <S>                              Stop the task under cursor
 Toggle           <cr>, <t>               Start or stop the task under cursor
 Done             <D>                          Mark task under cursor as done
+Undone           <U>                        Mark task under cursor as undone
 Refresh          <r>                                     Refresh all the GUI
 Toggle hide done <H>                                 Show or hide done tasks
 Quit             <q>, <esc>                                Quit the GUI mode
@@ -251,6 +253,7 @@ before proposing a pull request (via the script `run-tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
+  `Jun. 25, 2018` - Add ability to mark tasks as undone
   `Jun. 24, 2018` - Add option to show or hide done tasks
   `Jun. 23, 2018` - Init changelog
 
