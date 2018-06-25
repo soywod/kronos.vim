@@ -2,7 +2,8 @@ language: vim
 
 before_script: |
   git clone https://github.com/junegunn/vader.vim.git
-  git clone https://github.com/soywod/kronos.vim.git
+  git clone https://github.com/KimNorgaard/kronos.vim.git
+  git branch add-undo-task
 
 script: |
   TZ=UTC vim -Nu <(cat << VIMRC
