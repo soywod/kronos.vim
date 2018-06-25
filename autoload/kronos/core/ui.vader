@@ -33,6 +33,13 @@ Before:
    \'done': g_dateref + 3600 * 2,
   \}
 
+  let g_taskundone = {
+   \'id': 1,'desc': 'test 42',
+   \'tags': ['cli', 'a', 'b-c'],'due': g_dueref,'active': 0,
+   \'lastactive': g_dateref + 3600 * 2,'worktime': 3600,
+   \'done': 0,
+  \}
+
 After:
   call kronos#core#database#Purge(g_database)
   unlet g_database g_dateref g_task g_taskupdate g_taskstart g_taskstop
@@ -87,6 +94,21 @@ Execute (Done):
 Then (should mark as done a task):
   AssertEqual [g_taskdone], kronos#core#database#Read(g_database)
   AssertThrow kronos#core#ui#Done(g_database, g_dateref, 1)
+
+  unlet newid
+
+# ------------------------------------------------------------------- # UnDone #
+
+Execute (UnDone):
+  let newid = 1 . (g_dateref + 3600 * 2)
+  call kronos#core#ui#Add(g_database, g_dateref, '+cli test +a +b-c :16 42')
+  call kronos#core#ui#Start(g_database, g_dateref + 3600, 1)
+  call kronos#core#ui#Done(g_database, g_dateref + 3600 * 2, 1)
+  call kronos#core#ui#UnDone(g_database, newid)
+
+Then (should mark as undone a task):
+  AssertEqual [g_taskundone], kronos#core#database#Read(g_database)
+  AssertThrow kronos#core#ui#UnDone(g_database, 1)
 
   unlet newid
 

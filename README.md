@@ -169,6 +169,7 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 | Stop | `<S>` | Stop the task under cursor |
 | Toggle | `<Enter>`, `<t>` |  Start or stop the task under cursor |
 | Done | `<D>` | Mark task under cursor as done |
+| UnDone | `<U>` | Mark task under cursor as undone |
 | Refresh | `<r>` | Refresh all the GUI |
 | Toggle hide done | `<H>` | Show or hide done tasks |
 | Quit | `<q>`, `<Esc>` | Quit the GUI mode |
@@ -209,6 +210,7 @@ Tests should be added for each new functionality. Be sure to run tests before pr
 
 ## Changelog
 
+  - **Jun. 25, 2018** - Tasks can now be undone
   - **Jun. 24, 2018** - Add option to show or hide done tasks
   - **Jun. 23, 2018** - Init changelog
 
