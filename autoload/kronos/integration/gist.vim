@@ -10,7 +10,7 @@ function! kronos#integration#gist#Init()
 
   let s:gtoken = inputsecret(
     \'Gist sync has not been configured yet. ' .
-    \'Enter your GitHub token (:h kronos-gist)' .
+    \'Enter your GitHub token (:h kronos-gist-sync)' .
     \"\n> "
   \)
 

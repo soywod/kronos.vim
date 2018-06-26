@@ -19,6 +19,9 @@ CONTENTS                                                     *kronos-contents*
     a. Tasks list ............................................. |kronos-klist|
     b. Task info .............................................. |kronos-kinfo|
   4. Configuration ........................................... |kronos-config|
+    a. Hide done .......................................... |kronos-hide-done|
+    b. Database ............................................ |kronos-database|
+    c. Gist sync .......................................... |kronos-gist-sync|
   5. License ................................................ |kronos-license|
   6. Bugs ...................................................... |kronos-bugs|
   7. Contributing ...................................... |kronos-contributing|
@@ -37,13 +40,14 @@ to be more simple (focusing on what it's really needed). I hope you will enjoy
 it, feel free to contribute (see |kronos-contributing|).
 
 ==============================================================================
-USAGE                                    *kronos-usage* *kronos-usage-general*
+USAGE                                                          *kronos-usage* 
 
 Kronos comes with a unique command and its alias:
 >
   :Kronos <command> <args>
   :K      <command> <args>
 <
+                                                        *kronos-usage-general*
 Here the list of all available commands with their alias:
 >
   :K(ronos)                        | Start the GUI
@@ -70,9 +74,9 @@ A {tag} must start by *+* and should not contain any space. Eg:
 >
   :K a +tag +tag-2 +tag_3
 <
-A {due} must start by *:* and should contain numbers only.
-The full format of a valid due is *:DDMMYY:HHMM* but almost everything can be
-omitted. Here some example to understand better the concept:
+A {due} must start by *:* and should contain numbers only.  The full format of
+a valid due is *:DDMMYY:HHMM* but almost everything can be omitted. Here some
+example to understand better the concept:
 
 *<day>*   means the current day (day when the command is executed)
 *<month>* means the current month
@@ -133,8 +137,8 @@ To update a task:
 >
   :K(ronos) u(pdate) <id> <desc> <tags> <due>
 <
-Same usage as |kronos-add|, exept for {tags}. You can remove an existing tag by
-prefixing it with a *-* .
+Same usage as |kronos-add|, exept for {tags}. You can remove an existing tag
+by prefixing it with a *-* .
 
 For eg., to remove *oldtag* and add *newtag* to task *42* :
 >
@@ -186,17 +190,39 @@ Quit      <q>, <i>, <esc>                             Quit the GUI info mode
 ==============================================================================
 CONFIGURATION                                                  *kronos-config*
 
-Hide done tasks by default:
+Hide done tasks by default:                                 *kronos-hide-done*
 >
   g:kronos_hide_done = <boolean>
 <
 Default: `1`
 
-Path to the database file:
+Path to the database file:                                   *kronos-database*
 >
   g:kronos_database = <path>
 <
 Default: `<KRONOS_ROOT_DIR>/kronos.db`
+
+Enable Gist {1} sync feature:                               *kronos-gist-sync*
+>
+  g:kronos_gist_sync = <boolean>
+<
+This option will synchronize your local database with a secret Gist, so it can
+be used by other clients, or just act as a backup.
+
+The first time you activate this option, you will need to restart Vim, and a
+GitHub token will be prompted. To get one, go to GitHub settings page {2},
+click on "Generate new token", and check "gist" scope:
+>
+  Token description: kronos
+  Select scopes
+    [X] gist         Create gists
+<
+This feature requires {Vim8+}, with {+job} option. A port to Neovim is not
+planed yet, feel free to contribute. 
+
+Default: `0`
+                                                   https://gist.github.com {1}
+                                        https://github.com/settings/tokens {2}
 
 ==============================================================================
 LICENSE                                                       *kronos-license*
@@ -253,6 +279,7 @@ before proposing a pull request (via the script `run-tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
+  `Jun. 26, 2018` - Implement Gist sync feature
   `Jun. 25, 2018` - Add ability to mark tasks as undone
   `Jun. 24, 2018` - Add option to show or hide done tasks
   `Jun. 23, 2018` - Init changelog
