@@ -47,8 +47,8 @@ function! kronos#gui#Add()
     call kronos#core#ui#Add(g:kronos_database, localtime(), args)
   catch 'operation-canceled'
     return kronos#tool#log#Error('Operation canceled.')
-  " catch
-  "   return kronos#tool#log#Error('Error while adding new task.')
+  catch
+    return kronos#tool#log#Error('Error while adding new task.')
   endtry
 
   call kronos#gui#List()

@@ -2,10 +2,12 @@ let s:baseurl = 'https://api.github.com/gists'
 
 " --------------------------------------------------------------------- # Init #
 
-function! kronos#integration#gist#Init()
-  if filereadable(g:kronos_gist_conf)
-    let [s:gid, s:gtoken] = readfile(g:kronos_gist_conf)
-    return kronos#integration#gist#Read()
+function! kronos#hook#gist#Init()
+  let gistconf = kronos#GistConf()
+
+  if filereadable(gistconf)
+    let [s:gid, s:gtoken] = readfile(gistconf)
+    return kronos#hook#gist#Read()
   endif
 
   let s:gtoken = inputsecret(
@@ -20,13 +22,13 @@ function! kronos#integration#gist#Init()
 
   try
     redraw | call kronos#tool#log#Info('Processing ...')
-    let s:gid = kronos#integration#gist#Create()
+    let s:gid = kronos#hook#gist#Create()
   catch
     return kronos#tool#log#Error('Error while creating Gist.')
   endtry
 
   try
-    call writefile([s:gid, s:gtoken], g:kronos_gist_conf, 's')
+    call writefile([s:gid, s:gtoken], gistconf, 's')
   catch
     return kronos#tool#log#Error('Error while saving Gist config.')
   endtry
@@ -39,7 +41,7 @@ endfunction
 
 " ------------------------------------------------------------------- # Create #
 
-function! kronos#integration#gist#Create()
+function! kronos#hook#gist#Create()
   let header  = printf('Authorization: token %s', s:gtoken)
   let httpv   = 'POST'
   let body    = json_encode({
@@ -61,7 +63,7 @@ endfunction
 
 " --------------------------------------------------------------------- # Read #
 
-function! kronos#integration#gist#Read()
+function! kronos#hook#gist#Read()
   let header = printf('Authorization: token %s', s:gtoken)
   let curl   = join([
     \'curl', shellescape(s:baseurl . '/' . s:gid),
@@ -87,7 +89,7 @@ endfunction
 
 " -------------------------------------------------------------------- # Write #
 
-function! kronos#integration#gist#Write(data)
+function! kronos#hook#gist#Write(data)
   let httpv  = 'PATCH'
   let header = printf('Authorization: token %s', s:gtoken)
   let body   = json_encode({
