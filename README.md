@@ -198,6 +198,24 @@ g:kronos_database = <path>
 
 Default: `<KRONOS_ROOT_DIR>/kronos.db`
 
+Enable Gist sync feature:
+
+```vim
+g:kronos_gist_sync = <boolean>
+```
+
+The first time you activate this option, you will need to restart Vim, and a **GitHub token** will be prompted. To get one, [go to this page](https://github.com/settings/tokens), click on **Generate new token**, and check gist scope:
+
+```
+Token description: kronos
+Select scopes
+  [X] gist         Create gists
+```
+
+This feature requires `Vim8+`, with `+job` option. A port to Neovim is not planified yet, feel free to contribute. 
+
+Default: `0`
+
 ## Contributing
 
  Git commit messages follow the [Angular Convention](https://gist.github.com/stephenparish/9941e89d80e2bc58a153), but contain only a subject.
