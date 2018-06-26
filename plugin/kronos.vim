@@ -17,3 +17,9 @@ let g:kronos_database = get(
 command! -nargs=* Kronos call kronos#EntryPoint(<q-args>)
 command! -nargs=* K      call kronos#EntryPoint(<q-args>)
 
+if g:kronos_enable_gist
+  augroup testgroup
+    autocmd VimEnter * call kronos#integration#gist#Init()
+  augroup END
+endif
+

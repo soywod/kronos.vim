@@ -19,10 +19,6 @@ endfunction
 " -------------------------------------------------------------- # Entry point #
 
 function! kronos#EntryPoint(args)
-  if g:kronos_enable_gist
-    call kronos#integration#gist#Init()
-  endif
-
   if a:args =~? '^ *$'
     return kronos#gui#List()
   endif

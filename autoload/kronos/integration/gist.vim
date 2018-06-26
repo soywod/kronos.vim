@@ -5,9 +5,7 @@ let s:baseurl = 'https://api.github.com/gists'
 function! kronos#integration#gist#Init()
   if filereadable(g:kronos_gist_conf)
     let [s:gid, s:gtoken] = readfile(g:kronos_gist_conf)
-    let data = kronos#integration#gist#Read()
-
-    return writefile(data, g:kronos_database, 's')
+    return kronos#integration#gist#Read()
   endif
 
   let s:gtoken = inputsecret(
@@ -17,33 +15,36 @@ function! kronos#integration#gist#Init()
   \)
 
   if s:gtoken =~? '^ *$'
-    return kronos#integration#log#Error('Operation canceled.')
+    return kronos#tool#log#Error('Operation canceled.')
   endif
 
   try
-    redraw | call kronos#integration#log#Info('Processing ...')
+    redraw | call kronos#tool#log#Info('Processing ...')
     let s:gid = kronos#integration#gist#Create()
   catch
-    return kronos#integration#log#Error('Error while creating Gist.')
+    return kronos#tool#log#Error('Error while creating Gist.')
   endtry
 
   try
     call writefile([s:gid, s:gtoken], g:kronos_gist_conf, 's')
   catch
-    return kronos#integration#log#Error('Error while saving Gist config.')
+    return kronos#tool#log#Error('Error while saving Gist config.')
   endtry
 
-  redraw | call kronos#integration#log#Info('Gist sync configured.')
+  let tasks = kronos#core#database#Read(g:kronos_database)
+  call kronos#core#database#Write(g:kronos_database, tasks)
+  
+  redraw | call kronos#tool#log#Info('Gist sync configured.')
 endfunction
 
 " ------------------------------------------------------------------- # Create #
 
 function! kronos#integration#gist#Create()
-  let header = printf('Authorization: token %s', s:gtoken)
-  let httpv  = 'POST'
-  let body   = json_encode({
+  let header  = printf('Authorization: token %s', s:gtoken)
+  let httpv   = 'POST'
+  let body    = json_encode({
     \'description': 'Kronos database',
-    \'files': {'kronos.db': {'content': '{}'}}
+    \'files': {'kronos.db': {'content': '{}'}},
   \})
   
   let cmd = join([
@@ -51,7 +52,7 @@ function! kronos#integration#gist#Create()
     \'-H'  , shellescape(header),
     \'-X'  , shellescape(httpv),
     \'-d'  , shellescape(body),
-    \'-s'
+    \'-s',
   \], ' ')
 
   let res = systemlist(cmd)
@@ -62,16 +63,26 @@ endfunction
 
 function! kronos#integration#gist#Read()
   let header = printf('Authorization: token %s', s:gtoken)
-  let cmd    = join([
+  let curl   = join([
     \'curl', shellescape(s:baseurl . '/' . s:gid),
     \'-H'  , shellescape(header),
-    \'-s'
+    \'-s',
   \], ' ')
 
-  let res  = systemlist(cmd)
-  let data = matchlist(res, '"content": "\(.*\)",\?$')[1]
+  call job_start(
+    \['/bin/sh', '-c', curl],
+    \{'out_cb': 'ReadCallback', 'mode': 'nl'},
+  \)
+endfunction
 
-  return data == '{}' ? [] : split(data, '\\n')
+function! ReadCallback(_, data)
+  let matches = matchlist(a:data, '"content": "\({.*}\)",\?$')
+  if  empty(matches) | return | endif
+
+  if matches[1] != '{}'
+    let data = split(matches[1], '\\n')
+    call writefile(data, g:kronos_database, 's')
+  endif
 endfunction
 
 " -------------------------------------------------------------------- # Write #
@@ -80,17 +91,17 @@ function! kronos#integration#gist#Write(data)
   let httpv  = 'PATCH'
   let header = printf('Authorization: token %s', s:gtoken)
   let body   = json_encode({
-    \'files': {'kronos.db': {'content': a:data}}
+    \'files': {'kronos.db': {'content': a:data}},
   \})
   
-  let cmd = join([
+  let curl = join([
     \'curl', shellescape(s:baseurl . '/' . s:gid),
     \'-H'  , shellescape(header),
     \'-X'  , shellescape(httpv),
     \'-d'  , shellescape(body),
-    \'-s'
+    \'-s',
   \], ' ')
 
-  call system(cmd)
+  call job_start(['/bin/sh', '-c', curl])
 endfunction
 
