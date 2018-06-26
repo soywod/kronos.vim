@@ -4,7 +4,7 @@ let s:rootdir = expand('<sfile>:h:h')
 
 let g:kronos_hide_done = get(g:, 'kronos_hide_done', 1)
 
-let g:kronos_enable_gist = get(g:, 'kronos_enable_gist', 0)
+let g:kronos_gist_sync = get(g:, 'kronos_gist_sync', 0)
 let g:kronos_gist_conf   = resolve(s:rootdir . '/gist.conf')
 
 let g:kronos_database = get(
@@ -17,7 +17,7 @@ let g:kronos_database = get(
 command! -nargs=* Kronos call kronos#EntryPoint(<q-args>)
 command! -nargs=* K      call kronos#EntryPoint(<q-args>)
 
-if g:kronos_enable_gist
+if g:kronos_gist_sync
   augroup testgroup
     autocmd VimEnter * call kronos#integration#gist#Init()
   augroup END
