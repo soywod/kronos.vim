@@ -7,26 +7,25 @@
        _/    _/  _/    _/    _/_/    _/      _/    _/_/    _/_/_/         
                                                                    
 ==============================================================================
-CONTENTS                                                     *kronos-contents*
+TABLE OF CONTENTS                                            *kronos-contents*
 
-  1. Introduction ................................................... |kronos|
-  2. Usage .................................................... |kronos-usage|
-    a. General ........................................ |kronos-usage-general|
-    b. Add ...................................................... |kronos-add|
-    c. Update ................................................ |kronos-update|
-    d. Worktime ............................................ |kronos-worktime|
-  3. Mappings ...............................................|kronos-mappings|
-    a. Tasks list ............................................. |kronos-klist|
-    b. Task info .............................................. |kronos-kinfo|
-  4. Configuration ........................................... |kronos-config|
-    a. Hide done .......................................... |kronos-hide-done|
-    b. Database ............................................ |kronos-database|
-    c. Gist sync .......................................... |kronos-gist-sync|
-  5. License ................................................ |kronos-license|
-  6. Bugs ...................................................... |kronos-bugs|
-  7. Contributing ...................................... |kronos-contributing|
-  8. Changelog ............................................ |kronos-changelog|
-  9. Credits ................................................ |kronos-credits|
+  Introduction ...................................................... |kronos|
+  Usage ....................................................... |kronos-usage|
+    - Add ....................................................... |kronos-add|
+    - Update ................................................. |kronos-update|
+    - Worktime ............................................. |kronos-worktime|
+  Mappings ..................................................|kronos-mappings|
+    - Tasks list .............................................. |kronos-klist|
+    - Task info ............................................... |kronos-kinfo|
+  Configuration .............................................. |kronos-config|
+    - Hide done tasks ............................... |kronos-hide-done-tasks|
+    - Database ............................................. |kronos-database|
+    - Gist sync ........................................... |kronos-gist-sync|
+  License ................................................... |kronos-license|
+  Bugs ......................................................... |kronos-bugs|
+  Contributing ......................................... |kronos-contributing|
+  Changelog ............................................... |kronos-changelog|
+  Credits ................................................... |kronos-credits|
 
 ==============================================================================
 INTRODUCTION                                                          *kronos*
@@ -47,7 +46,6 @@ Kronos comes with a unique command and its alias:
   :Kronos <command> <args>
   :K      <command> <args>
 <
-                                                        *kronos-usage-general*
 Here the list of all available commands with their alias:
 >
   :K(ronos)                        | Start the GUI
@@ -217,8 +215,8 @@ click on "Generate new token", and check "gist" scope:
   Select scopes
     [X] gist         Create gists
 <
-This feature requires {Vim8+}, with {+job} option. A port to Neovim is not
-planed yet, feel free to contribute. 
+This feature requires at least `Vim 8`, with `+job` option. A port to `Neovim`
+is not planed yet, feel free to contribute. 
 
 Default: `0`
                                                    https://gist.github.com {1}
