@@ -6,6 +6,26 @@ A simple task and time manager for vim.
 <img width="1068" src="https://user-images.githubusercontent.com/10437171/41814954-1a80cba8-775d-11e8-9b9e-10d4c604aab3.png"></img>
 </p>
 
+## Table of contents
+
+  * [Introduction](#introduction)
+  * [Usage](#usage)
+    * [Add](#add)
+    * [Update](#update)
+    * [Worktime](#worktime)
+  * [Mappings](#mappings)
+    * [List](#klist)
+    * [Info](#info)
+  * [Configuration](#configuration)
+    * [Hide done tasks](#hide-done-tasks)
+    * [Database](#database)
+    * [Gist sync](#gist-sync)
+  * [License](#license)
+  * [Bugs](#bugs)
+  * [Contributing](#contributing)
+  * [Changelog](#changelog)
+  * [Credits](#credits)
+
 ## Introduction
 
 Kronos is a simple task and time manager for vim, inspired by [Taskwarrior](https://taskwarrior.org) and [Timewarrior](https://taskwarrior.org/docs/timewarrior).
@@ -182,6 +202,8 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 
 ## Configuration
 
+### Hide done tasks
+
 Hide done tasks by default:
 
 ```vim
@@ -190,6 +212,8 @@ g:kronos_hide_done = <boolean>
 
 Default: `1`
 
+### Database
+
 Path to the database file:
 
 ```vim
@@ -197,6 +221,28 @@ g:kronos_database = <path>
 ```
 
 Default: `<KRONOS_ROOT_DIR>/kronos.db`
+
+### Gist sync
+
+Enable [Gist](https://gist.github.com/) sync feature:
+
+```vim
+g:kronos_gist_sync = <boolean>
+```
+
+This option will synchronize your local [database](#database) with a secret Gist, so it can be used by other clients, or just act as a backup.
+
+The first time you activate this option, you will need to restart Vim, and a **GitHub token** will be prompted. To get one, [go to this page](https://github.com/settings/tokens), click on **Generate new token**, and check gist scope:
+
+```
+Token description: kronos
+Select scopes
+  [X] gist         Create gists
+```
+
+This feature requires `Vim 8+`, with `+job` option. A port to `Neovim` is not planed yet, feel free to contribute. 
+
+Default: `0`
 
 ## Contributing
 
@@ -210,9 +256,10 @@ Tests should be added for each new functionality. Be sure to run tests before pr
 
 ## Changelog
 
-  - **Jun. 25, 2018** - Add ability to mark tasks as undone
-  - **Jun. 24, 2018** - Add option to show or hide done tasks
-  - **Jun. 23, 2018** - Init changelog
+  - **Jun. 26**, *2018* - Implement Gist sync feature
+  - **Jun. 25**, *2018* - Add ability to mark tasks as undone
+  - **Jun. 24**, *2018* - Add option to show or hide done tasks
+  - **Jun. 23**, *2018* - Init changelog
 
 ## Credits
 
