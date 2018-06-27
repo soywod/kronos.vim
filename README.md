@@ -1,4 +1,4 @@
-# Kronos.vim [![Build Status](https://travis-ci.org/soywod/kronos.vim.svg?branch=master)](https://travis-ci.org/soywod/kronos.vim)
+# Kronos.vim [![Build Status](https://travis-ci.org/soywod/kronos.vim.svg?branch=master)](https://travis-ci.org/soywod/kronos.vim) [![IRC](https://img.shields.io/badge/freenode-%23kronos.io-blue.svg)](https://kiwiirc.com/client/irc.freenode.net/#kronos.io)
 
 A simple task and time manager for vim.
 
