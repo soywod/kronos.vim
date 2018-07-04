@@ -14,10 +14,12 @@ TABLE OF CONTENTS                                            *kronos-contents*
     - Add ....................................................... |kronos-add|
     - Update ................................................. |kronos-update|
     - Worktime ............................................. |kronos-worktime|
+    - Context ............................................... |kronos-context|
   Mappings ..................................................|kronos-mappings|
     - Tasks list .............................................. |kronos-klist|
     - Task info ............................................... |kronos-kinfo|
   Configuration .............................................. |kronos-config|
+    - Context ............................................... |kronos-context|
     - Hide done tasks ............................... |kronos-hide-done-tasks|
     - Database ............................................. |kronos-database|
     - Gist sync ........................................... |kronos-gist-sync|
@@ -59,7 +61,8 @@ Here the list of all available commands with their alias:
   :K(ronos) t(oggle)   <id>        | Start or stop a task
   :K(ronos) d(one)     <id>        | Mark as done a task
   :K(ronos) un(done)   <id>        | Mark as undone a task
-  :K(ronos) w(orktime) <id>        | Show the total worktime for a task
+  :K(ronos) w(orktime) <tags>      | Show the total worktime by tags
+  :K(ronos) c(ontext)  <tags>      | Define a context by tags
 <
 ------------------------------------------------------------------------------
 ADD                                                               *kronos-add*
@@ -153,6 +156,23 @@ Eg., to print the total worktime for tags *tag1* and *tag2* :
 >
   :K w +tag1 +tag2
 >
+------------------------------------------------------------------------------
+CONTEXT                                                       *kronos-context*
+
+To define a context by tags:
+>
+  :Kronos context <tags>
+<
+Eg., to define a context for tag *project1* :
+>
+  :K c project1
+>
+Only tasks with tag *project1* will be displayed in the |kronos-list|.
+If a new task is added with a context set, it will automatically get the tag
+*project1* .
+
+To clear the context, just enter an empty one.
+
 ==============================================================================
 MAPPINGS                                                     *kronos-mappings*
 
@@ -176,6 +196,7 @@ Stop             <S>                              Stop the task under cursor
 Toggle           <cr>, <t>               Start or stop the task under cursor
 Done             <D>                          Mark task under cursor as done
 Undone           <U>                        Mark task under cursor as undone
+Context          <C>                                   Set a context by tags
 Refresh          <r>                                     Refresh all the GUI
 Toggle hide done <H>                                 Show or hide done tasks
 Quit             <q>, <esc>                                Quit the GUI mode
@@ -187,6 +208,12 @@ Quit      <q>, <i>, <esc>                             Quit the GUI info mode
 
 ==============================================================================
 CONFIGURATION                                                  *kronos-config*
+
+Set a context by default:                                     *kronos-context*
+>
+  g:kronos_context = <string[]>
+<
+Default: `[]`
 
 Hide done tasks by default:                                 *kronos-hide-done*
 >
@@ -277,6 +304,7 @@ before proposing a pull request (via the script `run-tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
+  `Jul. 05, 2018` - Add context by tags
   `Jun. 26, 2018` - Implement Gist sync feature
   `Jun. 25, 2018` - Add ability to mark tasks as undone
   `Jun. 24, 2018` - Add option to show or hide done tasks

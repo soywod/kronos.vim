@@ -34,12 +34,7 @@ endfunction
 
 function! kronos#cli#List(args)
   try
-    let tasks = kronos#core#task#ReadAll(g:kronos_database)
-
-    if (g:kronos_hide_done)
-      let tasks = filter(copy(tasks), 'v:val.done == 0')
-    endif
-
+    let tasks = kronos#core#ui#List(g:kronos_database)
     let maxkeylen = max(map(copy(tasks), 'strdisplaywidth(v:val.id)'))
 
     for task in tasks
@@ -158,5 +153,15 @@ function! kronos#cli#Worktime(args)
   let message  = kronos#tool#datetime#PrintInterval(worktime)
 
   call kronos#tool#log#Info(message)
+endfunction
+
+" ------------------------------------------------------------------ # Context #
+
+function! kronos#cli#Context(args)
+  try
+    call kronos#core#ui#Context(a:args)
+  catch
+    return kronos#tool#log#Error('Error while setting context.')
+  endtry
 endfunction
 

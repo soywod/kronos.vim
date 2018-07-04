@@ -95,11 +95,7 @@ function! kronos#gui#List()
   let columns = s:CONST.LIST.COLUMN
   let headers = [filter(copy(s:CONST.LABEL), 'index(columns, v:key) + 1')]
   let prevpos = getpos('.')
-  let tasks   = kronos#core#task#ReadAll(g:kronos_database)
-
-  if (g:kronos_hide_done)
-    let tasks = filter(copy(tasks), 'v:val.done == 0')
-  endif
+  let tasks = kronos#core#ui#List(g:kronos_database)
 
   let headers = map(copy(headers), function('PrintListHeader'))
   let tasks   = map(copy(tasks), function('PrintListTask'))
@@ -236,6 +232,19 @@ function! kronos#gui#Undone()
     return kronos#tool#log#Error('Task not done.')
   catch
     return kronos#tool#log#Error('Error while marking task as undone.')
+  endtry
+
+  call kronos#gui#List()
+endfunction
+
+" ------------------------------------------------------------------ # Context #
+
+function! kronos#gui#Context()
+  try
+    let args = input('Context (:h kronos-context): ')
+    call kronos#core#ui#Context(args)
+  catch
+    return kronos#tool#log#Error('Error while setting context.')
   endtry
 
   call kronos#gui#List()

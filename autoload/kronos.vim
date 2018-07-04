@@ -13,6 +13,7 @@ function! s:Actions(dateref, args)
     \['^do\?n\?e\?$'            , 'Done'    ],
     \['^und\?o\?n\?e\?$'        , 'Undone'  ],
     \['^wo\?r\?k\?t\?i\?m\?e\?$', 'Worktime'],
+    \['^co\?n\?t\?e\?x\?t\?$'   , 'Context' ],
   \]
 endfunction
 

@@ -3,6 +3,13 @@
 function! kronos#core#ui#Add(database, dateref, args)
   let args = split(a:args, ' ')
   let [desc, tags, due] = s:ParseArgs(a:dateref, args, {})
+
+  for tag in copy(g:kronos_context)
+    if index(tags, tag) == -1
+      call add(tags, tag)
+    endif
+  endfor
+
   let id = kronos#core#task#Create(a:database, {
     \'desc'      : desc,
     \'tags'      : tags,
@@ -16,6 +23,22 @@ function! kronos#core#ui#Add(database, dateref, args)
   redraw
   let message = printf('Task [%d] added.', id)
   call kronos#tool#log#Info(message)
+endfunction
+
+" --------------------------------------------------------------------- # List #
+
+function! kronos#core#ui#List(database)
+  let tasks = kronos#core#task#ReadAll(a:database)
+
+  if (! empty(g:kronos_context))
+    let tasks = filter(copy(tasks), 's:MatchOneTag(v:val, g:kronos_context)')
+  endif
+
+  if (g:kronos_hide_done)
+    let tasks = filter(copy(tasks), 'v:val.done == 0')
+  endif
+
+  return tasks
 endfunction
 
 " ------------------------------------------------------------------- # Update #
@@ -96,19 +119,19 @@ endfunction
 " --------------------------------------------------------------------- # Done #
 
 function! kronos#core#ui#Done(database, dateref, id)
-  let l:task = copy(kronos#core#task#Read(a:database, a:id))
-  if  l:task.done | throw 'task-already-done' | endif
+  let task = copy(kronos#core#task#Read(a:database, a:id))
+  if  task.done | throw 'task-already-done' | endif
 
-  if  l:task.active
-    let l:task.worktime += (a:dateref - l:task.active)
-    let l:task.active = 0
-    let l:task.lastactive = a:dateref
+  if  task.active
+    let task.worktime += (a:dateref - task.active)
+    let task.active = 0
+    let task.lastactive = a:dateref
   endif
 
-  let l:task.done = a:dateref
-  let l:task.id   = a:id . a:dateref
+  let task.done = a:dateref
+  let task.id   = a:id . a:dateref
 
-  call kronos#core#task#Update(a:database, a:id, l:task)
+  call kronos#core#task#Update(a:database, a:id, task)
 
   redraw
   let message = printf('Task [%d] done.', a:id)
@@ -119,16 +142,16 @@ endfunction
 
 function! kronos#core#ui#Undone(database, id)
   let tasks = kronos#core#database#Read(a:database)
-  let l:task = copy(kronos#core#task#Read(a:database, a:id))
-  if  ! l:task.done | throw 'task-not-done' | endif
+  let task = copy(kronos#core#task#Read(a:database, a:id))
+  if  ! task.done | throw 'task-not-done' | endif
 
-  let l:task.done = 0
-  let l:task.id   = kronos#tool#task#GenerateId(tasks)
+  let task.done = 0
+  let task.id   = kronos#tool#task#GenerateId(tasks)
 
-  call kronos#core#task#Update(a:database, a:id, l:task)
+  call kronos#core#task#Update(a:database, a:id, task)
 
   redraw
-  let message = printf('Task [%d] undone.', l:task.id)
+  let message = printf('Task [%d] undone.', task.id)
   call kronos#tool#log#Info(message)
 endfunction
 
@@ -150,6 +173,16 @@ function! kronos#core#ui#Worktime(database, dateref, args)
   endfor
 
   return worktime
+endfunction
+
+" ------------------------------------------------------------------ # Context #
+
+function! kronos#core#ui#Context(args)
+  let g:kronos_context = split(a:args, ' ')
+
+  redraw
+  let message = printf('Context [%s] set.', g:kronos_context)
+  call kronos#tool#log#Info(message)
 endfunction
 
 " ------------------------------------------------------------------- # Helper #
@@ -189,5 +222,13 @@ function! s:ParseArgs(dateref, args, task)
   endfor
 
   return [join(desc, ' '), tags, due]
+endfunction
+
+function! s:MatchOneTag(task, tags)
+  for tag in a:task.tags
+    if index(a:tags, tag) + 1 | return 1 | endif
+  endfor
+
+  return 0
 endfunction
 

@@ -18,5 +18,6 @@ nnoremap <silent> <buffer> t     :call kronos#gui#Toggle()         <cr>
 nnoremap <silent> <buffer> <cr>  :call kronos#gui#Toggle()         <cr>
 nnoremap <silent> <buffer> u     :call kronos#gui#Update()         <cr>
 nnoremap <silent> <buffer> U     :call kronos#gui#Undone()         <cr>
+nnoremap <silent> <buffer> C     :call kronos#gui#Context()        <cr>
 nnoremap <silent> <buffer> H     :call kronos#gui#ToggleHideDone() <cr>
 

@@ -7,6 +7,7 @@ endfunction
 
 " ------------------------------------------------------------ # Configuration #
 
+let g:kronos_context   = get(g:, 'kronos_context', [])
 let g:kronos_hide_done = get(g:, 'kronos_hide_done', 1)
 let g:kronos_gist_sync = get(g:, 'kronos_gist_sync', 0)
 let g:kronos_database  = get(
