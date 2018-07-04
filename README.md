@@ -13,10 +13,12 @@ A simple task and time manager for vim.
     * [Add](#add)
     * [Update](#update)
     * [Worktime](#worktime)
+    * [Context](#context)
   * [Mappings](#mappings)
     * [List](#klist)
     * [Info](#info)
   * [Configuration](#configuration)
+    * [Context](#context-1)
     * [Hide done tasks](#hide-done-tasks)
     * [Database](#database)
     * [Gist sync](#gist-sync)
@@ -54,7 +56,8 @@ Here the list of all available commands with their alias:
 :Kronos sto(p)     <id>        " Stop a task
 :Kronos t(oggle)   <id>        " Start or stop a task
 :Kronos d(one)     <id>        " Mark as done a task
-:Kronos w(orktime) <id>        " Show the total worktime for a task
+:Kronos w(orktime) <tags>      " Show the total worktime for a task
+:Kronos c(ontext)  <tags>      " Define a context by tags
 ```
 
 ### Add
@@ -164,8 +167,28 @@ To print the total worktime for a tag:
 Eg., to print the total worktime for tags **tag1** and **tag2**:
 
 ```vim
-:K w +tag1 +tag2
+:K w tag1 tag2
 ```
+
+### Context
+
+To define a context by tags:
+
+```vim
+:Kronos context <tags>
+```
+Eg., to define a context for tag **project1** :
+
+```vim
+:K c project1
+```
+
+Only tasks with tag **project1** will be displayed in the [list](#list).
+
+If a new task is added with a context set, it will automatically get the tag
+**project1** .
+
+To clear the context, just enter an empty one.
 
 ## Mappings
 
@@ -190,6 +213,7 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 | Toggle | `<Enter>`, `<t>` |  Start or stop the task under cursor |
 | Done | `<D>` | Mark task under cursor as done |
 | Undone | `<U>` | Mark task under cursor as undone |
+| Context | `<C>` | Define a context by tags |
 | Refresh | `<r>` | Refresh all the GUI |
 | Toggle hide done | `<H>` | Show or hide done tasks |
 | Quit | `<q>`, `<Esc>` | Quit the GUI mode |
@@ -202,7 +226,15 @@ There is 2 different types of buffer (filetype): **klist** and **kinfo** (for ta
 
 ## Configuration
 
-### Hide done tasks
+### Context
+
+Define a context by default:
+
+```vim
+g:kronos_context = <string[]>
+```
+
+Default: `[]`
 
 Hide done tasks by default:
 
@@ -256,6 +288,7 @@ Tests should be added for each new functionality. Be sure to run tests before pr
 
 ## Changelog
 
+  - **Jul. 05**, *2018* - Add context by tags
   - **Jun. 26**, *2018* - Implement Gist sync feature
   - **Jun. 25**, *2018* - Add ability to mark tasks as undone
   - **Jun. 24**, *2018* - Add option to show or hide done tasks
