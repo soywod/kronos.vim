@@ -124,10 +124,10 @@ Execute (Worktime):
   \])
 
   let scenarios = [
-    \[90, ''     ],
-    \[60, '+a'   ],
-    \[60, '+b'   ],
-    \[60, '+a +b'],
+    \[90, ''   ],
+    \[60, 'a'  ],
+    \[60, 'b'  ],
+    \[60, 'a b'],
   \]
 
 Then (should calculate worktime):

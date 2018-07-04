@@ -158,9 +158,7 @@ endfunction
 " ----------------------------------------------------------------- # Worktime #
 
 function! kronos#core#ui#Worktime(database, dateref, args)
-  let args = split(a:args, ' ')
-  let [desc, tags, due] = s:ParseArgs(a:dateref, args, {})
-
+  let tags  = split(a:args, ' ')
   let tasks = kronos#core#task#ReadAll(a:database)
   let worktime = 0
 
