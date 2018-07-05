@@ -12,6 +12,7 @@ nnoremap <silent> <buffer> i     :call kronos#gui#Info()           <cr>
 nnoremap <silent> <buffer> r     :call kronos#gui#List()           <cr>
 nnoremap <silent> <buffer> S     :call kronos#gui#Stop()           <cr>
 nnoremap <silent> <buffer> s     :call kronos#gui#Start()          <cr>
+nnoremap <silent> <buffer> dd    :call kronos#gui#Delete()         <cr>
 nnoremap <silent> <buffer> <bs>  :call kronos#gui#Delete()         <cr>
 nnoremap <silent> <buffer> <del> :call kronos#gui#Delete()         <cr>
 nnoremap <silent> <buffer> t     :call kronos#gui#Toggle()         <cr>

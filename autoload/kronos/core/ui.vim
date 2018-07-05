@@ -63,9 +63,9 @@ endfunction
 " ------------------------------------------------------------------- # Delete #
 
 function! kronos#core#ui#Delete(database, id)
-  let prompt = 'Do you really want to delete the task [' . a:id . '] (y/N) ? '
-  let choice = input(prompt)
-  if  choice !~? '^y' | throw 'operation-canceled' | endif
+  echo 'Do you really want to delete the task [' . a:id . '] (y/N) ? '
+  let choice = tolower(nr2char(getchar()))
+  if  choice != 'y' | throw 'operation-canceled' | endif
 
   call kronos#core#task#Delete(a:database, a:id)
 
