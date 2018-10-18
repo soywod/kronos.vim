@@ -2,9 +2,9 @@ if exists('b:current_syntax')
   finish
 endif
 
-function! s:SetSyntax()
-  let columns = kronos#gui#Const().LIST.COLUMN
-  let widths  = kronos#gui#Const().LIST.WIDTH
+function! s:set_syntax()
+  let columns = kronos#interface#gui#config().list.column
+  let widths  = kronos#interface#gui#config().list.width
 
   let end   = 0
   let start = 1
@@ -12,30 +12,29 @@ function! s:SetSyntax()
 
   for column in columns
     let end    = start + widths[column] - 1
-    let region = 'region Kronos' . toupper(column[0]) . column[1:]
+    let region = 'region kronos_' . column[0] . column[1:]
 
     execute 'syntax '.region.' start=/\%'.start.'c/ end=/\%'.end.'c/'
     let start = end + 1
   endfor
 
-  syntax match KronosSeparator /|/
-  syntax match KronosDone      /^-.*$/     contains=KronosSeparator
-  syntax match KronosHead      /.*\%1l/    contains=KronosSeparator
-  syntax match KronosDueAlert  /.*ago\s*$/ contains=KronosSeparator
+  syntax match kronos_separator /|/
+  syntax match kronos_done      /^-.*$/     contains=kronos_separator
+  syntax match kronos_head      /.*\%1l/    contains=kronos_separator
+  syntax match kronos_due_alert /.*ago\s*$/ contains=kronos_separator
 endfunction
 
-call s:SetSyntax()
+call s:set_syntax()
 
-highlight default link KronosActive     String
-highlight default link KronosDesc       Comment
-highlight default link KronosDone       VertSplit
-highlight default link KronosDue        Structure
-highlight default link KronosDueAlert   Error
-highlight default link KronosId         Identifier
-highlight default link KronosSeparator  VertSplit
-highlight default link KronosTags       Tag
+highlight default link kronos_active    String
+highlight default link kronos_desc      Comment
+highlight default link kronos_done      VertSplit
+highlight default link kronos_due       Structure
+highlight default link kronos_due_alert Error
+highlight default link kronos_id        Identifier
+highlight default link kronos_separator VertSplit
+highlight default link kronos_tags      Tag
 
-highlight KronosHead term=bold,underline cterm=bold,underline
+highlight kronos_head term=bold,underline cterm=bold,underline gui=bold,underline
 
 let b:current_syntax = 'klist'
-

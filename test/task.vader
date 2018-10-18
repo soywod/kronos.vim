@@ -1,0 +1,111 @@
+Include: setup.vader
+
+# -------------------------------------------------------------------- # Utils #
+
+Execute (Generate id):
+  let scenarios = [
+    \[
+      \[{'id': 1}, {'id': 2}, {'id': 4}],
+      \3,
+    \],
+    \[
+      \[{'id': 2}, {'id': 3}, {'id': 5}],
+      \1,
+    \],
+    \[
+      \[{'id': 1}, {'id': 2}, {'id': 3}],
+      \4,
+    \],
+  \]
+
+Then (should generate new id):
+  for [tasks, id] in scenarios
+    AssertEqual id, kronos#task#generate_id(tasks)
+  endfor
+
+Execute (Get index by id):
+Then (should get task index by id):
+  AssertEqual 0, kronos#task#get_index_by_id([g_task], 1)
+  AssertThrows kronos#task#get_index_by_id([g_task], 0)
+
+# ------------------------------------------------------------------- # Create #
+
+Execute (Create):
+  let scenarios = [
+    \[
+      \1, 
+      \{
+        \'desc': 'desc 1',
+        \'tags': [],
+        \'due': 1526397300,
+        \'active': 0,
+        \'last_active': 0,
+        \'worktime': 0,
+        \'done': 0,
+      \}
+    \],
+    \[
+      \2, 
+      \{
+        \'desc': 'desc 2',
+        \'tags': ['tag_1', 'tag2'],
+        \'due': 1526397300,
+        \'active': 0,
+        \'last_active': 0,
+        \'worktime': 10,
+        \'done': 0,
+      \}
+    \],
+    \[
+      \5, 
+      \{
+        \'id': 5,
+        \'desc': 'desc 5',
+        \'tags': ['tag_1', 'tag2'],
+        \'due': 1526397300,
+        \'active': 0,
+        \'last_active': 0,
+        \'worktime': 10,
+        \'done': 0,
+      \}
+    \],
+  \]
+
+Then (should create task):
+  for [id, task] in scenarios
+    AssertEqual id, kronos#task#create(g_database, task)
+  endfor
+
+# --------------------------------------------------------------------- # Read #
+
+Execute (Read):
+  call kronos#task#create(g_database, g_task)
+
+Then (should read task):
+  AssertEqual g_task, kronos#task#read(g_database, g_task.id)
+
+# ----------------------------------------------------------------- # Read all #
+
+Execute (Read all):
+  call kronos#task#create(g_database, g_task)
+
+Then (should read all tasks):
+  AssertEqual [g_task], kronos#task#read_all(g_database)
+
+# ------------------------------------------------------------------- # Update #
+
+Execute (Update):
+  call kronos#task#create(g_database, g_task)
+  call kronos#task#update(g_database, g_task.id, g_task_updated)
+
+Then (should update task):
+  AssertEqual g_task_updated, kronos#task#read(g_database, g_task.id)
+
+# ------------------------------------------------------------------- # Delete #
+
+Execute (Delete):
+  call kronos#task#create(g_database, g_task)
+  call kronos#task#delete(g_database, g_task.id)
+
+Then (should delete task):
+  AssertEqual [], kronos#task#read_all(g_database)
