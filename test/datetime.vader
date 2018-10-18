@@ -1,0 +1,115 @@
+Include: setup.vader
+
+#------------------------------------------------------------------# Parse due #
+
+Execute (Parse due (date)):
+  let scenarios = [
+    \[':15'    , 1526342400, '15/05/18'],
+    \[':10'    , 1528588800, '10/06/18'],
+    \[':20'    , 1526774400, '20/06/18'],
+    \[':153'   , 1552608000, '15/03/19'],
+    \[':102'   , 1549756800, '10/02/19'],
+    \[':201'   , 1547942400, '20/01/19'],
+    \[':158'   , 1534291200, '15/08/18'],
+    \[':108'   , 1533859200, '10/08/18'],
+    \[':2010'  , 1539993600, '20/10/18'],
+    \[':140117', 'throw'   , '14/01/17'],
+  \]
+
+Then (should parse date):
+  for [due, date; _] in scenarios
+    if date == 'throw'
+      AssertThrow kronos#utils#datetime#parse_due(g_date_ref, due)
+    else
+      AssertEqual date, kronos#utils#datetime#parse_due(g_date_ref, due)
+    endif
+  endfor
+
+Execute (Parse due (time)):
+  let scenarios = [
+    \['::15'  , 1526482800, '16/05/18 15:00'],
+    \['::10'  , 1526464800, '16/05/18 10:00'],
+    \['::20'  , 1526414400, '15/05/18 20:00'],
+    \['::1515', 1526397300, '15/05/18 15:15'],
+    \['::1530', 1526398200, '15/05/18 15:30'],
+    \['::12'  , 1526472000, '16/05/18 12:00'],
+    \['::080' , 1526457600, '16/05/18 08:00'],
+    \['::0130', 1526434200, '16/05/18 01:30'],
+    \['::16'  , 1526400000, '15/05/18 16:00'],
+    \['::2000', 1526414400, '15/05/18 20:00'],
+    \['::2330', 1526427000, '15/05/18 23:30'],
+  \]
+
+Then (should parse time):
+  for [due, date; _] in scenarios
+    AssertEqual date, kronos#utils#datetime#parse_due(g_date_ref, due)
+  endfor
+
+Execute (Parse due (date&time)):
+  let scenarios = [
+    \[':155:15'     , 1526396400, '15/05/18 15:00'],
+    \[':160719:1821', 1563301260, '16/07/19 18:21'],
+    \[':1406:1420'  , 1528986000, '14/06/18 14:20'],
+    \[':1001:1001'  , 1547114460, '10/01/19 10:01'],
+    \[':100118:1001', 'throw'   , '10/01/18 10:01'],
+  \]
+
+Then (should parse date and time):
+  for [due, date; _] in scenarios
+    if date == 'throw'
+      AssertThrow kronos#utils#datetime#parse_due(g_date_ref, due)
+    else
+      AssertEqual date, kronos#utils#datetime#parse_due(g_date_ref, due)
+    endif
+  endfor
+
+"-------------------------------------------------------------# Print interval #
+
+Execute (Print interval):
+  let Interval = function('kronos#utils#datetime#print_interval')
+  let d = kronos#utils#datetime#config().second_in
+
+  let scenarios = [
+    \['1h 1min 1s', Interval(d.hour   + d.min    + d.sec)  ],
+    \['1y 1mo 2d' , Interval(d.year   + d.month  + d.day*2)],
+    \['1d 5h 2s'  , Interval(d.day    + d.hour*5 + d.sec*2)],
+    \['3w 55s'    , Interval(d.week*3 + d.sec*55)          ],
+  \]
+
+Then (should print interval):
+  for [printed, interval] in scenarios
+    AssertEqual printed, interval
+  endfor
+
+"-----------------------------------------------------------------# Print diff #
+
+Execute (Print diff):
+  let min   = kronos#utils#datetime#config().second_in.min
+  let hour  = kronos#utils#datetime#config().second_in.hour
+  let day   = kronos#utils#datetime#config().second_in.day
+  let week  = kronos#utils#datetime#config().second_in.week
+  let month = kronos#utils#datetime#config().second_in.month
+  let year  = kronos#utils#datetime#config().second_in.year
+
+  let scenarios = [
+    \[g_date_ref      , g_date_ref+42     , 'in 43s'  ],
+    \[g_date_ref+42   , g_date_ref        , '43s ago' ],
+    \[g_date_ref      , g_date_ref+min    , 'in 2min' ],
+    \[g_date_ref+min  , g_date_ref        , '2min ago'],
+    \[g_date_ref      , g_date_ref+hour-1 , 'in 60min'],
+    \[g_date_ref+hour , g_date_ref        , '2h ago'  ],
+    \[g_date_ref      , g_date_ref+day-1  , 'in 24h'  ],
+    \[g_date_ref+day  , g_date_ref        , '2d ago'  ],
+    \[g_date_ref      , g_date_ref+week-1 , 'in 7d'   ],
+    \[g_date_ref+week , g_date_ref        , '2w ago'  ],
+    \[g_date_ref      , g_date_ref+month-1, 'in 5w'   ],
+    \[g_date_ref+month, g_date_ref        , '2mo ago' ],
+    \[g_date_ref      , g_date_ref+year-1 , 'in 12mo' ],
+    \[g_date_ref+year , g_date_ref        , '2y ago'  ],
+    \[g_date_ref      , g_date_ref+year*5 , 'in 6y'   ],
+  \]
+
+Then (should print diff):
+  for [date_src, date_dest, diff] in scenarios
+    AssertEqual diff, kronos#utils#datetime#print_diff(date_src, date_dest)
+  endfor

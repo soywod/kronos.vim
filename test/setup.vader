@@ -1,0 +1,41 @@
+Before:
+  let g_dirname  = resolve(expand('<sfile>:h'))
+  let g_database = resolve(g_dirname . '/.database')
+  let g_date_ref = 1526397300 "15/05/2018 15:15 UTC
+
+  let g_data = {
+    \'tasks': [],
+    \'hide_done': 1,
+    \'enable_sync': 0,
+    \'sync_host': 'localhost:5000',
+    \'sync_user_id': '',
+    \'sync_device_id': '',
+    \'sync_version': 0,
+  \}
+
+  let g_task = {
+    \'id': 1,
+    \'desc': 'desc 1',
+    \'tags': ['tag_1', 'tag2'],
+    \'due': 1526397300,
+    \'active': 0,
+    \'last_active': 0,
+    \'worktime': 10,
+    \'done': 0,
+  \}
+
+  let g_task_updated = {
+    \'id': 1,
+    \'desc': 'desc 1 updated',
+    \'tags': ['tag_1', 'tag2', 'tag-3'],
+    \'due': 1526397300,
+    \'active': 0,
+    \'last_active': 0,
+    \'worktime': 20,
+    \'done': 0,
+  \}
+
+After:
+  call delete(g_database)
+  unlet g_database g_data g_dirname g_task g_date_ref
+  if exists('scenarios') | unlet scenarios | endif

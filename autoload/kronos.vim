@@ -1,44 +1,39 @@
-" ------------------------------------------------------------------- # Action #
-
-function! s:Actions(dateref, args)
-  return [
-    \['^li\?s\?t\?$'            , 'List'    ],
-    \['^in\?f\?o\?$'            , 'Info'    ],
-    \['^dele\?t\?e\?$'          , 'Delete'  ],
-    \['^ad\?d\?$'               , 'Add'     ],
-    \['^up\?d\?a\?t\?e\?$'      , 'Update'  ],
-    \['^star\?t\?$'             , 'Start'   ],
-    \['^stop\?$'                , 'Stop'    ],
-    \['^to\?g\?g\?l\?e\?$'      , 'Toggle'  ],
-    \['^do\?n\?e\?$'            , 'Done'    ],
-    \['^und\?o\?n\?e\?$'        , 'Undone'  ],
-    \['^wo\?r\?k\?t\?i\?m\?e\?$', 'Worktime'],
-    \['^co\?n\?t\?e\?x\?t\?$'   , 'Context' ],
-  \]
-endfunction
+let s:actions = [
+  \['^li\?s\?t\?$'            , 'list'    ],
+  \['^in\?f\?o\?$'            , 'info'    ],
+  \['^dele\?t\?e\?$'          , 'delete'  ],
+  \['^ad\?d\?$'               , 'add'     ],
+  \['^up\?d\?a\?t\?e\?$'      , 'update'  ],
+  \['^star\?t\?$'             , 'start'   ],
+  \['^stop\?$'                , 'stop'    ],
+  \['^to\?g\?g\?l\?e\?$'      , 'toggle'  ],
+  \['^do\?n\?e\?$'            , 'done'    ],
+  \['^und\?o\?n\?e\?$'        , 'undone'  ],
+  \['^wo\?r\?k\?t\?i\?m\?e\?$', 'worktime'],
+  \['^co\?n\?t\?e\?x\?t\?$'   , 'context' ],
+\]
 
 " -------------------------------------------------------------- # Entry point #
 
-function! kronos#EntryPoint(args)
+function! kronos#entry_point(args)
   if a:args =~? '^ *$'
-    return kronos#gui#List()
+    return kronos#interface#gui#list()
   endif
 
-  let farg = split(a:args, ' ')[0]
-  let args = a:args[len(farg) + 1:]
+  let first_arg = split(a:args, ' ')[0]
+  let args = a:args[len(first_arg) + 1:]
 
-  for [regex, action] in s:Actions(localtime(), args)
-    if farg =~? regex
-      return s:Trigger(action, args)
+  for [regex, action] in s:actions
+    if first_arg =~? regex
+      return s:trigger(action, args)
     endif
   endfor
 
-  return kronos#tool#log#Error('Command not found.')
+  call kronos#utils#log#error('Command not found.')
 endfunction
 
-" ------------------------------------------------------------------- # Helper #
+" -------------------------------------------------------------------- # Utils #
 
-function! s:Trigger(action, args)
-  execute 'call kronos#cli#' . a:action . '("' . a:args . '")'
+function! s:trigger(action, args)
+  execute 'call kronos#interface#cli#' . a:action . '("' . a:args . '")'
 endfunction
-
