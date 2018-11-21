@@ -1,4 +1,4 @@
-setlocal buftype=nofile
+setlocal buftype=acwrite
 setlocal cursorline
 " setlocal nomodifiable
 setlocal nowrap
@@ -6,10 +6,14 @@ setlocal startofline
 
 augroup klist
   autocmd! * <buffer>
-  autocmd InsertLeave,TextChanged <buffer> call kronos#interface#gui#parse_buffer()
+  " autocmd InsertLeave,TextChanged <buffer> call kronos#interface#gui#parse_buffer()
+  autocmd  BufWriteCmd <buffer> call kronos#interface#gui#parse_buffer()
 augroup end
 
-" nnoremap <silent> <buffer> q     :bdelete                                      <cr>
+let &modified = 0
+
+" nnoremap <silent> <buffer> <tab> :call kronos#interface#gui#parse_buffer()<cr>
+
 " nnoremap <silent> <buffer> <esc> :bdelete                                      <cr>
 " nnoremap <silent> <buffer> a     :call kronos#interface#gui#add()              <cr>
 " nnoremap <silent> <buffer> D     :call kronos#interface#gui#done()             <cr>

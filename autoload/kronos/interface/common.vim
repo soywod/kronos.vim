@@ -2,7 +2,7 @@
 
 function! kronos#interface#common#add(database, date_ref, args)
   let args = split(a:args, ' ')
-  let [desc, tags, due] = s:parse_args(a:date_ref, args, {})
+  let [desc, tags, due] = kronos#interface#common#parse_args(a:date_ref, args, {})
 
   for tag in copy(g:kronos_context)
     if index(tags, tag) == -1
@@ -27,9 +27,8 @@ function! kronos#interface#common#add(database, date_ref, args)
     call kronos#sync#common#send({'type': 'create', 'task': task})
   endif
 
-  redraw
-  let message = printf('Task [%d] added.', task.id)
-  call kronos#utils#log#info(message)
+"   let message = printf('Task [%d] added.', task.id)
+"   call kronos#utils#log#info(message)
 endfunction
 
 " --------------------------------------------------------------------- # List #
@@ -53,7 +52,7 @@ endfunction
 function! kronos#interface#common#update(database, date_ref, args)
   let [id; args] = split(a:args, ' ')
   let task = kronos#task#read(a:database, id)
-  let [desc, tags, due] = s:parse_args(a:date_ref, args, task)
+  let [desc, tags, due] = kronos#interface#common#parse_args(a:date_ref, args, task)
 
   if ! empty(desc) && task.desc != desc | let task.desc = desc | endif
 
@@ -67,18 +66,13 @@ function! kronos#interface#common#update(database, date_ref, args)
     call kronos#sync#common#send({'type': 'update', 'task': task})
   endif
 
-  redraw
-  let message = printf('Task [%d] updated.', id)
-  call kronos#utils#log#info(message)
+  " let message = printf('Task [%d] updated.', id)
+  " call kronos#utils#log#info(message)
 endfunction
 
 " ------------------------------------------------------------------- # Delete #
 
 function! kronos#interface#common#delete(database, id)
-  echo 'Do you really want to delete the task [' . a:id . '] (y/N) ? '
-  let choice = tolower(nr2char(getchar()))
-  if  choice != 'y' | throw 'operation canceled' | endif
-
   call kronos#task#delete(a:database, a:id)
 
   if g:kronos_sync
@@ -86,9 +80,8 @@ function! kronos#interface#common#delete(database, id)
     call kronos#sync#common#send({'type': 'delete', 'task_id': a:id})
   endif
 
-  redraw
-  let message = printf('Task [%d] deleted.', a:id)
-  call kronos#utils#log#info(message)
+  " let message = printf('Task [%d] deleted.', a:id)
+  " call kronos#utils#log#info(message)
 endfunction
 
 " -------------------------------------------------------------------- # Start #
@@ -101,9 +94,8 @@ function! kronos#interface#common#start(database, date_ref, id)
 
   call kronos#task#update(a:database, a:id, task)
 
-  redraw
-  let message = printf('Task [%d] started.', a:id)
-  call kronos#utils#log#info(message)
+  " let message = printf('Task [%d] started.', a:id)
+  " call kronos#utils#log#info(message)
 endfunction
 
 " --------------------------------------------------------------------- # Stop #
@@ -118,9 +110,8 @@ function! kronos#interface#common#stop(database, date_ref, id)
 
   call kronos#task#update(a:database, a:id, task)
 
-  redraw
-  let message = printf('Task [%d] stopped.', a:id)
-  call kronos#utils#log#info(message)
+  " let message = printf('Task [%d] stopped.', a:id)
+  " call kronos#utils#log#info(message)
 endfunction
 
 " ------------------------------------------------------------------- # Toggle #
@@ -150,9 +141,8 @@ function! kronos#interface#common#done(database, date_ref, id)
 
   call kronos#task#update(a:database, a:id, task)
 
-  redraw
-  let message = printf('Task [%d] done.', a:id)
-  call kronos#utils#log#info(message)
+  " let message = printf('Task [%d] done.', a:id)
+  " call kronos#utils#log#info(message)
 endfunction
 
 " ------------------------------------------------------------------- # Undone #
@@ -167,9 +157,8 @@ function! kronos#interface#common#undone(database, id)
 
   call kronos#task#update(a:database, a:id, task)
 
-  redraw
-  let message = printf('Task [%d] undone.', task.id)
-  call kronos#utils#log#info(message)
+  " let message = printf('Task [%d] undone.', task.id)
+  " call kronos#utils#log#info(message)
 endfunction
 
 " ----------------------------------------------------------------- # Worktime #
@@ -195,15 +184,16 @@ endfunction
 function! kronos#interface#common#context(args)
   let g:kronos_context = split(a:args, ' ')
 
-  redraw
-  let message = printf('Context %s set.', g:kronos_context)
-  call kronos#utils#log#info(message)
+  " let message = printf('Context %s set.', g:kronos_context)
+  " call kronos#utils#log#info(message)
 endfunction
 
 " -------------------------------------------------------------------- # Utils #
 
-function! s:parse_args(date_ref, args, task)
-  let desc    = []
+function! kronos#interface#common#parse_args(date_ref, args, task)
+  let args = split(a:args, ' ')
+
+  let desc     = []
   let tags_old = []
   let tags_new = []
 
@@ -215,7 +205,7 @@ function! s:parse_args(date_ref, args, task)
     let tags = []
   endif
 
-  for arg in a:args
+  for arg in args
     if arg =~ '^+\w'
       call add(tags_new, arg[1:])
     elseif arg =~ '^-\w'

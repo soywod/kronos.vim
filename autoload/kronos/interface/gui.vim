@@ -26,7 +26,7 @@ function! kronos#interface#gui#config()
   return s:config
 endfunction
 
-let s:body = []
+let s:rows = []
 
 " ---------------------------------------------------------------------- # Add #
 
@@ -87,14 +87,17 @@ function! kronos#interface#gui#list()
   let tasks = kronos#interface#common#list(g:kronos_database)
   let tasks = map(copy(tasks), 'kronos#task#to_list_string(v:val)')
 
-  silent! bdelete Kronos
+  redir => buflist | silent! ls | redir END
   silent! edit Kronos
+
+  if match(buflist, '"Kronos"') + 1
+    execute '0,$d'
+  endif
 
   call append(0, s:render(tasks))
   execute '$d'
   call setpos('.', prevpos)
   setlocal filetype=klist
-
 endfunction
 
 " ------------------------------------------------------------------- # Update #
@@ -243,45 +246,93 @@ function s:trim(str)
   return substitute(a:str, '\s*$', '', 'g')
 endfunction
 
-function kronos#interface#gui#parse_buffer()
-  let index = -1
+function s:parse_buffer_row(index, row)
+  if match(a:row, '^\d\s*|.*|.*|.*|.*|$') == -1
+    let [desc, tags, due] =
+      \kronos#interface#common#parse_args(localtime(), s:trim(a:row), {})
 
-  for row in getline(2, '$')
-    let index += 1
-    if  index(s:body, row) > -1 | continue | endif
+    return {
+      \'desc': desc,
+      \'tags': tags,
+      \'due': due,
+      \'active': 0,
+      \'last_active': 0,
+      \'worktime': 0,
+      \'done': 0,
+    \}
+  else
+    let cells = split(a:row, '|')
+    let id = s:trim(cells[0])
+    let desc = s:trim(join(cells[1:-4], ''))
+    let tags = split(s:trim(cells[-3]), ' ')
+    let due = s:trim(cells[-1])
 
-    let cells = split(row, '|')
     try
-      let id = +s:trim(cells[0])
-      let desc = s:trim(join(cells[1:-4], ''))
-      let tags = s:trim(cells[-3])
-      let active = s:trim(cells[-2])
-      let due = s:trim(cells[-1])
+      let task = kronos#task#read(g:kronos_database, id)
     catch
-      echo 'Error while parsing buffer.'
-      return
-    endtry
-
-    let tasks = kronos#interface#common#list(g:kronos_database)
-
-    if len(tasks) == len(s:body)
-      let update = {
-        \'id': id,
+      let task = {
         \'desc': desc,
-        \'tags': split(tags, ' '),
+        \'tags': tags,
+        \'due': due,
+        \'active': 0,
+        \'last_active': 0,
+        \'worktime': 0,
+        \'done': 0,
       \}
 
-      call kronos#task#update(
-        \g:kronos_database,
-        \id,
-        \kronos#database#merge_data(tasks[index], update),
-      \)
+      if id | let task.id = id | endif
+      return task
+    endtry
 
-      call kronos#interface#gui#list()
+    if match(due, '^\s*:') == -1
+      if cells[-1] != '' | let due = task.due
+      else | let due = 0 | endif
     else
-      echom 'add ' . id
+      let due = kronos#utils#datetime#parse_due(localtime(), due)
+    endif
+
+    return kronos#database#merge_data(task, {
+      \'desc': desc,
+      \'tags': tags,
+      \'due': due,
+    \})
+  endif
+endfunction
+
+function kronos#interface#gui#parse_buffer()
+  let tasks_old = kronos#interface#common#list(g:kronos_database)
+  let tasks_new = map(getline(2, '$'), 's:parse_buffer_row(v:key, v:val)')
+
+  let task_old_ids = map(copy(tasks_old), 'v:val.id')
+  let task_new_ids = map(
+    \filter(copy(tasks_new), 'has_key(v:val, ''id'')'),
+    \'v:val.id',
+  \)
+
+  " Tasks to delete
+  for task in tasks_old
+    if index(task_new_ids, task.id) > -1 | continue | endif
+    call kronos#interface#common#delete(g:kronos_database, task.id)
+  endfor
+
+  " Tasks to add / udpate
+  for task in tasks_new
+    if !has_key(task, 'id')
+      call kronos#task#create(g:kronos_database, task)
+      continue
+    endif
+
+    let index = index(task_old_ids, task.id)
+    if  index > -1 && task == tasks_old[index] | continue | endif
+
+    if index == -1
+      call kronos#task#create(g:kronos_database, task)
+    else
+      call kronos#task#update(g:kronos_database, task.id, task)
     endif
   endfor
+
+  call kronos#interface#gui#list()
 endfunction
 
 " ------------------------------------------------------------------- # Render #
@@ -289,9 +340,9 @@ endfunction
 function! s:render(tasks)
   let max_widths = s:get_max_widths(a:tasks, s:config.list.columns)
   let header = [s:render_row(s:config.labels, max_widths)]
-  let s:body = map(copy(a:tasks), 's:render_row(v:val, max_widths)')
+  let s:rows = map(copy(a:tasks), 's:render_row(v:val, max_widths)')
 
-  return header + s:body
+  return header + s:rows
 endfunction
 
 function! s:render_row(row, max_widths)
