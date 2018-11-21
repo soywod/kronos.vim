@@ -37,4 +37,4 @@ highlight default link kronos_tags      Tag
 
 highlight kronos_head term=bold,underline cterm=bold,underline gui=bold,underline
 
-let b:current_syntax = 'klist'
+let b:current_syntax = 'klist.old'

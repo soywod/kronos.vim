@@ -2,24 +2,13 @@
 
 let s:config = {
   \'info': {
-    \'column': ['key', 'value'],
-    \'key': ['id', 'desc', 'tags', 'active', 'last_active', 'due', 'worktime', 'done'],
-    \'width': {
-      \'key'  : 15,
-      \'value': 65,
-    \},
+    \'columns': ['key', 'value'],
+    \'keys': ['id', 'desc', 'tags', 'active', 'last_active', 'due', 'worktime', 'done'],
   \},
   \'list': {
-    \'column': ['id', 'desc', 'tags', 'active', 'due'],
-    \'width': {
-      \'active': 13,
-      \'desc': 29,
-      \'due': 13,
-      \'id': 5,
-      \'tags': 20,
-    \},
+    \'columns': ['id', 'desc', 'tags', 'active', 'due'],
   \},
-  \'label': {
+  \'labels': {
     \'active': 'ACTIVE',
     \'desc': 'DESC',
     \'done': 'DONE',
@@ -36,6 +25,8 @@ let s:config = {
 function! kronos#interface#gui#config()
   return s:config
 endfunction
+
+let s:body = []
 
 " ---------------------------------------------------------------------- # Add #
 
@@ -61,11 +52,11 @@ function! kronos#interface#gui#info()
   try
     let id = s:get_focused_task_id()
 
-    let columns = s:config.info.column
-    let keys    = s:config.info.key
-    let labels  = s:config.label
+    let columns = s:config.info.columns
+    let keys    = s:config.info.keys
+    let labels  = s:config.labels
 
-    let headers = [filter(copy(s:config.label), 'index(columns, v:key) + 1')]
+    let headers = [filter(copy(s:config.labels), 'index(columns, v:key) + 1')]
     let headers = map(copy(headers), function('s:print_info_header'))
 
     let task = kronos#task#read(g:kronos_database, id)
@@ -91,30 +82,19 @@ endfunction
 " --------------------------------------------------------------------- # List #
 
 function! kronos#interface#gui#list()
-  try
-    let columns = s:config.list.column
-    let headers = [filter(copy(s:config.label), 'index(columns, v:key) + 1')]
-    let prevpos = getpos('.')
-    let tasks = kronos#interface#common#list(g:kronos_database)
+  let prevpos = getpos('.')
 
-    let headers = map(copy(headers), function('s:print_list_header'))
-    let tasks   = map(copy(tasks), function('s:print_list_task'))
+  let tasks = kronos#interface#common#list(g:kronos_database)
+  let tasks = map(copy(tasks), 'kronos#task#to_list_string(v:val)')
 
-    redir => buflist | silent! ls | redir END
-    silent! edit Kronos
+  silent! bdelete Kronos
+  silent! edit Kronos
 
-    if match(buflist, '"Kronos"') + 1
-      setlocal modifiable
-      execute '0,$d'
-    endif
+  call append(0, s:render(tasks))
+  execute '$d'
+  call setpos('.', prevpos)
+  setlocal filetype=klist
 
-    call append(0, headers + tasks)
-    execute '$d'
-    call setpos('.', prevpos)
-    setlocal filetype=klist
-  catch
-    return kronos#utils#log#error('task list failed')
-  endtry
 endfunction
 
 " ------------------------------------------------------------------- # Update #
@@ -257,43 +237,86 @@ function! kronos#interface#gui#toggle_hide_done()
   endtry
 endfunction
 
-" -------------------------------------------------------------------- # Print #
+" ------------------------------------------------------------- # Parse buffer #
 
-function! kronos#interface#gui#print_row(type, row)
-  let columns = s:config[a:type].column
-  let widths  = s:config[a:type].width
+function s:trim(str)
+  return substitute(a:str, '\s*$', '', 'g')
+endfunction
 
+function kronos#interface#gui#parse_buffer()
+  let index = -1
+
+  for row in getline(2, '$')
+    let index += 1
+    if  index(s:body, row) > -1 | continue | endif
+
+    let cells = split(row, '|')
+    try
+      let id = +s:trim(cells[0])
+      let desc = s:trim(join(cells[1:-4], ''))
+      let tags = s:trim(cells[-3])
+      let active = s:trim(cells[-2])
+      let due = s:trim(cells[-1])
+    catch
+      echo 'Error while parsing buffer.'
+      return
+    endtry
+
+    let tasks = kronos#interface#common#list(g:kronos_database)
+
+    if len(tasks) == len(s:body)
+      let update = {
+        \'id': id,
+        \'desc': desc,
+        \'tags': split(tags, ' '),
+      \}
+
+      call kronos#task#update(
+        \g:kronos_database,
+        \id,
+        \kronos#database#merge_data(tasks[index], update),
+      \)
+
+      call kronos#interface#gui#list()
+    else
+      echom 'add ' . id
+    endif
+  endfor
+endfunction
+
+" ------------------------------------------------------------------- # Render #
+
+function! s:render(tasks)
+  let max_widths = s:get_max_widths(a:tasks, s:config.list.columns)
+  let header = [s:render_row(s:config.labels, max_widths)]
+  let s:body = map(copy(a:tasks), 's:render_row(v:val, max_widths)')
+
+  return header + s:body
+endfunction
+
+function! s:render_row(row, max_widths)
   return join(map(
-    \copy(columns),
-    \'s:print_prop(a:row[v:val], widths[v:val])',
-  \), '')[:78] . ' '
+    \copy(s:config.list.columns),
+    \'s:render_cell(a:row[v:val], a:max_widths[v:key])',
+  \), '')
+endfunction
+
+function! s:render_cell(cell, max_width)
+  let cell_width = strwidth(a:cell[:a:max_width])
+  return a:cell[:a:max_width] . repeat(' ', a:max_width - cell_width) . ' |'
 endfunction
 
 " -------------------------------------------------------------------- # Utils #
 
-function! s:print_list_header(_, row)
-  return kronos#interface#gui#print_row('list', a:row)
-endfunction
+function! s:get_max_widths(tasks, columns)
+  let max_widths = map(copy(a:columns), 'strlen(s:config.labels[v:val])')
 
-function! s:print_list_task(_, task)
-  let task = copy(kronos#task#to_list_string(a:task))
-  return kronos#interface#gui#print_row('list', task)
-endfunction
+  for task in a:tasks
+    let widths = map(copy(a:columns), 'strlen(task[v:val])')
+    call map(max_widths, 'max([widths[v:key], v:val])')
+  endfor
 
-function! s:print_info_header(_, row)
-  return kronos#interface#gui#print_row('info', a:row)
-endfunction
-
-function! s:print_info_prop(key, value)
-  let row = {'key': a:key, 'value': a:value}
-  return kronos#interface#gui#print_row('info', row)
-endfunction
-
-function! s:print_prop(prop, maxlen)
-  let maxlen = a:maxlen - 2
-  let proplen = strdisplaywidth(a:prop[:maxlen]) + 1
-
-  return a:prop[:maxlen] . repeat(' ', a:maxlen - proplen) . '|'
+  return max_widths
 endfunction
 
 function! s:get_focused_task_id()
