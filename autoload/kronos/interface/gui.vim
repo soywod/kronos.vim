@@ -240,16 +240,47 @@ function! kronos#interface#gui#toggle_hide_done()
   endtry
 endfunction
 
-" ------------------------------------------------------------- # Parse buffer #
+" ---------------------------------------------------------- # Cell management #
 
-function s:trim(str)
-  return substitute(a:str, '\s*$', '', 'g')
+function! kronos#interface#gui#select_next_cell()
+  normal! f|l
+
+  if col('.') == col('$') - 1
+    if line('.') == line('$')
+      normal! T|
+    else
+      normal! j0l
+    endif
+  endif
 endfunction
 
+function! kronos#interface#gui#select_prev_cell()
+  if col('.') == 2 && line('.') > 2
+    normal! k$T|
+  else
+    normal! 2T|
+  endif
+endfunction
+
+function! kronos#interface#gui#delete_in_cell()
+  execute printf('normal! %sdt|', col('.') == 1 ? '' : 'T|')
+endfunction
+
+function! kronos#interface#gui#change_in_cell()
+  call kronos#interface#gui#delete_in_cell()
+  startinsert
+endfunction
+
+function! kronos#interface#gui#visual_in_cell()
+  execute printf('normal! %svt|', col('.') == 1 ? '' : 'T|')
+endfunction
+
+" ------------------------------------------------------------- # Parse buffer #
+
 function s:parse_buffer_row(index, row)
-  if match(a:row, '^\d\s*|.*|.*|.*|.*|$') == -1
+  if match(a:row, '^|\d\s*|.*|.*|.*|.*|$') == -1
     let [desc, tags, due] =
-      \kronos#interface#common#parse_args(localtime(), s:trim(a:row), {})
+      \kronos#interface#common#parse_args(localtime(), kronos#utils#trim(a:row), {})
 
     return {
       \'desc': desc,
@@ -262,10 +293,10 @@ function s:parse_buffer_row(index, row)
     \}
   else
     let cells = split(a:row, '|')
-    let id = s:trim(cells[0])
-    let desc = s:trim(join(cells[1:-4], ''))
-    let tags = split(s:trim(cells[-3]), ' ')
-    let due = s:trim(cells[-1])
+    let id = kronos#utils#trim(cells[0])
+    let desc = kronos#utils#trim(join(cells[1:-4], ''))
+    let tags = split(kronos#utils#trim(cells[-3]), ' ')
+    let due = kronos#utils#trim(cells[-1])
 
     try
       let task = kronos#task#read(g:kronos_database, id)
@@ -346,7 +377,7 @@ function! s:render(tasks)
 endfunction
 
 function! s:render_row(row, max_widths)
-  return join(map(
+  return '|' . join(map(
     \copy(s:config.list.columns),
     \'s:render_cell(a:row[v:val], a:max_widths[v:key])',
   \), '')
