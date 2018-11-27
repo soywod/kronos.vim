@@ -22,11 +22,14 @@ let s:config = {
   \},
 \}
 
-function! kronos#interface#gui#config()
-  return s:config
-endfunction
+let s:max_widths = []
 
-let s:rows = []
+function! kronos#interface#gui#config()
+  return {
+    \'columns': s:config.list.columns,
+    \'widths': s:max_widths,
+  \}
+endfunction
 
 " ---------------------------------------------------------------------- # Add #
 
@@ -369,11 +372,11 @@ endfunction
 " ------------------------------------------------------------------- # Render #
 
 function! s:render(tasks)
-  let max_widths = s:get_max_widths(a:tasks, s:config.list.columns)
-  let header = [s:render_row(s:config.labels, max_widths)]
-  let s:rows = map(copy(a:tasks), 's:render_row(v:val, max_widths)')
+  let s:max_widths = s:get_max_widths(a:tasks, s:config.list.columns)
+  let header = [s:render_row(s:config.labels, s:max_widths)]
+  let rows = map(copy(a:tasks), 's:render_row(v:val, s:max_widths)')
 
-  return header + s:rows
+  return header + rows
 endfunction
 
 function! s:render_row(row, max_widths)
@@ -384,7 +387,7 @@ function! s:render_row(row, max_widths)
 endfunction
 
 function! s:render_cell(cell, max_width)
-  let cell_width = strwidth(a:cell[:a:max_width])
+  let cell_width = strdisplaywidth(a:cell[:a:max_width])
   return a:cell[:a:max_width] . repeat(' ', a:max_width - cell_width) . ' |'
 endfunction
 
