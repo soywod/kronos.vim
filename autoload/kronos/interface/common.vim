@@ -36,7 +36,7 @@ endfunction
 function! kronos#interface#common#list(database)
   let tasks = kronos#task#read_all(a:database)
 
-  if (! empty(g:kronos_context))
+  if (!empty(g:kronos_context))
     let tasks = filter(copy(tasks), 's:match_one_tag(v:val, g:kronos_context)')
   endif
 

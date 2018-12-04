@@ -1,8 +1,14 @@
 " ------------------------------------------------------------------- # Create #
 
 function! kronos#task#create(database, task)
+  let task  = copy(a:task)
   let tasks = kronos#database#read(a:database).tasks
-  let task = copy(a:task)
+
+  for tag in copy(g:kronos_context)
+    if index(task.tags, tag) == -1
+      call add(task.tags, tag)
+    endif
+  endfor
 
   if has_key(task, 'id')
     if len(filter(copy(tasks), 'v:val.id == task.id'))

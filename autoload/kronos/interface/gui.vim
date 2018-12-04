@@ -23,6 +23,7 @@ let s:config = {
 \}
 
 let s:max_widths = []
+let s:buff_name = 'Kronos'
 
 " --------------------------------------------------------------------- # Info #
 
@@ -52,9 +53,9 @@ function! kronos#interface#gui#list()
   let lines = map(copy(tasks), 'kronos#task#to_list_string(v:val)')
 
   redir => buflist | silent! ls | redir END
-  silent! edit Kronos
+  execute 'silent! edit ' . s:buff_name
 
-  if match(buflist, '"Kronos"') + 1
+  if match(buflist, '"Kronos') > -1
     execute '0,$d'
   endif
 
@@ -104,7 +105,7 @@ function! kronos#interface#gui#toggle()
   endif
 
   try
-    let id   = s:get_focused_task_id()
+    let id = s:get_focused_task_id()
     let task = kronos#task#read(g:kronos_database, id)
 
     return task.active
@@ -121,8 +122,19 @@ endfunction
 
 function! kronos#interface#gui#context()
   try
-    let args = input('Context (:h kronos-context): ')
+    let args = input('Go to context: ')
     call kronos#interface#common#context(args)
+
+    execute 'silent! bdelete ' . s:buff_name
+
+    if (len(g:kronos_context) == 0)
+      let s:buff_name = 'Kronos'
+    else
+      let tags = map(copy(g:kronos_context), 'printf("+%s", v:val)')
+      let s:buff_name = printf('Kronos [%s]', join(tags, ' '))
+    endif
+
+    echo
     call kronos#interface#gui#list()
   catch
     return kronos#utils#log#error('task context failed')
@@ -262,6 +274,7 @@ function kronos#interface#gui#parse_buffer()
   endfor
 
   call kronos#interface#gui#list()
+  let &modified = 0
 endfunction
 
 " ------------------------------------------------------------------ # Renders #
@@ -300,7 +313,7 @@ function! s:get_max_widths(tasks, columns)
 endfunction
 
 function! s:get_focused_task_id()
-  let tasks = kronos#task#read_all(g:kronos_database)
+  let tasks = kronos#interface#common#list(g:kronos_database)
   let index = line('.') - 2
   if  index == -1 | throw 'task not found' | endif
 
