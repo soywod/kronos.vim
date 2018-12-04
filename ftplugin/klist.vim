@@ -12,6 +12,7 @@ augroup end
 " ----------------------------------------------------------------- # Commands #
 
 nnoremap <silent> <buffer> <cr> :call kronos#interface#gui#toggle()<cr>
+nnoremap <silent> <buffer> K    :call kronos#interface#gui#info()<cr>
 
 " ---------------------------------------------------------------- # Next cell #
 
