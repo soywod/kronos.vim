@@ -174,6 +174,10 @@ endfunction
 " ------------------------------------------------------------------- # Toggle #
 
 function! kronos#interface#gui#toggle()
+  if &modified
+    return kronos#utils#log#error('buffer not saved')
+  endif
+
   try
     let id   = s:get_focused_task_id()
     let task = kronos#task#read(g:kronos_database, id)
@@ -281,7 +285,7 @@ endfunction
 " ------------------------------------------------------------- # Parse buffer #
 
 function s:parse_buffer_row(index, row)
-  if match(a:row, '^|\d\s*|.*|.*|.*|.*|$') == -1
+  if match(a:row, '^|\d\{-1,}\s\{-}|.*|.\{-}|.\{-}|.\{-}|$') == -1
     let [desc, tags, due] =
       \kronos#interface#common#parse_args(localtime(), kronos#utils#trim(a:row), {})
 
@@ -343,13 +347,11 @@ function kronos#interface#gui#parse_buffer()
     \'v:val.id',
   \)
 
-  " Tasks to delete
   for task in tasks_old
     if index(task_new_ids, task.id) > -1 | continue | endif
-    call kronos#interface#common#delete(g:kronos_database, task.id)
+    call kronos#interface#common#done(g:kronos_database, localtime(), task.id)
   endfor
 
-  " Tasks to add / udpate
   for task in tasks_new
     if !has_key(task, 'id')
       call kronos#task#create(g:kronos_database, task)
