@@ -1,6 +1,6 @@
 " ---------------------------------------------------------------------- # Add #
 
-function! kronos#interface#common#add(database, date_ref, args)
+function! kronos#interface#common#add(date_ref, args)
   let args = split(a:args, ' ')
   let [desc, tags, due] = kronos#interface#common#parse_args(a:date_ref, args, {})
 
@@ -20,7 +20,7 @@ function! kronos#interface#common#add(database, date_ref, args)
     \'done': 0,
   \}
 
-  let task.id = kronos#task#create(a:database, task)
+  let task.id = kronos#task#create(task)
 
   if g:kronos_sync
     call kronos#sync#common#bump_version()
@@ -33,8 +33,8 @@ endfunction
 
 " --------------------------------------------------------------------- # List #
 
-function! kronos#interface#common#list(database)
-  let tasks = kronos#task#read_all(a:database)
+function! kronos#interface#common#list()
+  let tasks = kronos#task#read_all()
 
   if (!empty(g:kronos_context))
     let tasks = filter(copy(tasks), 's:match_one_tag(v:val, g:kronos_context)')
@@ -49,9 +49,9 @@ endfunction
 
 " ------------------------------------------------------------------- # Update #
 
-function! kronos#interface#common#update(database, date_ref, args)
+function! kronos#interface#common#update(date_ref, args)
   let [id; args] = split(a:args, ' ')
-  let task = kronos#task#read(a:database, id)
+  let task = kronos#task#read(id)
   let [desc, tags, due] = kronos#interface#common#parse_args(a:date_ref, args, task)
 
   if ! empty(desc) && task.desc != desc | let task.desc = desc | endif
@@ -59,7 +59,7 @@ function! kronos#interface#common#update(database, date_ref, args)
   if task.tags != tags | let task.tags = tags | endif
   if task.due  != due  | let task.due  = due  | endif
 
-  call kronos#task#update(a:database, id, task)
+  call kronos#task#update(id, task)
 
   if g:kronos_sync
     call kronos#sync#common#bump_version()
@@ -72,8 +72,8 @@ endfunction
 
 " ------------------------------------------------------------------- # Delete #
 
-function! kronos#interface#common#delete(database, id)
-  call kronos#task#delete(a:database, a:id)
+function! kronos#interface#common#delete(id)
+  call kronos#task#delete(a:id)
 
   if g:kronos_sync
     call kronos#sync#common#bump_version()
@@ -86,13 +86,13 @@ endfunction
 
 " -------------------------------------------------------------------- # Start #
 
-function! kronos#interface#common#start(database, date_ref, id)
-  let task = kronos#task#read(a:database, a:id)
+function! kronos#interface#common#start(date_ref, id)
+  let task = kronos#task#read(a:id)
   if  task.active | throw 'task already active' | endif
 
   let task.active = a:date_ref
 
-  call kronos#task#update(a:database, a:id, task)
+  call kronos#task#update(a:id, task)
 
   " let message = printf('Task [%d] started.', a:id)
   " call kronos#utils#log#info(message)
@@ -100,15 +100,15 @@ endfunction
 
 " --------------------------------------------------------------------- # Stop #
 
-function! kronos#interface#common#stop(database, date_ref, id)
-  let task = kronos#task#read(a:database, a:id)
+function! kronos#interface#common#stop(date_ref, id)
+  let task = kronos#task#read(a:id)
   if  ! task.active | throw 'task already stopped' | endif
 
   let task.worktime += (a:date_ref - task.active)
   let task.active = 0
   let task.last_active = a:date_ref
 
-  call kronos#task#update(a:database, a:id, task)
+  call kronos#task#update(a:id, task)
 
   " let message = printf('Task [%d] stopped.', a:id)
   " call kronos#utils#log#info(message)
@@ -116,18 +116,18 @@ endfunction
 
 " ------------------------------------------------------------------- # Toggle #
 
-function! kronos#interface#common#toggle(database, date_ref, id)
-  let task = kronos#task#read(a:database, a:id)
+function! kronos#interface#common#toggle(date_ref, id)
+  let task = kronos#task#read(a:id)
 
   return task.active
-    \? kronos#interface#common#stop(a:database, a:date_ref, a:id)
-    \: kronos#interface#common#start(a:database, a:date_ref, a:id)
+    \? kronos#interface#common#stop(a:date_ref, a:id)
+    \: kronos#interface#common#start(a:date_ref, a:id)
 endfunction
 
 " --------------------------------------------------------------------- # Done #
 
-function! kronos#interface#common#done(database, date_ref, id)
-  let task = copy(kronos#task#read(a:database, a:id))
+function! kronos#interface#common#done(date_ref, id)
+  let task = copy(kronos#task#read(a:id))
   if  task.done | throw 'task already done' | endif
 
   if  task.active
@@ -139,7 +139,7 @@ function! kronos#interface#common#done(database, date_ref, id)
   let task.done = a:date_ref
   let task.id   = a:id . a:date_ref
 
-  call kronos#task#update(a:database, a:id, task)
+  call kronos#task#update(a:id, task)
 
   " let message = printf('Task [%d] done.', a:id)
   " call kronos#utils#log#info(message)
@@ -147,15 +147,15 @@ endfunction
 
 " ------------------------------------------------------------------- # Undone #
 
-function! kronos#interface#common#undone(database, id)
-  let tasks = kronos#database#read(a:database).tasks
-  let task = copy(kronos#task#read(a:database, a:id))
+function! kronos#interface#common#undone(id)
+  let tasks = kronos#database#read().tasks
+  let task = copy(kronos#task#read(a:id))
   if  ! task.done | throw 'task not done' | endif
 
   let task.done = 0
   let task.id = kronos#task#generate_id(tasks)
 
-  call kronos#task#update(a:database, a:id, task)
+  call kronos#task#update(a:id, task)
 
   " let message = printf('Task [%d] undone.', task.id)
   " call kronos#utils#log#info(message)
@@ -163,9 +163,9 @@ endfunction
 
 " ----------------------------------------------------------------- # Worktime #
 
-function! kronos#interface#common#worktime(database, date_ref, args)
+function! kronos#interface#common#worktime(date_ref, args)
   let tags  = split(a:args, ' ')
-  let tasks = kronos#task#read_all(a:database)
+  let tasks = kronos#task#read_all()
   let worktime = 0
 
   for task in tasks

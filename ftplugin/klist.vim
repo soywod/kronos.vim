@@ -36,5 +36,3 @@ vnoremap <silent> <buffer> <c-p> :call kronos#interface#gui#select_prev_cell()<c
 nnoremap <silent> <buffer> dic :call kronos#interface#gui#delete_in_cell()<cr>
 nnoremap <silent> <buffer> cic :call kronos#interface#gui#change_in_cell()<cr>
 nnoremap <silent> <buffer> vic :call kronos#interface#gui#visual_in_cell()<cr>
-
-let &modified = 0

@@ -1,8 +1,8 @@
 " ------------------------------------------------------------------- # Create #
 
-function! kronos#task#create(database, task)
-  let task  = copy(a:task)
-  let tasks = kronos#database#read(a:database).tasks
+function! kronos#task#create(task)
+  let task = copy(a:task)
+  let tasks = kronos#database#read().tasks
 
   for tag in copy(g:kronos_context)
     if index(task.tags, tag) == -1
@@ -11,23 +11,21 @@ function! kronos#task#create(database, task)
   endfor
 
   if has_key(task, 'id')
-    if len(filter(copy(tasks), 'v:val.id == task.id'))
-      throw 'task already exist'
-    endif
+    call s:throw_if_exists(task, tasks)
   else
     let task.id = kronos#task#generate_id(tasks)
   endif
 
-  let tasks_new = add(copy(tasks), task)
-  call kronos#database#write(a:database, {'tasks': tasks_new})
+  let next_tasks = add(copy(tasks), task)
+  call kronos#database#write({'tasks': next_tasks})
 
   return task.id
 endfunction
 
 " --------------------------------------------------------------------- # Read #
 
-function! kronos#task#read(database, id)
-  let tasks = kronos#database#read(a:database).tasks
+function! kronos#task#read(id)
+  let tasks = kronos#database#read().tasks
   let index = kronos#task#get_index_by_id(tasks, a:id)
 
   return tasks[index]
@@ -35,31 +33,39 @@ endfunction
 
 " ----------------------------------------------------------------- # Read all #
 
-function! kronos#task#read_all(database)
-  return kronos#database#read(a:database).tasks
+function! kronos#task#read_all()
+  return kronos#database#read().tasks
 endfunction
 
 " ------------------------------------------------------------------- # Update #
 
-function! kronos#task#update(database, id, task)
-  let tasks_new = copy(kronos#database#read(a:database).tasks)
+function! kronos#task#update(id, task)
+  let tasks_new = copy(kronos#database#read().tasks)
   let index = kronos#task#get_index_by_id(tasks_new, a:id)
 
   let tasks_new[index] = copy(a:task)
-  call kronos#database#write(a:database, {'tasks': tasks_new})
+  call kronos#database#write({'tasks': tasks_new})
 endfunction
 
 " ------------------------------------------------------------------- # Delete #
 
-function! kronos#task#delete(database, id)
-  let tasks_new = copy(kronos#database#read(a:database).tasks)
+function! kronos#task#delete(id)
+  let tasks_new = copy(kronos#database#read().tasks)
   let index = kronos#task#get_index_by_id(tasks_new, a:id)
 
   call remove(tasks_new, index)
-  call kronos#database#write(a:database, {'tasks': tasks_new})
+  call kronos#database#write({'tasks': tasks_new})
 endfunction
 
 " -------------------------------------------------------------------- # Utils #
+
+function! s:throw_if_exists(task, tasks)
+  for task in a:tasks
+    if task.id == a:task.id
+      throw 'task already exist'
+    endif
+  endfor
+endfunction
 
 function! kronos#task#generate_id(tasks)
   let ids = map(copy(a:tasks), 'v:val.id')

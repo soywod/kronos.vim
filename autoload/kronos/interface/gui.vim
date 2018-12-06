@@ -25,21 +25,22 @@ let s:config = {
 let s:max_widths = []
 let s:buff_name = 'Kronos'
 
+let s:compose = function('kronos#utils#compose')
+
 " --------------------------------------------------------------------- # Info #
 
 function! kronos#interface#gui#info()
-  let index = getcurpos()[1] - 1
-  let tasks = kronos#interface#common#list(g:kronos_database)
-  let task  = kronos#task#to_info_string(tasks[index])
+  let id = s:get_focused_task_id()
+  let task = s:compose('kronos#task#to_info_string', 'kronos#task#read')(id)
   let lines = map(
     \copy(s:config.info.keys),
     \'{"key": s:config.labels[v:val], "value": task[v:val]}',
   \)
 
-  silent! bdelete KronosInfo
-  silent! botright new KronosInfo
+  silent! bdelete 'Kronos Info'
+  silent! botright new Kronos Info
 
-  call append(0, s:render(lines, 'info'))
+  call append(0, s:render('info', lines))
   normal! ddgg
   setlocal filetype=kinfo
 endfunction
@@ -49,7 +50,7 @@ endfunction
 function! kronos#interface#gui#list()
   let prevpos = getpos('.')
 
-  let tasks = kronos#interface#common#list(g:kronos_database)
+  let tasks = kronos#interface#common#list()
   let lines = map(copy(tasks), 'kronos#task#to_list_string(v:val)')
 
   redir => buflist | silent! ls | redir END
@@ -59,10 +60,11 @@ function! kronos#interface#gui#list()
     execute '0,$d'
   endif
 
-  call append(0, s:render(lines, 'list'))
+  call append(0, s:render('list', lines))
   execute '$d'
   call setpos('.', prevpos)
   setlocal filetype=klist
+  let &modified = 0
 endfunction
 
 " -------------------------------------------------------------------- # Start #
@@ -70,7 +72,7 @@ endfunction
 function! kronos#interface#gui#start()
   try
     let id = s:get_focused_task_id()
-    call kronos#interface#common#start(g:kronos_database, localtime(), id)
+    call kronos#interface#common#start(localtime(), id)
     call kronos#interface#gui#list()
   catch 'task not found'
     return kronos#utils#log#error('task not found')
@@ -86,7 +88,7 @@ endfunction
 function! kronos#interface#gui#stop()
   try
     let id = s:get_focused_task_id()
-    call kronos#interface#common#stop(g:kronos_database, localtime(), id)
+    call kronos#interface#common#stop(localtime(), id)
     call kronos#interface#gui#list()
   catch 'task not found'
     return kronos#utils#log#error('task not found')
@@ -106,7 +108,7 @@ function! kronos#interface#gui#toggle()
 
   try
     let id = s:get_focused_task_id()
-    let task = kronos#task#read(g:kronos_database, id)
+    let task = kronos#task#read(id)
 
     return task.active
       \? kronos#interface#gui#stop()
@@ -211,7 +213,7 @@ function s:parse_buffer_line(index, line)
     let due = kronos#utils#trim(cells[-1])
 
     try
-      let task = kronos#task#read(g:kronos_database, id)
+      let task = kronos#task#read(id)
     catch
       let task = {
         \'desc': desc,
@@ -234,7 +236,7 @@ function s:parse_buffer_line(index, line)
       let due = kronos#utils#datetime#parse_due(localtime(), due)
     endif
 
-    return kronos#database#merge_data(task, {
+    return kronos#utils#assign(task, {
       \'desc': desc,
       \'tags': tags,
       \'due': due,
@@ -243,7 +245,7 @@ function s:parse_buffer_line(index, line)
 endfunction
 
 function kronos#interface#gui#parse_buffer()
-  let tasks_old = kronos#interface#common#list(g:kronos_database)
+  let tasks_old = kronos#interface#common#list()
   let tasks_new = map(getline(2, '$'), 's:parse_buffer_line(v:key, v:val)')
 
   let task_old_ids = map(copy(tasks_old), 'v:val.id')
@@ -254,12 +256,12 @@ function kronos#interface#gui#parse_buffer()
 
   for task in tasks_old
     if index(task_new_ids, task.id) > -1 | continue | endif
-    call kronos#interface#common#done(g:kronos_database, localtime(), task.id)
+    call kronos#interface#common#done(localtime(), task.id)
   endfor
 
   for task in tasks_new
     if !has_key(task, 'id')
-      call kronos#task#create(g:kronos_database, task)
+      call kronos#task#create(task)
       continue
     endif
 
@@ -267,9 +269,9 @@ function kronos#interface#gui#parse_buffer()
     if  index > -1 && task == tasks_old[index] | continue | endif
 
     if index == -1
-      call kronos#task#create(g:kronos_database, task)
+      call kronos#task#create(task)
     else
-      call kronos#task#update(g:kronos_database, task.id, task)
+      call kronos#task#update(task.id, task)
     endif
   endfor
 
@@ -279,7 +281,7 @@ endfunction
 
 " ------------------------------------------------------------------ # Renders #
 
-function! s:render(lines, type)
+function! s:render(type, lines)
   let s:max_widths = s:get_max_widths(a:lines, s:config[a:type].columns)
   let header = [s:render_line(s:config.labels, s:max_widths, a:type)]
   let line = map(copy(a:lines), 's:render_line(v:val, s:max_widths, a:type)')
@@ -313,7 +315,7 @@ function! s:get_max_widths(tasks, columns)
 endfunction
 
 function! s:get_focused_task_id()
-  let tasks = kronos#interface#common#list(g:kronos_database)
+  let tasks = kronos#interface#common#list()
   let index = line('.') - 2
   if  index == -1 | throw 'task not found' | endif
 
