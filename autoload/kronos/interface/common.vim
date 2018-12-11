@@ -228,11 +228,3 @@ function! kronos#interface#common#parse_args(date_ref, args, task)
 
   return [join(desc, ' '), tags, due]
 endfunction
-
-function! s:match_one_tag(task, tags)
-  for tag in a:task.tags
-    if index(a:tags, tag) + 1 | return 1 | endif
-  endfor
-
-  return 0
-endfunction

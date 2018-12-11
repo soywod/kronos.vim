@@ -1,4 +1,4 @@
-" ------------------------------------------------------------------- # Create #
+" --------------------------------------------------------------------- # CRUD #
 
 function! kronos#task#create(task)
   let task = copy(a:task)
@@ -16,13 +16,11 @@ function! kronos#task#create(task)
     let task.id = kronos#task#generate_id(tasks)
   endif
 
-  let next_tasks = add(copy(tasks), task)
-  call kronos#database#write({'tasks': next_tasks})
+  call add(tasks, task)
+  call kronos#database#write({'tasks': tasks})
 
   return task.id
 endfunction
-
-" --------------------------------------------------------------------- # Read #
 
 function! kronos#task#read(id)
   let tasks = kronos#database#read().tasks
@@ -31,30 +29,89 @@ function! kronos#task#read(id)
   return tasks[index]
 endfunction
 
-" ----------------------------------------------------------------- # Read all #
-
 function! kronos#task#read_all()
   return kronos#database#read().tasks
 endfunction
 
-" ------------------------------------------------------------------- # Update #
-
 function! kronos#task#update(id, task)
-  let tasks_new = copy(kronos#database#read().tasks)
-  let index = kronos#task#get_index_by_id(tasks_new, a:id)
+  let tasks = kronos#database#read().tasks
+  let index = kronos#task#get_index_by_id(tasks, a:id)
+  let tasks[index] = copy(kronos#utils#assign(tasks[index], a:task))
 
-  let tasks_new[index] = copy(a:task)
-  call kronos#database#write({'tasks': tasks_new})
+  return kronos#database#write({'tasks': tasks})
 endfunction
 
-" ------------------------------------------------------------------- # Delete #
-
 function! kronos#task#delete(id)
-  let tasks_new = copy(kronos#database#read().tasks)
-  let index = kronos#task#get_index_by_id(tasks_new, a:id)
+  let tasks = kronos#database#read().tasks
+  let index = kronos#task#get_index_by_id(tasks, a:id)
+  call remove(tasks, index)
 
-  call remove(tasks_new, index)
-  call kronos#database#write({'tasks': tasks_new})
+  return kronos#database#write({'tasks': tasks})
+endfunction
+
+" --------------------------------------------------------------------- # List #
+
+function! kronos#task#list()
+  let tasks = kronos#database#read().tasks
+
+  if (!empty(g:kronos_context))
+    let tasks = filter(copy(tasks), 's:match_one_tag(v:val, g:kronos_context)')
+  endif
+
+  if (g:kronos_hide_done)
+    let tasks = filter(copy(tasks), 'v:val.done == 0')
+  endif
+
+  return tasks
+endfunction
+
+function! s:match_one_tag(task, tags)
+  for tag in a:task.tags
+    if index(a:tags, tag) > -1 | return 1 | endif
+  endfor
+
+  return 0
+endfunction
+
+" ------------------------------------------------------------------- # Toggle #
+
+function! kronos#task#toggle(id)
+  let date_ref = localtime()
+  let task = kronos#task#read(a:id)
+
+  if task.active
+    return kronos#task#update(a:id, {
+      \'active': 0,
+      \'last_active': date_ref,
+      \'worktime': date_ref - task.active + task.worktime,
+    \})
+  endif
+
+  return kronos#task#update(a:id, {
+    \'active': date_ref,
+  \})
+endfunction
+
+" --------------------------------------------------------------------- # Done #
+
+function! kronos#task#done(id)
+  let date_ref = localtime()
+  let task = kronos#task#read(a:id)
+
+  let update = {
+    \'done': date_ref,
+    \'id': a:id . date_ref,
+  \}
+
+  if task.active
+    let update = kronos#utils#assign(update, {
+      \'active': 0,
+      \'last_active': date_ref,
+      \'worktime': date_ref - task.active + task.worktime,
+    \})
+  endif
+
+  return kronos#task#update(a:id, update)
 endfunction
 
 " -------------------------------------------------------------------- # Utils #
