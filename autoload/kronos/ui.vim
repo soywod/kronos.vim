@@ -75,11 +75,11 @@ function! kronos#ui#toggle()
     call kronos#task#toggle(id)
     call kronos#ui#list()
   catch 'task not found'
-    return kronos#utils#log#error('task not found')
+    return kronos#utils#error_log('task not found')
   catch 'task already active'
-    return kronos#utils#log#error('task already active')
+    return kronos#utils#error_log('task already active')
   catch
-    return kronos#utils#log#error('task start failed')
+    return kronos#utils#error_log('task start failed')
   endtry
 endfunction
 
@@ -102,7 +102,7 @@ function! kronos#ui#context()
     echo
     call kronos#ui#list()
   catch
-    return kronos#utils#log#error('task context failed')
+    return kronos#utils#error_log('task context failed')
   endtry
 endfunction
 
@@ -113,7 +113,7 @@ function! kronos#ui#toggle_hide_done()
     let g:kronos_hide_done = ! g:kronos_hide_done
     call kronos#ui#list()
   catch
-    return kronos#utils#log#error('task toggle hide done failed')
+    return kronos#utils#error_log('task toggle hide done failed')
   endtry
 endfunction
 
@@ -163,7 +163,6 @@ function kronos#ui#parse_buffer()
     \filter(copy(tasks_new), 'has_key(v:val, ''id'')'),
     \'v:val.id',
   \)
-  echom string(task_new_ids)
 
   for task in tasks_old
     if index(task_new_ids, task.id) > -1 | continue | endif
@@ -231,7 +230,7 @@ function s:parse_buffer_line(index, line)
       if cells[-1] != '' | let due = task.due
       else | let due = 0 | endif
     else
-      let due = kronos#utils#datetime#parse_due(localtime(), due)
+      let due = kronos#utils#parse_due(localtime(), due)
     endif
 
     return kronos#utils#assign(task, {
@@ -257,7 +256,7 @@ function! s:parse_args(date_ref, args)
     elseif arg =~ '^-\w'
       call add(tags_old, arg[1:])
     elseif arg =~ '^:\w*'
-      let due = kronos#utils#datetime#parse_due(a:date_ref, arg)
+      let due = kronos#utils#parse_due(a:date_ref, arg)
     else
       call add(desc, arg)
     endif

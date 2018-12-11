@@ -149,8 +149,8 @@ endfunction
 function! kronos#task#to_info_string(task)
   let task = copy(a:task)
 
-  let Print_date     = function('kronos#utils#datetime#print_date')
-  let Print_interval = function('kronos#utils#datetime#print_interval')
+  let Print_date     = function('kronos#utils#date')
+  let Print_interval = function('kronos#utils#date_interval')
 
   let worktime_str = task.active
     \? Print_interval(task.worktime + localtime() - task.active)
@@ -170,8 +170,8 @@ endfunction
 function! kronos#task#to_list_string(task)
   let task = copy(a:task)
 
-  let Print_diff = function('kronos#utils#datetime#print_diff', [localtime()])
-  let Print_interval  = function('kronos#utils#datetime#print_interval')
+  let Print_diff = function('kronos#utils#date_diff', [localtime()])
+  let Print_interval  = function('kronos#utils#date_interval')
 
   let task.id = task.done ? '-' : task.id
   let task.tags = join(task.tags, ' ')

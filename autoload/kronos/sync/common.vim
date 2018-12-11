@@ -9,13 +9,13 @@ function! kronos#sync#common#init()
   try
     execute 'call kronos#sync#' . s:editor . '#init()'
   catch 'channel'
-    return kronos#utils#log#error('sync: missing option +channel')
+    return kronos#utils#error_log('sync: missing option +channel')
   catch 'job'
-    return kronos#utils#log#error('sync: missing option +job')
+    return kronos#utils#error_log('sync: missing option +job')
   catch 'version'
-    return kronos#utils#log#error('sync: missing vim8+')
+    return kronos#utils#error_log('sync: missing vim8+')
   catch
-    return kronos#utils#log#error('sync: init failed')
+    return kronos#utils#error_log('sync: init failed')
   endtry
 
   let data = kronos#database#read(g:kronos_database)
@@ -48,7 +48,7 @@ function! kronos#sync#common#on_data(data_raw)
   let data = json_decode(a:data_raw)
 
   if ! data.success
-    return kronos#utils#log#error('Kronos sync: ' . data.error)
+    return kronos#utils#error_log('Kronos sync: ' . data.error)
   endif
 
   if data.type == 'login'
@@ -68,7 +68,7 @@ function! kronos#sync#common#on_data(data_raw)
       \})
     endif
 
-    call kronos#utils#log#info('Kronos sync: login succeed')
+    call kronos#utils#log('Kronos sync: login succeed')
 
   elseif data.type == 'read-all'
     call kronos#database#write(g:kronos_database, {'tasks': data.tasks})

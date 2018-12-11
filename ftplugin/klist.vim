@@ -24,13 +24,13 @@ vnoremap <silent> <buffer> <c-n> :call kronos#ui#select_next_cell()<cr>
 
 " ---------------------------------------------------------------- # Prev cell #
 
-nnoremap <silent> <buffer> <s-tab> :call kronos#interface#gui#select_prev_cell()<cr>
-vnoremap <silent> <buffer> <s-tab> :call kronos#interface#gui#select_prev_cell()<cr>
+nnoremap <silent> <buffer> <s-tab> :call kronos#ui#select_prev_cell()<cr>
+vnoremap <silent> <buffer> <s-tab> :call kronos#ui#select_prev_cell()<cr>
 
 nnoremap <silent> <buffer> <c-p> :call kronos#ui#select_prev_cell()<cr>
 vnoremap <silent> <buffer> <c-p> :call kronos#ui#select_prev_cell()<cr>
 
-" -------------------------------------------------------------- # Cell update #
+" ---------------------------------------------------------- # Cell management #
 
 nnoremap <silent> <buffer> dic :call kronos#ui#delete_in_cell()<cr>
 nnoremap <silent> <buffer> cic :call kronos#ui#change_in_cell()<cr>
