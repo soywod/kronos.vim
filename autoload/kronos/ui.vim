@@ -111,6 +111,36 @@ function! kronos#ui#toggle_hide_done()
   endtry
 endfunction
 
+" ----------------------------------------------------------------- # Worktime #
+
+function! kronos#ui#worktime()
+  try
+    let args = input('Worktime for: ')
+    let tags = split(kronos#utils#trim(args), ' ')
+    let tasks = kronos#task#read_all()
+    let worktime = 0
+
+    for task in tasks
+      let matchtags = filter(copy(tags), 'index(task.tags, v:val) > -1')
+
+      if matchtags == tags
+        let worktime += task.worktime
+      endif
+    endfor
+
+    if !worktime
+      throw 'worktime empty'
+    endif
+
+    let worktime_str = kronos#utils#date_interval(worktime)
+    redraw | call kronos#utils#log(worktime_str)
+  catch 'worktime empty'
+    return kronos#utils#error_log('worktime empty')
+  catch
+    return kronos#utils#error_log('task worktime failed')
+  endtry
+endfunction
+
 " ---------------------------------------------------------- # Cell management #
 
 function! kronos#ui#select_next_cell()

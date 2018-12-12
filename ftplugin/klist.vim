@@ -15,6 +15,7 @@ nnoremap <nowait><buffer><silent> <CR>    :call kronos#ui#toggle()          <CR>
 nnoremap <nowait><buffer><silent> K       :call kronos#ui#info()            <CR>
 nnoremap <nowait><buffer>         gc      :call kronos#ui#context()         <CR>
 nnoremap <nowait><buffer><silent> gh      :call kronos#ui#toggle_hide_done()<CR>
+nnoremap <nowait><buffer><silent> gw      :call kronos#ui#worktime()        <CR>
 
 " ---------------------------------------------------------- # Cell management #
 
