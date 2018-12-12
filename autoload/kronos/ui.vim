@@ -65,6 +65,7 @@ function! kronos#ui#list()
   call setpos('.', prevpos)
   setlocal filetype=klist
   let &modified = 0
+  echo
 endfunction
 
 " ------------------------------------------------------------------- # Toggle #
@@ -88,18 +89,9 @@ endfunction
 function! kronos#ui#context()
   try
     let args = input('Go to context: ')
-    let g:kronos_context = split(args, ' ')
+    let g:kronos_context = split(kronos#utils#trim(args), ' ')
 
-    execute 'silent! bdelete ' . s:buff_name
-
-    if (len(g:kronos_context) == 0)
-      let s:buff_name = 'Kronos'
-    else
-      let tags = map(copy(g:kronos_context), 'printf("+%s", v:val)')
-      let s:buff_name = printf('Kronos [%s]', join(tags, ' '))
-    endif
-
-    echo
+    call s:refresh_buff_name()
     call kronos#ui#list()
   catch
     return kronos#utils#error_log('task context failed')
@@ -110,7 +102,9 @@ endfunction
 
 function! kronos#ui#toggle_hide_done()
   try
-    let g:kronos_hide_done = ! g:kronos_hide_done
+    let g:kronos_hide_done = !g:kronos_hide_done
+
+    call s:refresh_buff_name()
     call kronos#ui#list()
   catch
     return kronos#utils#error_log('task toggle hide done failed')
@@ -166,7 +160,11 @@ function kronos#ui#parse_buffer()
 
   for task in tasks_old
     if index(task_new_ids, task.id) > -1 | continue | endif
-    call kronos#task#done(task.id)
+    if task.done
+      call kronos#task#delete(task.id)
+    else
+      call kronos#task#done(task.id)
+    endif
   endfor
 
   for task in tasks_new
@@ -190,7 +188,7 @@ function kronos#ui#parse_buffer()
 endfunction
 
 function s:parse_buffer_line(index, line)
-  if match(a:line, '^|\d\{-1,}\s\{-}|.*|.\{-}|.\{-}|.\{-}|$') == -1
+  if match(a:line, '^|-\=\d\{-1,}\s\{-}|.*|.\{-}|.\{-}|.\{-}|$') == -1
     let [desc, tags, due] = s:parse_args(localtime(), kronos#utils#trim(a:line))
 
     return {
@@ -315,4 +313,22 @@ function! s:get_focused_task_id()
   if  index == -1 | throw 'task not found' | endif
 
   return +get(tasks, index).id
+endfunction
+
+function! s:refresh_buff_name()
+  let buff_name = 'Kronos'
+
+  if !g:kronos_hide_done
+    let buff_name .= '*'
+  endif
+
+  if len(g:kronos_context) > 0
+    let tags = map(copy(g:kronos_context), 'printf(" +%s", v:val)')
+    let buff_name .= join(tags, '')
+  endif
+
+  if buff_name != s:buff_name
+    execute 'silent! bdelete ' . s:buff_name
+    let s:buff_name = buff_name
+  endif
 endfunction

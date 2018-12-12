@@ -10,22 +10,24 @@ augroup end
 
 " ------------------------------------------------------------ # Main commands #
 
-nnoremap <silent> <buffer> <cr> :call kronos#ui#toggle() <cr>
-nnoremap <silent> <buffer> K    :call kronos#ui#info()   <cr>
-nnoremap <nowait> <buffer> gc   :call kronos#ui#context()<cr>
+nnoremap <nowait><buffer><silent> <Space> :call kronos#ui#list()            <CR>
+nnoremap <nowait><buffer><silent> <CR>    :call kronos#ui#toggle()          <CR>
+nnoremap <nowait><buffer><silent> K       :call kronos#ui#info()            <CR>
+nnoremap <nowait><buffer>         gc      :call kronos#ui#context()         <CR>
+nnoremap <nowait><buffer><silent> gh      :call kronos#ui#toggle_hide_done()<CR>
 
 " ---------------------------------------------------------- # Cell management #
 
-nnoremap <silent> <buffer> <tab> :call kronos#ui#select_next_cell()<cr>
-nnoremap <silent> <buffer> <c-n> :call kronos#ui#select_next_cell()<cr>
-vnoremap <silent> <buffer> <tab> :call kronos#ui#select_next_cell()<cr>
-vnoremap <silent> <buffer> <c-n> :call kronos#ui#select_next_cell()<cr>
+nnoremap <silent> <buffer> <Tab> :call kronos#ui#select_next_cell()<CR>
+nnoremap <silent> <buffer> <C-n> :call kronos#ui#select_next_cell()<CR>
+vnoremap <silent> <buffer> <Tab> :call kronos#ui#select_next_cell()<CR>
+vnoremap <silent> <buffer> <C-n> :call kronos#ui#select_next_cell()<CR>
 
-nnoremap <silent> <buffer> <s-tab> :call kronos#ui#select_prev_cell()<cr>
-nnoremap <silent> <buffer> <c-p> :call kronos#ui#select_prev_cell()  <cr>
-vnoremap <silent> <buffer> <s-tab> :call kronos#ui#select_prev_cell()<cr>
-vnoremap <silent> <buffer> <c-p> :call kronos#ui#select_prev_cell()  <cr>
+nnoremap <silent> <buffer> <S-Tab> :call kronos#ui#select_prev_cell()<CR>
+nnoremap <silent> <buffer> <C-p> :call kronos#ui#select_prev_cell()  <CR>
+vnoremap <silent> <buffer> <S-Tab> :call kronos#ui#select_prev_cell()<CR>
+vnoremap <silent> <buffer> <C-p> :call kronos#ui#select_prev_cell()  <CR>
 
-nnoremap <silent> <buffer> dic :call kronos#ui#delete_in_cell()<cr>
-nnoremap <silent> <buffer> cic :call kronos#ui#change_in_cell()<cr>
-nnoremap <silent> <buffer> vic :call kronos#ui#visual_in_cell()<cr>
+nnoremap <silent> <buffer> dic :call kronos#ui#delete_in_cell()<CR>
+nnoremap <silent> <buffer> cic :call kronos#ui#change_in_cell()<CR>
+nnoremap <silent> <buffer> vic :call kronos#ui#visual_in_cell()<CR>

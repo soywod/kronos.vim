@@ -100,7 +100,7 @@ function! kronos#task#done(id)
 
   let update = {
     \'done': date_ref,
-    \'id': a:id . date_ref,
+    \'id': -(a:id . date_ref),
   \}
 
   if task.active
@@ -173,7 +173,6 @@ function! kronos#task#to_list_string(task)
   let Print_diff = function('kronos#utils#date_diff', [localtime()])
   let Print_interval  = function('kronos#utils#date_interval')
 
-  let task.id = task.done ? '-' : task.id
   let task.tags = join(task.tags, ' ')
   let task.worktime = task.worktime ? Print_interval(task.worktime) : ''
 
