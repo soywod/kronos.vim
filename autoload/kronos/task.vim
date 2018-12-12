@@ -17,9 +17,11 @@ function! kronos#task#create(task)
   endif
 
   call add(tasks, task)
-  call kronos#database#write({'tasks': tasks})
 
-  return task.id
+  let next_version = kronos#sync#bump_version()
+  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
+
+  return task
 endfunction
 
 function! kronos#task#read(id)
@@ -36,9 +38,12 @@ endfunction
 function! kronos#task#update(id, task)
   let tasks = kronos#database#read().tasks
   let index = kronos#task#get_index_by_id(tasks, a:id)
-  let tasks[index] = copy(kronos#utils#assign(tasks[index], a:task))
+  let tasks[index] = kronos#utils#assign(tasks[index], a:task)
 
-  return kronos#database#write({'tasks': tasks})
+  let next_version = kronos#sync#bump_version()
+  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
+
+  return tasks[index]
 endfunction
 
 function! kronos#task#delete(id)
@@ -46,7 +51,10 @@ function! kronos#task#delete(id)
   let index = kronos#task#get_index_by_id(tasks, a:id)
   call remove(tasks, index)
 
-  return kronos#database#write({'tasks': tasks})
+  let next_version = kronos#sync#bump_version()
+  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
+
+  return a:id
 endfunction
 
 " --------------------------------------------------------------------- # List #

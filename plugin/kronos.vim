@@ -16,6 +16,6 @@ command! Kronos call kronos#ui#list()
 
 if g:kronos_sync
   augroup kronos
-    autocmd VimEnter * call kronos#sync#common#init()
+    autocmd VimEnter * call kronos#sync#init()
   augroup END
 endif

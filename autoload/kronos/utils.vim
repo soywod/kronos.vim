@@ -70,12 +70,17 @@ endfunction
 
 " ------------------------------------------------------------------- # Assign #
 
-function! kronos#utils#assign(base, override)
-  return map(copy(a:base), 's:assign(a:base, a:override, v:key)')
-endfunction
+function! kronos#utils#assign(...)
+  let overrides = copy(a:000)
+  let base = remove(overrides, 0)
 
-function! s:assign(base, override, key)
-  return has_key(a:override, a:key) ? a:override[a:key] : a:base[a:key]
+  for override in overrides
+    for [key, val] in items(override)
+      let base[key] = val
+    endfor
+  endfor
+
+  return base
 endfunction
 
 " ---------------------------------------------------------------- # Parse due #

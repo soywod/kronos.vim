@@ -191,15 +191,24 @@ function kronos#ui#parse_buffer()
   for task in tasks_old
     if index(task_new_ids, task.id) > -1 | continue | endif
     if task.done
-      call kronos#task#delete(task.id)
+      call kronos#sync#send({
+        \'type': 'delete',
+        \'task_id': kronos#task#delete(task.id),
+      \})
     else
-      call kronos#task#done(task.id)
+      call kronos#sync#send({
+        \'type': 'update',
+        \'task': kronos#task#done(task.id),
+      \})
     endif
   endfor
 
   for task in tasks_new
     if !has_key(task, 'id')
-      call kronos#task#create(task)
+      call kronos#sync#send({
+        \'type': 'create',
+        \'task': kronos#task#create(task),
+      \})
       continue
     endif
 
@@ -207,9 +216,15 @@ function kronos#ui#parse_buffer()
     if  index > -1 && task == tasks_old[index] | continue | endif
 
     if index == -1
-      call kronos#task#create(task)
+      call kronos#sync#send({
+        \'type': 'create',
+        \'task': kronos#task#create(task),
+      \})
     else
-      call kronos#task#update(task.id, task)
+      call kronos#sync#send({
+        \'type': 'update',
+        \'task': kronos#task#update(task.id, task),
+      \})
     endif
   endfor
 

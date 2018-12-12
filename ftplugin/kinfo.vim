@@ -6,7 +6,7 @@ setlocal startofline
 
 " ----------------------------------------------------------------- # Commands #
 
-nnoremap <silent> <buffer> K     :bdelete <cr>
-nnoremap <silent> <buffer> q     :bdelete <cr>
-nnoremap <silent> <buffer> <cr>  :bdelete <cr>
-nnoremap <silent> <buffer> <esc> :bdelete <cr>
+nnoremap <buffer><silent> K     :bdelete <CR>
+nnoremap <buffer><silent> q     :bdelete <CR>
+nnoremap <buffer><silent> <CR>  :bdelete <CR>
+nnoremap <buffer><silent> <Esc> :bdelete <CR>
