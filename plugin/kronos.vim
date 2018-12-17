@@ -11,7 +11,6 @@ let g:kronos_sync_host = get(g:, 'kronos_sync_host', 'localhost:5000')
 
 " ----------------------------------------------------------------- # Commands #
 
-command! K      call kronos#ui#list()
 command! Kronos call kronos#ui#list()
 
 if g:kronos_sync
