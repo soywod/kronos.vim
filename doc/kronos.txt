@@ -1,4 +1,4 @@
-*kronos.txt* - A vim client for Kronos protocol {1}.
+*kronos.txt* - A synchronized cross-platform task and time manager {1}.
 
            _/    _/  _/_/_/      _/_/    _/      _/    _/_/      _/_/_/   
           _/  _/    _/    _/  _/    _/  _/_/    _/  _/    _/  _/          
@@ -6,28 +6,29 @@
         _/  _/    _/    _/  _/    _/  _/    _/_/  _/    _/        _/      
        _/    _/  _/    _/    _/_/    _/      _/    _/_/    _/_/_/         
                                                                    
-                                       https://github.com/kronos-io/kronos {1}
+                                   https://github.com/kronos-io/kronos.vim {1}
 
 ==============================================================================
 TABLE OF CONTENTS                                            *kronos-contents*
 
   Introduction ...................................................... |kronos|
+  Mappings ................................................  |kronos-mappings|
   Usage ....................................................... |kronos-usage|
-    - Add ....................................................... |kronos-add|
-    - Update ................................................. |kronos-update|
-    - Worktime ............................................. |kronos-worktime|
-    - Context ............................................... |kronos-context|
-  Mappings ..................................................|kronos-mappings|
-    - Tasks list .............................................. |kronos-klist|
-    - Task info ............................................... |kronos-kinfo|
+   - Create .................................................  |kronos-create|
+   - Read ...................................................... |kronos-read|
+   - Update .................................................. |kronos-update|
+   - Start/stop .........................................  |kronos-start-stop|
+   - Hide done tasks ................................ |kronos-hide-done-tasks|
+   - Context ................................................ |kronos-context|
+   - Worktime .............................................. |kronos-worktime|
+   - Delete .................................................. |kronos-delete|
   Config ..................................................... |kronos-config|
-    - Database ............................................. |kronos-database|
-    - Hide done tasks ............................... |kronos-hide-done-tasks|
-    - Context ............................................... |kronos-context|
-    - Sync ..................................................... |kronos-sync|
-    - Sync host ........................................... |kronos-sync-host|
+   - Context ................................................ |kronos-context|
+   - Database .............................................. |kronos-database|
+   - Hide done tasks ................................ |kronos-hide-done-tasks|
+   - Sync ...................................................... |kronos-sync|
+   - Sync host ............................................ |kronos-sync-host|
   License ................................................... |kronos-license|
-  Bugs ......................................................... |kronos-bugs|
   Contributing ......................................... |kronos-contributing|
   Changelog ............................................... |kronos-changelog|
   Credits ................................................... |kronos-credits|
@@ -44,173 +45,95 @@ to be more simple (focusing on what it's really needed). I hope you will enjoy
 it, feel free to contribute (see |kronos-contributing|).
 
 ==============================================================================
-USAGE                                                          *kronos-usage* 
+MAPPINGS                                                    *kronos-mappings* 
 
-Kronos comes with a unique command and its alias:
+Jump to the next cell      <Tab>, <C-n> 
+Jump to the prev cell      <S-Tab>, <C-p>
+Change in cell             {cic}
+Visual in cell             {vic}
+Delete in cell             {dic}
+Show task infos            {K}
+Hide/show done tasks       {gh}
+Set context                {gc}
+Show worktime              {gw}
+
+==============================================================================
+USAGE                                                           *kronos-usage* 
 >
-  :Kronos <command> <args>
-  :K      <command> <args>
-<
-Here the list of all available commands with their alias:
->
-  :K(ronos)                        | Start the GUI
-  :K(ronos) l(ist)                 | List all tasks
-  :K(ronos) i(nfo)     <id>        | Show task informations
-  :K(ronos) del(ete)   <id>        | Delete a task
-  :K(ronos) a(dd)      <args>      | Add a new task
-  :K(ronos) u(pdate)   <id> <args> | Update a task
-  :K(ronos) sta(rt)    <id>        | Start a task
-  :K(ronos) sto(p)     <id>        | Stop a task
-  :K(ronos) t(oggle)   <id>        | Start or stop a task
-  :K(ronos) d(one)     <id>        | Mark as done a task
-  :K(ronos) un(done)   <id>        | Mark as undone a task
-  :K(ronos) w(orktime) <tags>      | Show the total worktime by tags
-  :K(ronos) c(ontext)  <tags>      | Define a context by tags
+  :Kronos
 <
 ------------------------------------------------------------------------------
-ADD                                                               *kronos-add*
+CREATE                                                         *kronos-create*
 
-To add a new task:
->
-  :K(ronos) a(dd) <desc> <tags> <due>
-<
-A {tag} must start by *+* and should not contain any space. Eg:
->
-  :K a +tag +tag-2 +tag_3
-<
-A {due} must start by *:* and should contain numbers only.  The full format of
-a valid due is *:DDMMYY:HHMM* but almost everything can be omitted. Here some
-example to understand better the concept:
+To create a task, you can:
 
-*<day>*   means the current day (day when the command is executed)
-*<month>* means the current month
-*<year>*  means the current year
+ - Write a full table line `|id|desc|tags|active|due|`
+ - Write a Kronos create format {1}: `my task +with-tag :18`
 
-Full due:
->
-  :K a :100518:1200 | 10th of May 2018, 12h00
-<
-If minutes omitted, set to *00* :
->
-  :K a :100518:12   | 10th of May 2018, 12h00
-<
-If hours omitted, set to *00* :
->
-  :K a :100518      | 10th of May 2018, 00h00
-<
-If years omitted, try first the current year. If the final date is exceeded,
-try with the next year:
->
-  :K a :1005        | 10th of May <year> or <year>+1, 00h00
-<
-If months omitted, try first the current month. If the final date is exceeded,
-try with the next month:
->
-  :K a :10          | 10th of <month> or <month>+1 <year>, 00h00
-<
-If days omitted, try first the current day. If the final date is exceeded try
-with the next day:
->
-  :K a :            | <day> or <day>+1 of <month> <year>, 00h00
-  :K a ::8          | <day> or <day>+1 of <month> <year>, 08h00
-<
-All together:
->
-  Command executed on 1st of March, 2018 at 21h21
-  :K a my awesome task +firstTask :3:18 +awesome
-<
-will result in:
->
-  {
-    desc: my awesome task
-    tags: [firstTask, awesome]
-    due : 3rd of March 2018, 18h00
-  }
-<
-The order is not important, tags can be everywhere, and due as well. The desc
-is the remaining of text present after removing tags and due. Both examples
-end up with the same result:
->
-  :K a my awesome task +firstTask :3:18 +awesome
-  :K a my +awesame awesome :3:18 +firstTask task
-<
+                                {1} https://github.com/kronos-io/kronos#create
+
+------------------------------------------------------------------------------
+READ                                                             *kronos-read*
+
+To show focused task details, press {K}.
+
 ------------------------------------------------------------------------------
 UPDATE                                                         *kronos-update*
 
-To update a task:
->
-  :K(ronos) u(pdate) <id> <desc> <tags> <due>
-<
-Same usage as |kronos-add|, exept for {tags}. You can remove an existing tag
-by prefixing it with a *-* .
+To update a task, just edit the cell and save.
 
-For eg., to remove *oldtag* and add *newtag* to task *42* :
->
-  :K u 42 -oldtag +newtag
-<
+For the `due` field, you need to use the date Kronos create format {1} (eg:
+`:18`, `:20:1230`...).
+
+                                {1} https://github.com/kronos-io/kronos#create
+
 ------------------------------------------------------------------------------
-WORKTIME                                                     *kronos-worktime*
+START-STOP                                                 *kronos-start-stop*
 
-To print the total worktime for a tag:
->
-  :Kronos worktime <tags>
-<
-Eg., to print the total worktime for tags *tag1* and *tag2* :
->
-  :K w +tag1 +tag2
->
+To start/stop a task, press <Enter>.
+
+------------------------------------------------------------------------------
+DONE                                                             *kronos-done*
+
+To mark a task as done, delete the line.
+
+------------------------------------------------------------------------------
+HIDE DONE TASKS                                       *kronos-hide-done-tasks*
+
+To show/hide done tasks, press {gh} (for `go hide`).
+
 ------------------------------------------------------------------------------
 CONTEXT                                                       *kronos-context*
 
-To define a context by tags:
->
-  :Kronos context <tags>
-<
-Eg., to define a context for tag *project1* :
->
-  :K c project1
->
-Only tasks with tag *project1* will be displayed in the |kronos-list|.
-If a new task is added with a context set, it will automatically get the tag
-*project1* .
+The context is a filter over tags. Once setup:
 
-To clear the context, just enter an empty one.
+ - You will see only tasks containing at least one tag of your context
+ - When you create a task, all tags in your context will be assigned to it
 
-==============================================================================
-MAPPINGS                                                     *kronos-mappings*
-
-To start the GUI mode:
->
-  :K(ronos)
-<
-There is 2 different types of buffer (filetype): *klist* and *kinfo* (for
-tasks list and task info). When you start the GUI mode, you arrive on the
-*klist* buffer.
+To setup a context, press {gc} (for `go to context`), and type all tags you
+want in your context (separated by spaces). Typing an empty context removes
+it.
 
 ------------------------------------------------------------------------------
-KLIST                                                           *kronos-klist*
+WORKTIME                                                     *kronos-worktime*
 
-Add              <a>                  Args will be prompted (see |kronos-add|)
-Show info        <i>                Open the *kinfo* buffer (see |kronos-kinfo|)
-Update           <u>               Args will be prompted (see |kronos-update|)
-Delete           <bs>, <del>                   Confirmation will be prompted
-Start            <s>                             Start the task under cursor
-Stop             <S>                              Stop the task under cursor
-Toggle           <cr>, <t>               Start or stop the task under cursor
-Done             <D>                          Mark task under cursor as done
-Undone           <U>                        Mark task under cursor as undone
-Context          <C>                                   Set a context by tags
-Refresh          <r>                                     Refresh all the GUI
-Toggle hide done <H>                                 Show or hide done tasks
-Quit             <q>, <esc>                                Quit the GUI mode
+The worktime allows you to check how much time you spent on a tag. Press {gw}
+(for `go to worktime`), and type the tags you want to calculate the total
+worktime.
 
 ------------------------------------------------------------------------------
-KINFO                                                           *kronos-kinfo*
+DELETE                                                         *kronos-delete*
 
-Quit      <q>, <i>, <esc>                             Quit the GUI info mode
+To delete a task, delete the line when done tasks are shown.
 
 ==============================================================================
 CONFIG                                                         *kronos-config*
+
+Define a context by default:                                  *kronos-context*
+>
+  g:kronos_context = <string[]>
+<
+Default: `[]`
 
 Path to the database file:                                   *kronos-database*
 >
@@ -223,12 +146,6 @@ Hide done tasks by default:                                 *kronos-hide-done*
   g:kronos_hide_done = <boolean>
 <
 Default: `1`
-
-Set a context by default:                                     *kronos-context*
->
-  g:kronos_context = <string[]>
-<
-Default: `[]`
 
 Enable sync feature:                                             *kronos-sync*
 >
@@ -268,11 +185,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ==============================================================================
-BUGS                                                             *kronos-bugs*
-
-Not yet :p
-
-==============================================================================
 CONTRIBUTING                                             *kronos-contributing*
 
 Report any bugs here: https://github.com/soywod/kronos.vim/issues
@@ -296,25 +208,29 @@ before proposing a pull request (via the script `tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
-  `Oct. 18, 2018` - Refactor code to match the `Kronos protocol` {1}
+  `Dec. 26, 2018` - Refactor interface (Vimwiki like {1})
+  `Oct. 18, 2018` - Refactor code to match the `Kronos protocol` {2}
   `Jul. 05, 2018` - Add context by tags
   `Jun. 26, 2018` - Implement Gist sync feature
   `Jun. 25, 2018` - Add ability to mark tasks as undone
   `Jun. 24, 2018` - Add option to show or hide done tasks
   `Jun. 23, 2018` - Init changelog
 
-                                       https://github.com/kronos-io/kronos {1}
+                                        https://github.com/vimwiki/vimwiki {1}
+                                       https://github.com/kronos-io/kronos {2}
 
 ==============================================================================
 CREDITS                                                       *kronos-credits*
 
   - `Taskwarrior` {1}, a task manager
   - `Timewarrior` {2}, a time manager
-  - `vim-taskwarrior` {3}, a very good `Taskwarrior` wrapper for vim
+  - `vim-taskwarrior` {3}, a `Taskwarrior` wrapper for vim
+  - `Vimwiki` {4}
 
                                                    https://taskwarrior.org {1}
                                   https://taskwarrior.org/docs/timewarrior {2}
                                 https://github.com/blindFS/vim-taskwarrior {3}
+                                        https://github.com/vimwiki/vimwiki {4}
 
 ==============================================================================
 vim:tw=78:ts=4:ft=help:norl:

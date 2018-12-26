@@ -226,3 +226,4 @@ proposing a pull request.
 - [Timewarrior](https://taskwarrior.org/docs/timewarrior), a time manager
 - [vim-taskwarrior](https://github.com/blindFS/vim-taskwarrior), a
   Taskwarrior wrapper for vim
+- [Vimwiki](https://github.com/vimwiki/vimwiki)
