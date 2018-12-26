@@ -1,23 +1,34 @@
-setlocal buftype=nofile
+setlocal buftype=acwrite
 setlocal cursorline
-setlocal nomodifiable
 setlocal nowrap
 setlocal startofline
 
-nnoremap <silent> <buffer> q     :bdelete                                      <cr>
-nnoremap <silent> <buffer> <esc> :bdelete                                      <cr>
-nnoremap <silent> <buffer> a     :call kronos#interface#gui#add()              <cr>
-nnoremap <silent> <buffer> D     :call kronos#interface#gui#done()             <cr>
-nnoremap <silent> <buffer> i     :call kronos#interface#gui#info()             <cr>
-nnoremap <silent> <buffer> r     :call kronos#interface#gui#list()             <cr>
-nnoremap <silent> <buffer> S     :call kronos#interface#gui#stop()             <cr>
-nnoremap <silent> <buffer> s     :call kronos#interface#gui#start()            <cr>
-nnoremap <silent> <buffer> dd    :call kronos#interface#gui#delete()           <cr>
-nnoremap <silent> <buffer> <bs>  :call kronos#interface#gui#delete()           <cr>
-nnoremap <silent> <buffer> <del> :call kronos#interface#gui#delete()           <cr>
-nnoremap <silent> <buffer> t     :call kronos#interface#gui#toggle()           <cr>
-nnoremap <silent> <buffer> <cr>  :call kronos#interface#gui#toggle()           <cr>
-nnoremap <silent> <buffer> u     :call kronos#interface#gui#update()           <cr>
-nnoremap <silent> <buffer> U     :call kronos#interface#gui#undone()           <cr>
-nnoremap <silent> <buffer> C     :call kronos#interface#gui#context()          <cr>
-nnoremap <silent> <buffer> H     :call kronos#interface#gui#toggle_hide_done() <cr>
+augroup klist
+  autocmd! * <buffer>
+  autocmd  BufWriteCmd <buffer> call kronos#ui#parse_buffer()
+augroup end
+
+" ------------------------------------------------------------ # Main commands #
+
+nnoremap <nowait><buffer><silent> <Space> :call kronos#ui#list()            <CR>
+nnoremap <nowait><buffer><silent> <CR>    :call kronos#ui#toggle()          <CR>
+nnoremap <nowait><buffer><silent> K       :call kronos#ui#info()            <CR>
+nnoremap <nowait><buffer>         gc      :call kronos#ui#context()         <CR>
+nnoremap <nowait><buffer><silent> gh      :call kronos#ui#toggle_hide_done()<CR>
+nnoremap <nowait><buffer><silent> gw      :call kronos#ui#worktime()        <CR>
+
+" ---------------------------------------------------------- # Cell management #
+
+nnoremap <silent> <buffer> <Tab> :call kronos#ui#select_next_cell()<CR>
+nnoremap <silent> <buffer> <C-n> :call kronos#ui#select_next_cell()<CR>
+vnoremap <silent> <buffer> <Tab> :call kronos#ui#select_next_cell()<CR>
+vnoremap <silent> <buffer> <C-n> :call kronos#ui#select_next_cell()<CR>
+
+nnoremap <silent> <buffer> <S-Tab> :call kronos#ui#select_prev_cell()<CR>
+nnoremap <silent> <buffer> <C-p> :call kronos#ui#select_prev_cell()  <CR>
+vnoremap <silent> <buffer> <S-Tab> :call kronos#ui#select_prev_cell()<CR>
+vnoremap <silent> <buffer> <C-p> :call kronos#ui#select_prev_cell()  <CR>
+
+nnoremap <silent> <buffer> dic :call kronos#ui#delete_in_cell()<CR>
+nnoremap <silent> <buffer> cic :call kronos#ui#change_in_cell()<CR>
+nnoremap <silent> <buffer> vic :call kronos#ui#visual_in_cell()<CR>

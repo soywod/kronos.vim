@@ -37,78 +37,68 @@ let s:config = {
   \},
 \}
 
-function! kronos#utils#datetime#config()
+function! kronos#utils#config()
   return s:config
 endfunction
 
-" ----------------------------------------------------------- # Get human date #
+" ------------------------------------------------------------------ # Compose #
 
-function! kronos#utils#datetime#print_date(date)
-  return strftime(s:config.date_format, a:date)
+function! kronos#utils#compose(...)
+  let funcs = map(reverse(copy(a:000)), 'function(v:val)')
+  return function('s:compose', [funcs])
 endfunction
 
-" --------------------------------------------------------- # Print human time #
+function! s:compose(funcs, arg)
+  let data = a:arg
 
-function! kronos#utils#datetime#print_interval(interval)
-  let interval = a:interval
-  let diffarr  = []
-
-  for unit in ['year', 'month', 'week', 'day', 'hour', 'min', 'sec']
-    let nbsec = s:config.second_in[unit]
-    let ratio = interval / nbsec
-
-    if ratio != 0
-      let unitfmt   = s:config.label.unit[unit]
-      let unitstr   = printf(unitfmt, ratio)
-      let diffarr  += [unitstr]
-      let interval -= (ratio * nbsec)
-    endif
+  for Func in a:funcs
+    let data = Func(data)
   endfor
 
-  return join(diffarr, ' ')
+  return data
 endfunction
 
-" --------------------------------------------------------------- # Print diff #
+" --------------------------------------------------------------------- # Trim #
 
-function! kronos#utils#datetime#print_diff(datesrc, datedest)
-  let datediff  = abs(a:datesrc - a:datedest)
-  let difffmt   = s:config.label[a:datesrc < a:datedest ? 'in' : 'ago']
-  let intervals = [
-    \['sec'  , 'min'  ],
-    \['min'  , 'hour' ],
-    \['hour' , 'day'  ],
-    \['day'  , 'week' ],
-    \['week' , 'month'],
-    \['month', 'year' ],
-    \['year' , 'year' ],
-  \]
+function! kronos#utils#trim(str)
+  return kronos#utils#compose('s:trim_left', 's:trim_right')(a:str)
+endfunction
 
-  for [min, max] in intervals
-    let secmin = s:config.second_in[min]
-    let secmax = s:config.second_in[max]
+function! s:trim_left(str)
+  return substitute(a:str, '^\s*', '', 'g')
+endfunction
 
-    if datediff < secmax || min == 'year'
-      let value   = datediff / secmin + 1
-      let unitfmt = s:config.label.unit[min]
-      let unitstr = printf(unitfmt, value)
-      let diffstr = printf(difffmt, unitstr)
+function! s:trim_right(str)
+  return substitute(a:str, '\s*$', '', 'g')
+endfunction
 
-      return diffstr
-    endif
+" ------------------------------------------------------------------- # Assign #
+
+function! kronos#utils#assign(...)
+  let overrides = copy(a:000)
+  let base = remove(overrides, 0)
+
+  for override in overrides
+    for [key, val] in items(override)
+      let base[key] = val
+      unlet key val
+    endfor
   endfor
+
+  return base
 endfunction
 
 " ---------------------------------------------------------------- # Parse due #
 
-function! kronos#utils#datetime#parse_due(dateref, duestr)
+function! kronos#utils#parse_due(dateref, duestr)
   let matches = matchlist(a:duestr, s:parse_due_regex)
-  let due  = kronos#utils#datetime#parse_due_recursive(a:dateref, 0, matches[1:5])
+  let due  = s:parse_due(a:dateref, 0, matches[1:5])
   let due -= strftime('%S', due)
 
   return due
 endfunction
 
-function! kronos#utils#datetime#parse_due_recursive(dateref, dateapprox, payload)
+function! s:parse_due(dateref, dateapprox, payload)
   let [day, month, year, hour, min] = a:payload
   let [dayref, monthref, yearref, hourref, minref] = split(
     \strftime('%d/%m/%y/%H/%M', a:dateref),
@@ -150,11 +140,77 @@ function! kronos#utils#datetime#parse_due_recursive(dateref, dateapprox, payload
   let dateapprox += delta * s:config.second_in.hour
   if  dateapprox == a:dateapprox | return dateapprox | endif
 
-  return kronos#utils#datetime#parse_due_recursive(a:dateref, dateapprox, [
+  return s:parse_due(a:dateref, dateapprox, [
     \day,
     \strftime('%m', dateapprox),
     \strftime('%y', dateapprox),
     \hour,
     \strftime('%M', dateapprox),
   \])
+endfunction
+
+" --------------------------------------------------------------- # Date utils #
+
+function! kronos#utils#date(date)
+  return strftime(s:config.date_format, a:date)
+endfunction
+
+function! kronos#utils#date_diff(datesrc, datedest)
+  let datediff  = abs(a:datesrc - a:datedest)
+  let difffmt   = s:config.label[a:datesrc < a:datedest ? 'in' : 'ago']
+  let intervals = [
+    \['sec'  , 'min'  ],
+    \['min'  , 'hour' ],
+    \['hour' , 'day'  ],
+    \['day'  , 'week' ],
+    \['week' , 'month'],
+    \['month', 'year' ],
+    \['year' , 'year' ],
+  \]
+
+  for [min, max] in intervals
+    let secmin = s:config.second_in[min]
+    let secmax = s:config.second_in[max]
+
+    if datediff < secmax || min == 'year'
+      let value   = datediff / secmin + 1
+      let unitfmt = s:config.label.unit[min]
+      let unitstr = printf(unitfmt, value)
+      let diffstr = printf(difffmt, unitstr)
+
+      return diffstr
+    endif
+  endfor
+endfunction
+
+function! kronos#utils#date_interval(interval)
+  let interval = a:interval
+  let diffarr  = []
+
+  for unit in ['year', 'month', 'week', 'day', 'hour', 'min', 'sec']
+    let nbsec = s:config.second_in[unit]
+    let ratio = interval / nbsec
+
+    if ratio != 0
+      let unitfmt   = s:config.label.unit[unit]
+      let unitstr   = printf(unitfmt, ratio)
+      let diffarr  += [unitstr]
+      let interval -= (ratio * nbsec)
+    endif
+  endfor
+
+  return join(diffarr, ' ')
+endfunction
+
+" ---------------------------------------------------------------- # Log utils #
+
+function! kronos#utils#log(msg)
+  echom a:msg
+endfunction
+
+function! kronos#utils#error_log(msg)
+  redraw
+  echohl ErrorMsg
+  echom 'Kronos: ' . a:msg . '.'
+  echohl None
 endfunction

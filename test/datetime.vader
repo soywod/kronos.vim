@@ -19,9 +19,9 @@ Execute (Parse due (date)):
 Then (should parse date):
   for [due, date; _] in scenarios
     if date == 'throw'
-      AssertThrow kronos#utils#datetime#parse_due(g_date_ref, due)
+      AssertThrow kronos#utils#parse_due(g_date_ref, due)
     else
-      AssertEqual date, kronos#utils#datetime#parse_due(g_date_ref, due)
+      AssertEqual date, kronos#utils#parse_due(g_date_ref, due)
     endif
   endfor
 
@@ -42,7 +42,7 @@ Execute (Parse due (time)):
 
 Then (should parse time):
   for [due, date; _] in scenarios
-    AssertEqual date, kronos#utils#datetime#parse_due(g_date_ref, due)
+    AssertEqual date, kronos#utils#parse_due(g_date_ref, due)
   endfor
 
 Execute (Parse due (date&time)):
@@ -57,17 +57,17 @@ Execute (Parse due (date&time)):
 Then (should parse date and time):
   for [due, date; _] in scenarios
     if date == 'throw'
-      AssertThrow kronos#utils#datetime#parse_due(g_date_ref, due)
+      AssertThrow kronos#utils#parse_due(g_date_ref, due)
     else
-      AssertEqual date, kronos#utils#datetime#parse_due(g_date_ref, due)
+      AssertEqual date, kronos#utils#parse_due(g_date_ref, due)
     endif
   endfor
 
 "-------------------------------------------------------------# Print interval #
 
 Execute (Print interval):
-  let Interval = function('kronos#utils#datetime#print_interval')
-  let d = kronos#utils#datetime#config().second_in
+  let Interval = function('kronos#utils#date_interval')
+  let d = kronos#utils#config().second_in
 
   let scenarios = [
     \['1h 1min 1s', Interval(d.hour   + d.min    + d.sec)  ],
@@ -84,12 +84,12 @@ Then (should print interval):
 "-----------------------------------------------------------------# Print diff #
 
 Execute (Print diff):
-  let min   = kronos#utils#datetime#config().second_in.min
-  let hour  = kronos#utils#datetime#config().second_in.hour
-  let day   = kronos#utils#datetime#config().second_in.day
-  let week  = kronos#utils#datetime#config().second_in.week
-  let month = kronos#utils#datetime#config().second_in.month
-  let year  = kronos#utils#datetime#config().second_in.year
+  let min   = kronos#utils#config().second_in.min
+  let hour  = kronos#utils#config().second_in.hour
+  let day   = kronos#utils#config().second_in.day
+  let week  = kronos#utils#config().second_in.week
+  let month = kronos#utils#config().second_in.month
+  let year  = kronos#utils#config().second_in.year
 
   let scenarios = [
     \[g_date_ref      , g_date_ref+42     , 'in 43s'  ],
@@ -111,5 +111,5 @@ Execute (Print diff):
 
 Then (should print diff):
   for [date_src, date_dest, diff] in scenarios
-    AssertEqual diff, kronos#utils#datetime#print_diff(date_src, date_dest)
+    AssertEqual diff, kronos#utils#date_diff(date_src, date_dest)
   endfor

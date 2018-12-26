@@ -1,59 +1,136 @@
-" ------------------------------------------------------------------- # Create #
+" --------------------------------------------------------------------- # CRUD #
 
-function! kronos#task#create(database, task)
-  let tasks = kronos#database#read(a:database).tasks
+function! kronos#task#create(task)
   let task = copy(a:task)
+  let tasks = kronos#database#read().tasks
+
+  for tag in copy(g:kronos_context)
+    if index(task.tags, tag) == -1
+      call add(task.tags, tag)
+    endif
+  endfor
 
   if has_key(task, 'id')
-    if len(filter(copy(tasks), 'v:val.id == task.id'))
-      throw 'task already exist'
-    endif
+    call s:throw_if_exists(task, tasks)
   else
     let task.id = kronos#task#generate_id(tasks)
   endif
 
-  let tasks_new = add(copy(tasks), task)
-  call kronos#database#write(a:database, {'tasks': tasks_new})
+  call add(tasks, task)
 
-  return task.id
+  let next_version = kronos#sync#bump_version()
+  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
+
+  return task
 endfunction
 
-" --------------------------------------------------------------------- # Read #
-
-function! kronos#task#read(database, id)
-  let tasks = kronos#database#read(a:database).tasks
+function! kronos#task#read(id)
+  let tasks = kronos#database#read().tasks
   let index = kronos#task#get_index_by_id(tasks, a:id)
 
   return tasks[index]
 endfunction
 
-" ----------------------------------------------------------------- # Read all #
-
-function! kronos#task#read_all(database)
-  return kronos#database#read(a:database).tasks
+function! kronos#task#read_all()
+  return kronos#database#read().tasks
 endfunction
 
-" ------------------------------------------------------------------- # Update #
+function! kronos#task#update(id, task)
+  let tasks = kronos#database#read().tasks
+  let index = kronos#task#get_index_by_id(tasks, a:id)
+  let tasks[index] = kronos#utils#assign(tasks[index], a:task)
 
-function! kronos#task#update(database, id, task)
-  let tasks_new = copy(kronos#database#read(a:database).tasks)
-  let index = kronos#task#get_index_by_id(tasks_new, a:id)
+  let next_version = kronos#sync#bump_version()
+  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
 
-  let tasks_new[index] = copy(a:task)
-  call kronos#database#write(a:database, {'tasks': tasks_new})
+  return tasks[index]
 endfunction
 
-" ------------------------------------------------------------------- # Delete #
+function! kronos#task#delete(id)
+  let tasks = kronos#database#read().tasks
+  let index = kronos#task#get_index_by_id(tasks, a:id)
+  call remove(tasks, index)
 
-function! kronos#task#delete(database, id)
-  let tasks_new = copy(kronos#database#read(a:database).tasks)
-  let index = kronos#task#get_index_by_id(tasks_new, a:id)
+  let next_version = kronos#sync#bump_version()
+  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
 
-  call remove(tasks_new, index)
-  call kronos#database#write(a:database, {'tasks': tasks_new})
+  return a:id
+endfunction
+
+" --------------------------------------------------------------------- # List #
+
+function! kronos#task#list()
+  let tasks = kronos#database#read().tasks
+
+  if (!empty(g:kronos_context))
+    let tasks = filter(copy(tasks), 's:match_one_tag(v:val, g:kronos_context)')
+  endif
+
+  if (g:kronos_hide_done)
+    let tasks = filter(copy(tasks), 'v:val.done == 0')
+  endif
+
+  return tasks
+endfunction
+
+function! s:match_one_tag(task, tags)
+  for tag in a:task.tags
+    if index(a:tags, tag) > -1 | return 1 | endif
+  endfor
+
+  return 0
+endfunction
+
+" ------------------------------------------------------------------- # Toggle #
+
+function! kronos#task#toggle(id)
+  let date_ref = localtime()
+  let task = kronos#task#read(a:id)
+
+  if task.active
+    return kronos#task#update(a:id, {
+      \'active': 0,
+      \'last_active': date_ref,
+      \'worktime': date_ref - task.active + task.worktime,
+    \})
+  endif
+
+  return kronos#task#update(a:id, {
+    \'active': date_ref,
+  \})
+endfunction
+
+" --------------------------------------------------------------------- # Done #
+
+function! kronos#task#done(id)
+  let date_ref = localtime()
+  let task = kronos#task#read(a:id)
+
+  let update = {
+    \'done': date_ref,
+    \'id': -(a:id . date_ref),
+  \}
+
+  if task.active
+    let update = kronos#utils#assign(update, {
+      \'active': 0,
+      \'last_active': date_ref,
+      \'worktime': date_ref - task.active + task.worktime,
+    \})
+  endif
+
+  return kronos#task#update(a:id, update)
 endfunction
 
 " -------------------------------------------------------------------- # Utils #
+
+function! s:throw_if_exists(task, tasks)
+  for task in a:tasks
+    if task.id == a:task.id
+      throw 'task already exist'
+    endif
+  endfor
+endfunction
 
 function! kronos#task#generate_id(tasks)
   let ids = map(copy(a:tasks), 'v:val.id')
@@ -80,8 +157,8 @@ endfunction
 function! kronos#task#to_info_string(task)
   let task = copy(a:task)
 
-  let Print_date     = function('kronos#utils#datetime#print_date')
-  let Print_interval = function('kronos#utils#datetime#print_interval')
+  let Print_date     = function('kronos#utils#date')
+  let Print_interval = function('kronos#utils#date_interval')
 
   let worktime_str = task.active
     \? Print_interval(task.worktime + localtime() - task.active)
@@ -101,10 +178,9 @@ endfunction
 function! kronos#task#to_list_string(task)
   let task = copy(a:task)
 
-  let Print_diff = function('kronos#utils#datetime#print_diff', [localtime()])
-  let Print_interval  = function('kronos#utils#datetime#print_interval')
+  let Print_diff = function('kronos#utils#date_diff', [localtime()])
+  let Print_interval  = function('kronos#utils#date_interval')
 
-  let task.id = task.done ? '-' : task.id
   let task.tags = join(task.tags, ' ')
   let task.worktime = task.worktime ? Print_interval(task.worktime) : ''
 

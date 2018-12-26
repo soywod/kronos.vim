@@ -2,39 +2,33 @@ if exists('b:current_syntax')
   finish
 endif
 
-function! s:set_syntax()
-  let columns = kronos#interface#gui#config().list.column
-  let widths  = kronos#interface#gui#config().list.width
+syntax match kronos_separator /|/
 
-  let end   = 0
-  let start = 1
-  let due   = 79 - widths['due']
+syntax match kronos_due /:\%(\d\{1,6}\%(:\d\{1,4}\)\=\|\d\{,6}:\d\{1,4}\)/
+syntax match kronos_tag /+[a-zA-Z0-9\-_]\+/
 
-  for column in columns
-    let end    = start + widths[column] - 1
-    let region = 'region kronos_' . column[0] . column[1:]
+syntax match kronos_table_id     /^|.\{-}|/                              contains=kronos_separator
+syntax match kronos_table_desc   /^|.\{-}|.\{-}|/                        contains=kronos_table_id,kronos_separator
+syntax match kronos_table_tags   /^|.\{-}|.\{-}|.\{-}|/                  contains=kronos_table_id,kronos_table_desc,kronos_separator
+syntax match kronos_table_active /^|.\{-}|.\{-}|.\{-}|.\{-}|/            contains=kronos_table_id,kronos_table_desc,kronos_table_tags,kronos_separator
+syntax match kronos_table_due    /^|.\{-}|.\{-}|.\{-}|.\{-}|.\{-}|/      contains=kronos_table_id,kronos_table_desc,kronos_table_tags,kronos_table_active,kronos_separator
+syntax match kronos_table_due_alert /^|.\{-}|.\{-}|.\{-}|.\{-}|.*ago.*|/ contains=kronos_table_id,kronos_table_desc,kronos_table_tags,kronos_table_active,kronos_separator
 
-    execute 'syntax '.region.' start=/\%'.start.'c/ end=/\%'.end.'c/'
-    let start = end + 1
-  endfor
+syntax match kronos_table_done      /^|-.*/  contains=kronos_separator
+syntax match kronos_table_head      /.*\%1l/ contains=kronos_separator
 
-  syntax match kronos_separator /|/
-  syntax match kronos_done      /^-.*$/     contains=kronos_separator
-  syntax match kronos_head      /.*\%1l/    contains=kronos_separator
-  syntax match kronos_due_alert /.*ago\s*$/ contains=kronos_separator
-endfunction
+highlight default link kronos_separator       VertSplit
+highlight default link kronos_table_active    String
+highlight default link kronos_table_desc      Comment
+highlight default link kronos_table_done      VertSplit
+highlight default link kronos_table_due       Structure
+highlight default link kronos_table_due_alert Error
+highlight default link kronos_table_id        Identifier
+highlight default link kronos_table_tags      Tag
 
-call s:set_syntax()
+highlight default link kronos_due kronos_table_due
+highlight default link kronos_tag kronos_table_tags
 
-highlight default link kronos_active    String
-highlight default link kronos_desc      Comment
-highlight default link kronos_done      VertSplit
-highlight default link kronos_due       Structure
-highlight default link kronos_due_alert Error
-highlight default link kronos_id        Identifier
-highlight default link kronos_separator VertSplit
-highlight default link kronos_tags      Tag
-
-highlight kronos_head term=bold,underline cterm=bold,underline gui=bold,underline
+highlight kronos_table_head term=bold,underline cterm=bold,underline gui=bold,underline
 
 let b:current_syntax = 'klist'

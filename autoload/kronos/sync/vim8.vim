@@ -1,3 +1,5 @@
+let s:channel = 0
+
 " --------------------------------------------------------------------- # Init #
 
 function! kronos#sync#vim8#init()
@@ -7,17 +9,24 @@ function! kronos#sync#vim8#init()
 
   let options = {
     \'mode': 'nl',
-    \'callback': function('s:on_data'),
+    \'callback': function('s:handle_data'),
+    \'close_cb': function('s:handle_close'),
   \}
 
   let s:channel = ch_open(g:kronos_sync_host, options)
   if ch_status(s:channel) != 'open' | throw 0 | endif
 endfunction
 
-" ------------------------------------------------------------------ # On data #
+" -------------------------------------------------------------- # Handle data #
 
-function! s:on_data(channel, raw_data)
-  return kronos#sync#common#on_data(a:raw_data)
+function! s:handle_data(channel, raw_data)
+  return kronos#sync#handle_data(a:raw_data)
+endfunction
+
+" ------------------------------------------------------------- # Handle close #
+
+function! s:handle_close(channel)
+  return kronos#sync#handle_close()
 endfunction
 
 " --------------------------------------------------------------------- # Send #

@@ -4,6 +4,9 @@ setlocal nomodifiable
 setlocal nowrap
 setlocal startofline
 
-nnoremap <silent> <buffer> i     :bdelete <cr>
-nnoremap <silent> <buffer> q     :bdelete <cr>
-nnoremap <silent> <buffer> <esc> :bdelete <cr>
+" ----------------------------------------------------------------- # Commands #
+
+nnoremap <buffer><silent> K     :bdelete <CR>
+nnoremap <buffer><silent> q     :bdelete <CR>
+nnoremap <buffer><silent> <CR>  :bdelete <CR>
+nnoremap <buffer><silent> <Esc> :bdelete <CR>
