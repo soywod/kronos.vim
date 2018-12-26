@@ -73,39 +73,48 @@ Execute (Create):
 
 Then (should create task):
   for [id, task] in scenarios
-    AssertEqual id, kronos#task#create(g_database, task)
+    AssertEqual id, kronos#task#create(task).id
   endfor
 
 # --------------------------------------------------------------------- # Read #
 
 Execute (Read):
-  call kronos#task#create(g_database, g_task)
+  call kronos#task#create(g_task)
 
 Then (should read task):
-  AssertEqual g_task, kronos#task#read(g_database, g_task.id)
+  AssertEqual g_task, kronos#task#read(g_task.id)
 
 # ----------------------------------------------------------------- # Read all #
 
 Execute (Read all):
-  call kronos#task#create(g_database, g_task)
+  call kronos#task#create(g_task)
 
 Then (should read all tasks):
-  AssertEqual [g_task], kronos#task#read_all(g_database)
+  AssertEqual [g_task], kronos#task#read_all()
 
 # ------------------------------------------------------------------- # Update #
 
 Execute (Update):
-  call kronos#task#create(g_database, g_task)
-  call kronos#task#update(g_database, g_task.id, g_task_updated)
+  call kronos#task#create(g_task)
+  call kronos#task#update(g_task.id, g_task_updated)
 
 Then (should update task):
-  AssertEqual g_task_updated, kronos#task#read(g_database, g_task.id)
+  AssertEqual g_task_updated, kronos#task#read(g_task.id)
 
 # ------------------------------------------------------------------- # Delete #
 
 Execute (Delete):
-  call kronos#task#create(g_database, g_task)
-  call kronos#task#delete(g_database, g_task.id)
+  call kronos#task#create(g_task)
+  call kronos#task#delete(g_task.id)
 
 Then (should delete task):
-  AssertEqual [], kronos#task#read_all(g_database)
+  AssertEqual [], kronos#task#read_all()
+
+# ------------------------------------------------------------------- # Toggle #
+# TODO
+# --------------------------------------------------------------------- # Done #
+# TODO
+# ----------------------------------------------------------- # To list string #
+# TODO
+# ----------------------------------------------------------- # To info string #
+# TODO

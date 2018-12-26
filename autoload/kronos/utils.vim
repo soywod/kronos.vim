@@ -37,14 +37,18 @@ let s:config = {
   \},
 \}
 
+function! kronos#utils#config()
+  return s:config
+endfunction
+
 " ------------------------------------------------------------------ # Compose #
 
-function kronos#utils#compose(...)
+function! kronos#utils#compose(...)
   let funcs = map(reverse(copy(a:000)), 'function(v:val)')
   return function('s:compose', [funcs])
 endfunction
 
-function s:compose(funcs, arg)
+function! s:compose(funcs, arg)
   let data = a:arg
 
   for Func in a:funcs
@@ -56,15 +60,15 @@ endfunction
 
 " --------------------------------------------------------------------- # Trim #
 
-function kronos#utils#trim(str)
+function! kronos#utils#trim(str)
   return kronos#utils#compose('s:trim_left', 's:trim_right')(a:str)
 endfunction
 
-function s:trim_left(str)
+function! s:trim_left(str)
   return substitute(a:str, '^\s*', '', 'g')
 endfunction
 
-function s:trim_right(str)
+function! s:trim_right(str)
   return substitute(a:str, '\s*$', '', 'g')
 endfunction
 
@@ -77,6 +81,7 @@ function! kronos#utils#assign(...)
   for override in overrides
     for [key, val] in items(override)
       let base[key] = val
+      unlet key val
     endfor
   endfor
 

@@ -26,9 +26,9 @@ endfunction
 function! s:read_from_scratch()
   return {
     \'tasks': [],
-    \'hide_done': 1,
-    \'enable_sync': 0,
-    \'sync_host': 'localhost:5000',
+    \'hide_done': g:kronos_hide_done,
+    \'enable_sync': g:kronos_sync,
+    \'sync_host': g:kronos_sync_host,
     \'sync_user_id': '',
     \'sync_device_id': '',
     \'sync_version': 0,

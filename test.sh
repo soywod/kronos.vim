@@ -6,4 +6,5 @@ FILES=${1:-*}'.vader'
 TZ=UTC vim -Nu <(cat << EOF
 set rtp+=$DIRNAME
 set rtp+=$DIRNAME/vader.vim
-EOF) "+Vader! test/**/$FILES"
+EOF
+) "+Vader! test/**/$FILES"

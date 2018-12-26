@@ -1,6 +1,5 @@
 Before:
-  let g_dirname  = resolve(expand('<sfile>:h'))
-  let g_database = resolve(g_dirname . '/.database')
+  let g:kronos_database = '/tmp/.test.database'
   let g_date_ref = 1526397300 "15/05/2018 15:15 UTC
 
   let g_data = {
@@ -36,6 +35,6 @@ Before:
   \}
 
 After:
-  call delete(g_database)
-  unlet g_database g_data g_dirname g_task g_date_ref
+  call delete(g:kronos_database)
+  unlet g_data g_task g_date_ref
   if exists('scenarios') | unlet scenarios | endif
