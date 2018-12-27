@@ -25,8 +25,8 @@ Then (should generate new id):
 
 Execute (Get index by id):
 Then (should get task index by id):
-  AssertEqual 0, kronos#task#get_index_by_id([g_task], 1)
-  AssertThrows kronos#task#get_index_by_id([g_task], 0)
+  AssertEqual 0, kronos#task#get_position([g_task], 1)
+  AssertThrows kronos#task#get_position([g_task], 0)
 
 # ------------------------------------------------------------------- # Create #
 

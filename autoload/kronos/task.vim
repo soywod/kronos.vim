@@ -16,6 +16,8 @@ function! kronos#task#create(task)
     let task.id = kronos#task#generate_id(tasks)
   endif
 
+  let user_id = kronos#database#read().sync_user_id
+  let task.index = user_id . '#' . task.id . '#' . localtime()
   call add(tasks, task)
 
   let next_version = kronos#sync#bump_version()
@@ -26,9 +28,9 @@ endfunction
 
 function! kronos#task#read(id)
   let tasks = kronos#database#read().tasks
-  let index = kronos#task#get_index_by_id(tasks, a:id)
+  let position = kronos#task#get_position(tasks, a:id)
 
-  return tasks[index]
+  return tasks[position]
 endfunction
 
 function! kronos#task#read_all()
@@ -37,24 +39,26 @@ endfunction
 
 function! kronos#task#update(id, task)
   let tasks = kronos#database#read().tasks
-  let index = kronos#task#get_index_by_id(tasks, a:id)
-  let tasks[index] = kronos#utils#assign(tasks[index], a:task)
+  let position = kronos#task#get_position(tasks, a:id)
+  let prev_task = tasks[position]
+  let tasks[position] = kronos#utils#assign(tasks[position], a:task)
 
   let next_version = kronos#sync#bump_version()
   call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
 
-  return tasks[index]
+  return prev_task
 endfunction
 
 function! kronos#task#delete(id)
   let tasks = kronos#database#read().tasks
-  let index = kronos#task#get_index_by_id(tasks, a:id)
-  call remove(tasks, index)
+  let position = kronos#task#get_position(tasks, a:id)
+  let index = tasks[position].index
+  call remove(tasks, position)
 
   let next_version = kronos#sync#bump_version()
   call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
 
-  return a:id
+  return index
 endfunction
 
 " --------------------------------------------------------------------- # List #
@@ -143,12 +147,12 @@ function! kronos#task#generate_id(tasks)
   return id_new
 endfunction
 
-function! kronos#task#get_index_by_id(tasks, id)
-  let index = 0
+function! kronos#task#get_position(tasks, id)
+  let position = 0
 
   for task in a:tasks
-    if  task.id == a:id | return index | endif
-    let index += 1
+    if  task.id == a:id | return position | endif
+    let position += 1
   endfor
 
   throw 'task not found'

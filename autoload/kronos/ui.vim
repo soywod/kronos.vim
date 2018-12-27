@@ -73,7 +73,11 @@ endfunction
 function! kronos#ui#toggle()
   try
     let id = s:get_focused_task_id()
-    call kronos#task#toggle(id)
+    call kronos#sync#send({
+      \'type': 'update',
+      \'task_id': id,
+      \'task': kronos#task#toggle(id),
+    \})
     call kronos#ui#list()
   catch 'task not found'
     return kronos#utils#error_log('task not found')
@@ -193,11 +197,12 @@ function kronos#ui#parse_buffer()
     if task.done
       call kronos#sync#send({
         \'type': 'delete',
-        \'task_id': kronos#task#delete(task.id),
+        \'task_index': kronos#task#delete(task.id),
       \})
     else
       call kronos#sync#send({
         \'type': 'update',
+        \'task_id': task.id,
         \'task': kronos#task#done(task.id),
       \})
     endif
@@ -223,6 +228,7 @@ function kronos#ui#parse_buffer()
     else
       call kronos#sync#send({
         \'type': 'update',
+        \'task_id': task.id,
         \'task': kronos#task#update(task.id, task),
       \})
     endif
