@@ -8,15 +8,21 @@ let s:config = {
   \'list': {
     \'columns': ['id', 'desc', 'tags', 'active', 'due'],
   \},
+  \'worktime': {
+    \'columns': ['date', 'worktime'],
+  \},
   \'labels': {
     \'active': 'ACTIVE',
+    \'date': 'DATE',
     \'desc': 'DESC',
     \'done': 'DONE',
     \'due': 'DUE',
     \'id': 'ID',
     \'key': 'KEY',
     \'tags': 'TAGS',
+    \'total': 'TOTAL',
     \'value': 'VALUE',
+    \'worktime': 'WORKTIME',
   \},
 \}
 
@@ -24,6 +30,7 @@ let s:max_widths = []
 let s:buff_name = 'Kronos'
 
 let s:compose = function('kronos#utils#compose')
+let s:date_interval = function('kronos#utils#date_interval')
 
 " --------------------------------------------------------------------- # Info #
 
@@ -128,15 +135,23 @@ function! kronos#ui#worktime()
     \'values'
   \)(worktimes)
 
-  let lines = map(
+  let worktimes_lines = map(
     \copy(days),
-    \'v:val . '': '' . kronos#utils#date_interval(worktimes[v:val])',
+    \'{"date": v:val, "worktime": s:date_interval(worktimes[v:val])}',
   \)
+
+  let empty_line = {'date': '---', 'worktime': '---'}
+  let total_line = {
+    \'date': s:config.labels['total'],
+    \'worktime': total,
+  \}
+
+  let lines = worktimes_lines + [empty_line, total_line]
 
   silent! bdelete 'Kronos Worktime'
   silent! botright new Kronos Worktime
 
-  call append(0, lines + ['total: ' . total])
+  call append(0, s:render('worktime', lines))
   normal! ddgg
   setlocal filetype=kwtime
 endfunction
