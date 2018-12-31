@@ -163,21 +163,10 @@ endfunction
 function! kronos#task#to_info_string(task)
   let task = copy(a:task)
 
-  let Print_date     = function('kronos#utils#date')
-  let Print_interval = function('kronos#utils#date_interval')
-
-  let worktime_str = task.active
-    \? Print_interval(task.worktime + localtime() - task.active)
-    \: task.worktime ? Print_interval(task.worktime) : ''
-
-  let task.active      = task.active      ? Print_date(task.active)      : ''
-  let task.done        = task.done        ? Print_date(task.done)        : ''
-  let task.due         = task.due         ? Print_date(task.due)         : ''
-  let task.last_active = task.last_active ? Print_date(task.last_active) : ''
-
-  let task.worktime   = worktime_str
-  let task.tags       = join(task.tags, ' ')
-
+  let task.tags   = join(task.tags, ' ')
+  let task.active = task.active ? 'true' : 'false'
+  let task.done = task.done ? kronos#utils#date(task.done) : ''
+  let task.due  = task.due  ? kronos#utils#date(task.due)  : ''
   return task
 endfunction
 
@@ -189,9 +178,9 @@ function! kronos#task#to_list_string(task)
 
   let task.tags = join(task.tags, ' ')
 
-  let task.active      = task.active ? Print_diff(task.start[-1]) : ''
-  let task.done        = task.done   ? Print_diff(task.done)      : ''
-  let task.due         = task.due    ? Print_diff(task.due)       : ''
+  let task.active = task.active ? Print_diff(task.start[-1]) : ''
+  let task.done   = task.done   ? Print_diff(task.done)      : ''
+  let task.due    = task.due    ? Print_diff(task.due)       : ''
 
   return task
 endfunction

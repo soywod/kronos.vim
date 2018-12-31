@@ -39,8 +39,6 @@ Execute (Create):
         \'tags': [],
         \'due': 1526397300,
         \'active': 0,
-        \'last_active': 0,
-        \'worktime': 0,
         \'done': 0,
       \}
     \],
@@ -51,8 +49,6 @@ Execute (Create):
         \'tags': ['tag_1', 'tag2'],
         \'due': 1526397300,
         \'active': 0,
-        \'last_active': 0,
-        \'worktime': 10,
         \'done': 0,
       \}
     \],
@@ -64,8 +60,6 @@ Execute (Create):
         \'tags': ['tag_1', 'tag2'],
         \'due': 1526397300,
         \'active': 0,
-        \'last_active': 0,
-        \'worktime': 10,
         \'done': 0,
       \}
     \],
@@ -82,7 +76,12 @@ Execute (Read):
   call kronos#task#create(g_task)
 
 Then (should read task):
-  AssertEqual g_task, kronos#task#read(g_task.id)
+  AssertEqual g_task.id, kronos#task#read(g_task.id).id
+  AssertEqual g_task.desc, kronos#task#read(g_task.id).desc
+  AssertEqual g_task.tags, kronos#task#read(g_task.id).tags
+  AssertEqual g_task.due, kronos#task#read(g_task.id).due
+  AssertEqual g_task.active, kronos#task#read(g_task.id).active
+  AssertEqual g_task.done, kronos#task#read(g_task.id).done
 
 # ----------------------------------------------------------------- # Read all #
 
@@ -90,7 +89,7 @@ Execute (Read all):
   call kronos#task#create(g_task)
 
 Then (should read all tasks):
-  AssertEqual [g_task], kronos#task#read_all()
+  AssertEqual 1, len(kronos#task#read_all())
 
 # ------------------------------------------------------------------- # Update #
 
@@ -99,7 +98,12 @@ Execute (Update):
   call kronos#task#update(g_task.id, g_task_updated)
 
 Then (should update task):
-  AssertEqual g_task_updated, kronos#task#read(g_task.id)
+  AssertEqual g_task_updated.id, kronos#task#read(g_task_updated.id).id
+  AssertEqual g_task_updated.desc, kronos#task#read(g_task_updated.id).desc
+  AssertEqual g_task_updated.tags, kronos#task#read(g_task_updated.id).tags
+  AssertEqual g_task_updated.due, kronos#task#read(g_task_updated.id).due
+  AssertEqual g_task_updated.active, kronos#task#read(g_task_updated.id).active
+  AssertEqual g_task_updated.done, kronos#task#read(g_task_updated.id).done
 
 # ------------------------------------------------------------------- # Delete #
 

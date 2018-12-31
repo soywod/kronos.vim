@@ -3,7 +3,7 @@
 let s:config = {
   \'info': {
     \'columns': ['key', 'value'],
-    \'keys': ['id', 'desc', 'tags', 'active', 'last_active', 'due', 'worktime', 'done'],
+    \'keys': ['id', 'desc', 'tags', 'active', 'due', 'done'],
   \},
   \'list': {
     \'columns': ['id', 'desc', 'tags', 'active', 'due'],
@@ -15,10 +15,8 @@ let s:config = {
     \'due': 'DUE',
     \'id': 'ID',
     \'key': 'KEY',
-    \'last_active': 'LAST ACTIVE',
     \'tags': 'TAGS',
     \'value': 'VALUE',
-    \'worktime': 'WORKTIME',
   \},
 \}
 

@@ -18,8 +18,6 @@ Before:
     \'tags': ['tag_1', 'tag2'],
     \'due': 1526397300,
     \'active': 0,
-    \'last_active': 0,
-    \'worktime': 10,
     \'done': 0,
   \}
 
@@ -29,8 +27,6 @@ Before:
     \'tags': ['tag_1', 'tag2', 'tag-3'],
     \'due': 1526397300,
     \'active': 0,
-    \'last_active': 0,
-    \'worktime': 20,
     \'done': 0,
   \}
 
