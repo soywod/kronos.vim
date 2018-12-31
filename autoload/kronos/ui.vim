@@ -3,7 +3,7 @@
 let s:config = {
   \'info': {
     \'columns': ['key', 'value'],
-    \'keys': ['id', 'desc', 'tags', 'active', 'last_active', 'due', 'worktime', 'done'],
+    \'keys': ['id', 'desc', 'tags', 'active', 'due', 'done'],
   \},
   \'list': {
     \'columns': ['id', 'desc', 'tags', 'active', 'due'],
@@ -15,10 +15,8 @@ let s:config = {
     \'due': 'DUE',
     \'id': 'ID',
     \'key': 'KEY',
-    \'last_active': 'LAST ACTIVE',
     \'tags': 'TAGS',
     \'value': 'VALUE',
-    \'worktime': 'WORKTIME',
   \},
 \}
 
@@ -118,31 +116,23 @@ endfunction
 " ----------------------------------------------------------------- # Worktime #
 
 function! kronos#ui#worktime()
-  try
-    let args = input('Worktime for: ')
-    let tags = split(kronos#utils#trim(args), ' ')
-    let tasks = kronos#task#read_all()
-    let worktime = 0
+  let args = input('Worktime for: ')
+  let tags = split(kronos#utils#trim(args), ' ')
+  let tasks = kronos#task#read_all()
+  let worktimes = kronos#utils#worktime(tasks, tags, localtime())
+  let days = sort(copy(keys(worktimes)))
 
-    for task in tasks
-      let matchtags = filter(copy(tags), 'index(task.tags, v:val) > -1')
+  let lines = map(
+    \copy(days),
+    \'v:val . '': '' . kronos#utils#date_interval(worktimes[v:val])',
+  \)
 
-      if matchtags == tags
-        let worktime += task.worktime
-      endif
-    endfor
+  silent! bdelete 'Kronos Worktime'
+  silent! botright new Kronos Worktime
 
-    if !worktime
-      throw 'worktime empty'
-    endif
-
-    let worktime_str = kronos#utils#date_interval(worktime)
-    redraw | call kronos#utils#log(worktime_str)
-  catch 'worktime empty'
-    return kronos#utils#error_log('worktime empty')
-  catch
-    return kronos#utils#error_log('task worktime failed')
-  endtry
+  call append(0, lines)
+  normal! ddgg
+  setlocal filetype=kwtime
 endfunction
 
 " ---------------------------------------------------------- # Cell management #
@@ -247,8 +237,8 @@ function s:parse_buffer_line(index, line)
       \'tags': tags,
       \'due': due,
       \'active': 0,
-      \'last_active': 0,
-      \'worktime': 0,
+      \'start': [],
+      \'stop': [],
       \'done': 0,
     \}
   else
@@ -266,8 +256,8 @@ function s:parse_buffer_line(index, line)
         \'tags': tags,
         \'due': due,
         \'active': 0,
-        \'last_active': 0,
-        \'worktime': 0,
+        \'start': [],
+        \'stop': [],
         \'done': 0,
       \}
 

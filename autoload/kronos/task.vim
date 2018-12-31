@@ -1,8 +1,10 @@
 " --------------------------------------------------------------------- # CRUD #
 
 function! kronos#task#create(task)
+  let database = kronos#database#read()
   let task = copy(a:task)
-  let tasks = kronos#database#read().tasks
+  let tasks = database.tasks
+  let user_id = database.sync_user_id
 
   for tag in copy(g:kronos_context)
     if index(task.tags, tag) == -1
@@ -16,7 +18,6 @@ function! kronos#task#create(task)
     let task.id = kronos#task#generate_id(tasks)
   endif
 
-  let user_id = kronos#database#read().sync_user_id
   let task.index = user_id . '#' . task.id . '#' . localtime()
   call add(tasks, task)
 
@@ -87,21 +88,23 @@ endfunction
 
 " ------------------------------------------------------------------- # Toggle #
 
-function! kronos#task#toggle(id)
-  let date_ref = localtime()
-  let task = kronos#task#read(a:id)
-
-  if task.active
-    return kronos#task#update(a:id, {
-      \'active': 0,
-      \'last_active': date_ref,
-      \'worktime': date_ref - task.active + task.worktime,
-    \})
-  endif
-
-  return kronos#task#update(a:id, {
-    \'active': date_ref,
+function! s:start(task)
+  return kronos#task#update(a:task.id, {
+    \'active': 1,
+    \'start': a:task.start + [localtime()],
   \})
+endfunction
+
+function! s:stop(task)
+  return kronos#task#update(a:task.id, {
+    \'active': 0,
+    \'stop': a:task.stop + [localtime()],
+  \})
+endfunction
+
+function! kronos#task#toggle(id)
+  let task = kronos#task#read(a:id)
+  return task.active ? s:stop(task) : s:start(task)
 endfunction
 
 " --------------------------------------------------------------------- # Done #
@@ -118,8 +121,7 @@ function! kronos#task#done(id)
   if task.active
     let update = kronos#utils#assign(update, {
       \'active': 0,
-      \'last_active': date_ref,
-      \'worktime': date_ref - task.active + task.worktime,
+      \'stop': a:task.stop + [localtime()],
     \})
   endif
 
@@ -161,21 +163,10 @@ endfunction
 function! kronos#task#to_info_string(task)
   let task = copy(a:task)
 
-  let Print_date     = function('kronos#utils#date')
-  let Print_interval = function('kronos#utils#date_interval')
-
-  let worktime_str = task.active
-    \? Print_interval(task.worktime + localtime() - task.active)
-    \: task.worktime ? Print_interval(task.worktime) : ''
-
-  let task.active      = task.active      ? Print_date(task.active)      : ''
-  let task.done        = task.done        ? Print_date(task.done)        : ''
-  let task.due         = task.due         ? Print_date(task.due)         : ''
-  let task.last_active = task.last_active ? Print_date(task.last_active) : ''
-
-  let task.worktime   = worktime_str
-  let task.tags       = join(task.tags, ' ')
-
+  let task.tags   = join(task.tags, ' ')
+  let task.active = task.active ? 'true' : 'false'
+  let task.done = task.done ? kronos#utils#date(task.done) : ''
+  let task.due  = task.due  ? kronos#utils#date(task.due)  : ''
   return task
 endfunction
 
@@ -186,12 +177,10 @@ function! kronos#task#to_list_string(task)
   let Print_interval  = function('kronos#utils#date_interval')
 
   let task.tags = join(task.tags, ' ')
-  let task.worktime = task.worktime ? Print_interval(task.worktime) : ''
 
-  let task.active      = task.active      ? Print_diff(task.active)      : ''
-  let task.done        = task.done        ? Print_diff(task.done)        : ''
-  let task.due         = task.due         ? Print_diff(task.due)         : ''
-  let task.last_active = task.last_active ? Print_diff(task.last_active) : ''
+  let task.active = task.active ? Print_diff(task.start[-1]) : ''
+  let task.done   = task.done   ? Print_diff(task.done)      : ''
+  let task.due    = task.due    ? Print_diff(task.due)       : ''
 
   return task
 endfunction

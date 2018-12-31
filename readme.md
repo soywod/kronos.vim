@@ -126,11 +126,11 @@ context](https://user-images.githubusercontent.com/10437171/50439628-09713500-08
 
 ### Worktime
 
-The worktime allows you to check how much time you spent on a tag. Press `gw`
-(for `go to worktime`), and type the tags you want to calculate the total
-worktime:
+The worktime allows you to check how much time you spent on one or many tags,
+grouped by day. Press `gw` (for `go to worktime`), and type the tags you want
+to calculate the total worktime:
 
-![Worktime](https://user-images.githubusercontent.com/10437171/50439560-c44d0300-08f2-11e9-88c6-fae550797201.gif)
+![Worktime](https://user-images.githubusercontent.com/10437171/50560067-2182f300-0cfd-11e9-95bc-6b3ce1f23535.gif)
 
 ### Delete
 
@@ -210,6 +210,7 @@ proposing a pull request.
 
 ## Changelog
 
+- `Dec. 31, 2018` - Worktime is now calculated also per day
 - `Dec. 26, 2018` - Refactor interface
   ([Vimwiki](https://github.com/vimwiki/vimwiki) like)
 - `Oct. 18, 2018` - Refactor code to match the [Kronos
