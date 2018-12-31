@@ -1,8 +1,10 @@
 " --------------------------------------------------------------------- # CRUD #
 
 function! kronos#task#create(task)
+  let database = kronos#database#read()
   let task = copy(a:task)
-  let tasks = kronos#database#read().tasks
+  let tasks = database.tasks
+  let user_id = database.sync_user_id
 
   for tag in copy(g:kronos_context)
     if index(task.tags, tag) == -1
@@ -16,7 +18,6 @@ function! kronos#task#create(task)
     let task.id = kronos#task#generate_id(tasks)
   endif
 
-  let user_id = kronos#database#read().sync_user_id
   let task.index = user_id . '#' . task.id . '#' . localtime()
   call add(tasks, task)
 

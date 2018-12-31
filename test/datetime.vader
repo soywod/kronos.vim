@@ -128,49 +128,49 @@ Execute (Worktime):
 
   let scenarios = [
     \[
-      \now, ['tag-a'],
-      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag-a', 'tag-b']}],
-      \{'16-05-18': s.hour * 5},
+      \now, ['tag/a'],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
+      \{'16/05/18': s.hour * 5},
     \],
     \[
-      \now, ['tag-c'],
-      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag-a', 'tag-b']}],
+      \now, ['tag/c'],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
       \{},
     \],
     \[
-      \now, ['tag-a', 'tag-c'],
-      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag-a', 'tag-b']}],
+      \now, ['tag/a', 'tag/c'],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
       \{},
     \],
     \[
       \now, [],
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': []}],
-      \{'16-05-18': s.hour * 5},
+      \{'16/05/18': s.hour * 5},
     \],
     \[
       \d16_at_h18, [],
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': []}],
-      \{'16-05-18': s.hour * 5},
+      \{'16/05/18': s.hour * 5},
     \],
     \[
       \d16_at_h22, [],
       \[{'active': 1, 'start': [d16_at_h15], 'stop': [], 'tags': []}],
-      \{'16-05-18': s.hour * 7},
+      \{'16/05/18': s.hour * 7},
     \],
     \[
       \d16_at_h18, [],
       \[{'active': 1, 'start': [d16_at_h15], 'stop': [], 'tags': []}],
-      \{'16-05-18': s.hour * 3},
+      \{'16/05/18': s.hour * 3},
     \],
     \[
       \d16_at_h22, [],
       \[{'active': 1, 'start': [d16_at_h15, d16_at_h20], 'stop': [d16_at_h18], 'tags': []}],
-      \{'16-05-18': s.hour * 5},
+      \{'16/05/18': s.hour * 5},
     \],
     \[
       \now, [],
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d17_at_h15], 'tags': []}],
-      \{'16-05-18': s.hour * 8 + s.min * 59, '17-05-18': s.hour * 15},
+      \{'16/05/18': s.hour * 8 + s.min * 59, '17/05/18': s.hour * 15},
     \],
   \]
 

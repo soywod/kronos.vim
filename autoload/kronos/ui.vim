@@ -115,9 +115,9 @@ function! kronos#ui#toggle_hide_done()
   endtry
 endfunction
 
-" ----------------------------------------------------------------- # Worktime #
+" ----------------------------------------------------------- # Worktime (old) #
 
-function! kronos#ui#worktime()
+function! kronos#ui#worktime_old()
   try
     let args = input('Worktime for: ')
     let tags = split(kronos#utils#trim(args), ' ')
@@ -143,6 +143,28 @@ function! kronos#ui#worktime()
   catch
     return kronos#utils#error_log('task worktime failed')
   endtry
+endfunction
+
+" ----------------------------------------------------------------- # Worktime #
+
+function! kronos#ui#worktime()
+  let args = input('Worktime for: ')
+  let tags = split(kronos#utils#trim(args), ' ')
+  let tasks = kronos#task#read_all()
+  let worktimes = kronos#utils#worktime(tasks, tags, localtime())
+  let days = sort(copy(keys(worktimes)))
+
+  let lines = map(
+    \copy(days),
+    \'v:val . '': '' . kronos#utils#date_interval(worktimes[v:val])',
+  \)
+
+  silent! bdelete 'Kronos Worktime'
+  silent! botright new Kronos Worktime
+
+  call append(0, lines)
+  normal! ddgg
+  setlocal filetype=kwtime
 endfunction
 
 " ---------------------------------------------------------- # Cell management #

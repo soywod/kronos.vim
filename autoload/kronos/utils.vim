@@ -220,7 +220,7 @@ function! kronos#utils#worktime(tasks, tags, date_ref)
       let stop  = stops[index]
 
       while end_of_day < stop
-        let [key, hour, min] = split(strftime('%d-%m-%y/%H/%M', start), '/')
+        let [key, hour, min] = split(strftime('%d/%m/%y#%H#%M', start), '#')
 
         let end_hour = (23 - hour) * s:config.second_in.hour
         let end_min = (59 - min) * s:config.second_in.min
