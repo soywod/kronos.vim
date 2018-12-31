@@ -1,6 +1,6 @@
 Include: setup.vader
 
-#------------------------------------------------------------------# Parse due #
+# ---------------------------------------------------------------- # Parse due #
 
 Execute (Parse due (date)):
   let scenarios = [
@@ -63,7 +63,7 @@ Then (should parse date and time):
     endif
   endfor
 
-"-------------------------------------------------------------# Print interval #
+# ----------------------------------------------------------- # Print interval #
 
 Execute (Print interval):
   let Interval = function('kronos#utils#date_interval')
@@ -81,7 +81,7 @@ Then (should print interval):
     AssertEqual printed, interval
   endfor
 
-"-----------------------------------------------------------------# Print diff #
+# --------------------------------------------------------------- # Print diff #
 
 Execute (Print diff):
   let min   = kronos#utils#config().second_in.min
@@ -113,3 +113,70 @@ Then (should print diff):
   for [date_src, date_dest, diff] in scenarios
     AssertEqual diff, kronos#utils#date_diff(date_src, date_dest)
   endfor
+
+# ----------------------------------------------------------------- # Worktime #
+
+Execute (Worktime):
+  let s = kronos#utils#config().second_in
+
+  let now = localtime()
+  let d16_at_h15 = 1526482800 " 16/05/2018, 15:00 GMT
+  let d16_at_h18 = 1526493600 " 16/05/2018, 18:00 GMT
+  let d16_at_h20 = 1526500800 " 16/05/2018, 20:00 GMT
+  let d16_at_h22 = 1526508000 " 16/05/2018, 22:00 GMT
+  let d17_at_h15 = 1526569200 " 17/05/2018, 15:00 GMT
+
+  let scenarios = [
+    \[
+      \now, ['tag-a'],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag-a', 'tag-b']}],
+      \{'16-05-18': s.hour * 5},
+    \],
+    \[
+      \now, ['tag-c'],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag-a', 'tag-b']}],
+      \{},
+    \],
+    \[
+      \now, ['tag-a', 'tag-c'],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag-a', 'tag-b']}],
+      \{},
+    \],
+    \[
+      \now, [],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': []}],
+      \{'16-05-18': s.hour * 5},
+    \],
+    \[
+      \d16_at_h18, [],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': []}],
+      \{'16-05-18': s.hour * 5},
+    \],
+    \[
+      \d16_at_h22, [],
+      \[{'active': 1, 'start': [d16_at_h15], 'stop': [], 'tags': []}],
+      \{'16-05-18': s.hour * 7},
+    \],
+    \[
+      \d16_at_h18, [],
+      \[{'active': 1, 'start': [d16_at_h15], 'stop': [], 'tags': []}],
+      \{'16-05-18': s.hour * 3},
+    \],
+    \[
+      \d16_at_h22, [],
+      \[{'active': 1, 'start': [d16_at_h15, d16_at_h20], 'stop': [d16_at_h18], 'tags': []}],
+      \{'16-05-18': s.hour * 5},
+    \],
+    \[
+      \now, [],
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d17_at_h15], 'tags': []}],
+      \{'16-05-18': s.hour * 8 + s.min * 59, '17-05-18': s.hour * 15},
+    \],
+  \]
+
+Then (should calculate worktimes per day):
+  for [date_ref, tags, tasks, worktimes] in scenarios
+    AssertEqual worktimes, kronos#utils#worktime(tasks, tags, date_ref)
+  endfor
+
+  unlet s now d16_at_h15 d16_at_h18 d16_at_h20 d16_at_h22 d17_at_h15

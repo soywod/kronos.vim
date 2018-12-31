@@ -202,6 +202,41 @@ function! kronos#utils#date_interval(interval)
   return join(diffarr, ' ')
 endfunction
 
+" ----------------------------------------------------------------- # Worktime #
+
+function! kronos#utils#worktime(tasks, tags, date_ref)
+  let worktimes = {}
+
+  for task in a:tasks
+    let match_tags = filter(copy(a:tags), 'index(task.tags, v:val) > -1')
+    if match_tags != a:tags | continue | endif
+
+    let starts = task.start
+    let stops  = task.active ? task.stop + [a:date_ref] : task.stop
+
+    for index in range(len(starts))
+      let end_of_day = 0
+      let start = starts[index]
+      let stop  = stops[index]
+
+      while end_of_day < stop
+        let [key, hour, min] = split(strftime('%d-%m-%y/%H/%M', start), '/')
+
+        let end_hour = (23 - hour) * s:config.second_in.hour
+        let end_min = (59 - min) * s:config.second_in.min
+        let end_of_day = start + end_hour + end_min
+        let min_stop = stop < end_of_day ? stop : end_of_day
+
+        if !has_key(worktimes, key) | let worktimes[key] = 0 | endif
+        let worktimes[key] += (min_stop - start)
+        let start = end_of_day + s:config.second_in.min
+      endwhile
+    endfor
+  endfor
+
+  return worktimes
+endfunction
+
 " ---------------------------------------------------------------- # Log utils #
 
 function! kronos#utils#log(msg)
