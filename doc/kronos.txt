@@ -117,9 +117,9 @@ it.
 ------------------------------------------------------------------------------
 WORKTIME                                                     *kronos-worktime*
 
-The worktime allows you to check how much time you spent on a tag. Press {gw}
-(for `go to worktime`), and type the tags you want to calculate the total
-worktime.
+The worktime allows you to check how much time you spent on one or many tags,
+grouped by day. Press {gw} (for `go to worktime`), and type the tags you want
+to calculate the total worktime.
 
 ------------------------------------------------------------------------------
 DELETE                                                         *kronos-delete*
@@ -208,6 +208,7 @@ before proposing a pull request (via the script `tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
+  `Dec. 31, 2018` - Worktime is now calculated also per day
   `Dec. 26, 2018` - Refactor interface (Vimwiki like {1})
   `Oct. 18, 2018` - Refactor code to match the `Kronos protocol` {2}
   `Jul. 05, 2018` - Add context by tags
