@@ -120,7 +120,13 @@ function! kronos#ui#worktime()
   let tags = split(kronos#utils#trim(args), ' ')
   let tasks = kronos#task#read_all()
   let worktimes = kronos#utils#worktime(tasks, tags, localtime())
-  let days = sort(copy(keys(worktimes)))
+
+  let days  = s:compose('sort', 'keys')(worktimes)
+  let total = s:compose(
+    \'kronos#utils#date_interval',
+    \'kronos#utils#sum',
+    \'values'
+  \)(worktimes)
 
   let lines = map(
     \copy(days),
@@ -130,7 +136,7 @@ function! kronos#ui#worktime()
   silent! bdelete 'Kronos Worktime'
   silent! botright new Kronos Worktime
 
-  call append(0, lines)
+  call append(0, lines + ['total: ' . total])
   normal! ddgg
   setlocal filetype=kwtime
 endfunction

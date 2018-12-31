@@ -88,6 +88,18 @@ function! kronos#utils#assign(...)
   return base
 endfunction
 
+" ---------------------------------------------------------------------- # Sum #
+
+function! kronos#utils#sum(array)
+  let total = 0
+
+  for item in a:array
+    let total += item
+  endfor
+
+  return total
+endfunction
+
 " ---------------------------------------------------------------- # Parse due #
 
 function! kronos#utils#parse_due(dateref, duestr)
