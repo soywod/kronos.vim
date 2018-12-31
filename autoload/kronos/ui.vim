@@ -247,8 +247,8 @@ function s:parse_buffer_line(index, line)
       \'tags': tags,
       \'due': due,
       \'active': 0,
-      \'last_active': 0,
-      \'worktime': 0,
+      \'start': [],
+      \'stop': [],
       \'done': 0,
     \}
   else
@@ -266,8 +266,8 @@ function s:parse_buffer_line(index, line)
         \'tags': tags,
         \'due': due,
         \'active': 0,
-        \'last_active': 0,
-        \'worktime': 0,
+        \'start': [],
+        \'stop': [],
         \'done': 0,
       \}
 

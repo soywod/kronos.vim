@@ -87,21 +87,23 @@ endfunction
 
 " ------------------------------------------------------------------- # Toggle #
 
-function! kronos#task#toggle(id)
-  let date_ref = localtime()
-  let task = kronos#task#read(a:id)
-
-  if task.active
-    return kronos#task#update(a:id, {
-      \'active': 0,
-      \'last_active': date_ref,
-      \'worktime': date_ref - task.active + task.worktime,
-    \})
-  endif
-
-  return kronos#task#update(a:id, {
-    \'active': date_ref,
+function! s:start(task)
+  return kronos#task#update(a:task.id, {
+    \'active': 1,
+    \'start': a:task.start + [localtime()],
   \})
+endfunction
+
+function! s:stop(task)
+  return kronos#task#update(a:task.id, {
+    \'active': 0,
+    \'stop': a:task.stop + [localtime()],
+  \})
+endfunction
+
+function! kronos#task#toggle(id)
+  let task = kronos#task#read(a:id)
+  return task.active ? s:stop(task) : s:start(task)
 endfunction
 
 " --------------------------------------------------------------------- # Done #
@@ -118,8 +120,7 @@ function! kronos#task#done(id)
   if task.active
     let update = kronos#utils#assign(update, {
       \'active': 0,
-      \'last_active': date_ref,
-      \'worktime': date_ref - task.active + task.worktime,
+      \'stop': a:task.stop + [localtime()],
     \})
   endif
 
@@ -186,12 +187,10 @@ function! kronos#task#to_list_string(task)
   let Print_interval  = function('kronos#utils#date_interval')
 
   let task.tags = join(task.tags, ' ')
-  let task.worktime = task.worktime ? Print_interval(task.worktime) : ''
 
-  let task.active      = task.active      ? Print_diff(task.active)      : ''
-  let task.done        = task.done        ? Print_diff(task.done)        : ''
-  let task.due         = task.due         ? Print_diff(task.due)         : ''
-  let task.last_active = task.last_active ? Print_diff(task.last_active) : ''
+  let task.active      = task.active ? Print_diff(task.start[-1]) : ''
+  let task.done        = task.done   ? Print_diff(task.done)      : ''
+  let task.due         = task.due    ? Print_diff(task.due)       : ''
 
   return task
 endfunction
