@@ -148,12 +148,16 @@ function! kronos#ui#worktime()
 
   let lines = worktimes_lines + [empty_line, total_line]
 
-  silent! bdelete 'Kronos Worktime'
-  silent! botright new Kronos Worktime
+  let tags_str = empty(tags)
+    \? ''
+    \: join(map(copy(tags), 'printf(" +%s", v:val)'), '')
+
+  execute 'silent! botright new Kronos Worktime' . tags_str
 
   call append(0, s:render('worktime', lines))
   normal! ddgg
   setlocal filetype=kwtime
+  echo
 endfunction
 
 " ---------------------------------------------------------- # Cell management #
