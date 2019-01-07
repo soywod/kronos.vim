@@ -121,7 +121,7 @@ function! kronos#task#done(id)
   if task.active
     let update = kronos#utils#assign(update, {
       \'active': 0,
-      \'stop': a:task.stop + [localtime()],
+      \'stop': task.stop + [localtime()],
     \})
   endif
 
