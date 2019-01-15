@@ -1,3 +1,5 @@
+let s:localtime = function('kronos#utils#date#localtime')
+
 " ------------------------------------------------------------------- # Config #
 
 let s:config = {
@@ -126,7 +128,7 @@ function! kronos#ui#worktime()
   let args = input('Worktime for: ')
   let tags = split(kronos#utils#trim(args), ' ')
   let tasks = kronos#task#read_all()
-  let worktimes = kronos#utils#worktime(tasks, tags, localtime())
+  let worktimes = kronos#utils#worktime(tasks, tags, s:localtime())
 
   let days  = s:compose('sort', 'keys')(worktimes)
   let total = s:compose(
@@ -255,7 +257,7 @@ endfunction
 
 function s:parse_buffer_line(index, line)
   if match(a:line, '^|-\=\d\{-1,}\s\{-}|.*|.\{-}|.\{-}|.\{-}|$') == -1
-    let [desc, tags, due] = s:parse_args(localtime(), kronos#utils#trim(a:line))
+    let [desc, tags, due] = s:parse_args(s:localtime(), kronos#utils#trim(a:line))
 
     return {
       \'desc': desc,
@@ -294,7 +296,7 @@ function s:parse_buffer_line(index, line)
       if cells[-1] != '' | let due = task.due
       else | let due = 0 | endif
     else
-      let due = kronos#utils#parse_due(localtime(), due)
+      let due = kronos#utils#parse_due(s:localtime(), due)
     endif
 
     return kronos#utils#assign(task, {

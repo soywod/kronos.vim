@@ -1,3 +1,5 @@
+let s:strftime = function('kronos#utils#date#strftime')
+
 " ------------------------------------------------------------------- # Config #
 
 let s:secs_in_sec   = 1
@@ -13,14 +15,14 @@ let s:parse_due_regex =
 
 let s:config = {
   \'date_format': '%c',
-  \'second_in': {
-    \'sec'  : s:secs_in_sec,
-    \'min'  : s:secs_in_min,
-    \'hour' : s:secs_in_min * s:mins_in_hour,
-    \'day'  : s:secs_in_min * s:mins_in_hour * s:hours_in_day,
-    \'week' : s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_week,
-    \'month': s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_month,
-    \'year' : s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_year,
+  \'msec_in': {
+    \'sec'  : 1000 * s:secs_in_sec,
+    \'min'  : 1000 * s:secs_in_min,
+    \'hour' : 1000 * s:secs_in_min * s:mins_in_hour,
+    \'day'  : 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day,
+    \'week' : 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_week,
+    \'month': 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_month,
+    \'year' : 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_year,
   \},
   \'label': {
     \'ago': '%s ago',
@@ -102,10 +104,10 @@ endfunction
 
 " ---------------------------------------------------------------- # Parse due #
 
-function! kronos#utils#parse_due(dateref, duestr)
-  let matches = matchlist(a:duestr, s:parse_due_regex)
-  let due  = s:parse_due(a:dateref, 0, matches[1:5])
-  let due -= strftime('%S', due)
+function! kronos#utils#parse_due(date_ref, due_str)
+  let matches = matchlist(a:due_str, s:parse_due_regex)
+  let due  = s:parse_due(a:date_ref, 0, matches[1:5])
+  let due -= s:strftime('%S', due)
 
   return due
 endfunction
@@ -113,7 +115,7 @@ endfunction
 function! s:parse_due(dateref, dateapprox, payload)
   let [day, month, year, hour, min] = a:payload
   let [dayref, monthref, yearref, hourref, minref] = split(
-    \strftime('%d/%m/%y/%H/%M', a:dateref),
+    \s:strftime('%d/%m/%y/%H/%M', a:dateref),
     \'/',
   \)
 
@@ -123,48 +125,49 @@ function! s:parse_due(dateref, dateapprox, payload)
   let hourmatch  = hour  == '' ? hourref  : +hour
   let minmatch   = min   == '' ? 0        : +min
 
-  let daydiff   = (daymatch - dayref)     * s:config.second_in.day
-  let monthdiff = (monthmatch - monthref) * s:config.second_in.month
-  let yeardiff  = (yearmatch - yearref)   * s:config.second_in.year
-  let hourdiff  = (hourmatch - hourref)   * s:config.second_in.hour
-  let mindiff   = (minmatch - minref)     * s:config.second_in.min
+  let daydiff   = (daymatch - dayref)     * s:config.msec_in.day
+  let monthdiff = (monthmatch - monthref) * s:config.msec_in.month
+  let yeardiff  = (yearmatch - yearref)   * s:config.msec_in.year
+  let hourdiff  = (hourmatch - hourref)   * s:config.msec_in.hour
+  let mindiff   = (minmatch - minref)     * s:config.msec_in.min
 
   let diff = daydiff + monthdiff + yeardiff + mindiff + hourdiff
   if  diff == 0 | return a:dateref | endif
 
   if diff < 0
     if     yeardiff  < 0 | throw 'invalid-date'
-    elseif monthdiff < 0 | let diff += s:config.second_in.year
-    elseif daydiff   < 0 | let diff += s:config.second_in.month
-    elseif hourdiff  < 0 | let diff += s:config.second_in.day
-    elseif mindiff   < 0 | let diff += s:config.second_in.day
+    elseif monthdiff < 0 | let diff += s:config.msec_in.year
+    elseif daydiff   < 0 | let diff += s:config.msec_in.month
+    elseif hourdiff  < 0 | let diff += s:config.msec_in.day
+    elseif mindiff   < 0 | let diff += s:config.msec_in.day
     endif
   endif
 
   let dateapprox = a:dateref + diff
 
   if day != ''
-    let delta       = day - strftime('%d', dateapprox)
-    let dateapprox += delta * s:config.second_in.day
+    let delta       = day - s:strftime('%d', dateapprox)
+    let dateapprox += delta * s:config.msec_in.day
   endif
 
-  let delta       = hour - strftime('%H', dateapprox)
-  let dateapprox += delta * s:config.second_in.hour
+  let delta       = hour - s:strftime('%H', dateapprox)
+  let dateapprox += delta * s:config.msec_in.hour
+
   if  dateapprox == a:dateapprox | return dateapprox | endif
 
   return s:parse_due(a:dateref, dateapprox, [
     \day,
-    \strftime('%m', dateapprox),
-    \strftime('%y', dateapprox),
+    \s:strftime('%m', dateapprox),
+    \s:strftime('%y', dateapprox),
     \hour,
-    \strftime('%M', dateapprox),
+    \s:strftime('%M', dateapprox),
   \])
 endfunction
 
 " --------------------------------------------------------------- # Date utils #
 
 function! kronos#utils#date(date)
-  return strftime(s:config.date_format, a:date)
+  return s:strftime(s:config.date_format, a:date)
 endfunction
 
 function! kronos#utils#date_diff(datesrc, datedest)
@@ -181,8 +184,8 @@ function! kronos#utils#date_diff(datesrc, datedest)
   \]
 
   for [min, max] in intervals
-    let secmin = s:config.second_in[min]
-    let secmax = s:config.second_in[max]
+    let secmin = s:config.msec_in[min]
+    let secmax = s:config.msec_in[max]
 
     if datediff < secmax || min == 'year'
       let value   = datediff / secmin + 1
@@ -200,7 +203,7 @@ function! kronos#utils#date_interval(interval)
   let diffarr  = []
 
   for unit in ['year', 'month', 'week', 'day', 'hour', 'min', 'sec']
-    let nbsec = s:config.second_in[unit]
+    let nbsec = s:config.msec_in[unit]
     let ratio = interval / nbsec
 
     if ratio != 0
@@ -232,16 +235,16 @@ function! kronos#utils#worktime(tasks, tags, date_ref)
       let stop  = stops[index]
 
       while end_of_day < stop
-        let [key, hour, min] = split(strftime('%d/%m/%y#%H#%M', start), '#')
+        let [key, hour, min] = split(s:strftime('%d/%m/%y#%H#%M', start), '#')
 
-        let end_hour = (23 - hour) * s:config.second_in.hour
-        let end_min = (59 - min) * s:config.second_in.min
+        let end_hour = (23 - hour) * s:config.msec_in.hour
+        let end_min = (59 - min) * s:config.msec_in.min
         let end_of_day = start + end_hour + end_min
         let min_stop = stop < end_of_day ? stop : end_of_day
 
         if !has_key(worktimes, key) | let worktimes[key] = 0 | endif
         let worktimes[key] += (min_stop - start)
-        let start = end_of_day + s:config.second_in.min
+        let start = end_of_day + s:config.msec_in.min
       endwhile
     endfor
   endfor

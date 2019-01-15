@@ -50,6 +50,8 @@ function! kronos#sync#handle_data(data_raw)
     return kronos#utils#error_log('sync: ' . data.error)
   endif
 
+  echom data.version
+  echom s:version
   if data.type == 'login'
     let s:user_id = data.user_id
     let s:device_id = data.device_id
@@ -70,9 +72,10 @@ function! kronos#sync#handle_data(data_raw)
     call kronos#utils#log('Kronos: sync: login succeed.')
 
   elseif data.type == 'read-all'
+    let s:version = data.version
     call kronos#database#write({'tasks': data.tasks})
 
-  elseif data.type != 'write-all'
+  elseif data.version > s:version
     let s:version = data.version
 
     try
@@ -107,13 +110,18 @@ endfunction
 " ------------------------------------------------------------- # Bump version #
 
 function! kronos#sync#bump_version()
-  let s:version = localtime() * 1000
+  let s:version = kronos#utils#date#localtime()
   return s:version
 endfunction
 
 " --------------------------------------------------------------------- # Send #
 
 function! kronos#sync#send(data)
+  if index(['create', 'update', 'delete'], a:data.type) != -1
+    let sync_version = kronos#sync#bump_version()
+    call kronos#database#write({'sync_version': sync_version})
+  endif
+
   if !g:kronos_sync | return | endif
 
   let data = kronos#utils#assign(a:data, {

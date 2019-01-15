@@ -1,3 +1,5 @@
+let s:localtime = function('kronos#utils#date#localtime')
+
 " --------------------------------------------------------------------- # CRUD #
 
 function! kronos#task#create(task)
@@ -18,11 +20,10 @@ function! kronos#task#create(task)
     let task.id = kronos#task#generate_id(tasks)
   endif
 
-  let task.index = user_id . '#' . task.id . '#' . localtime()
+  let task.index = user_id . '#' . task.id . '#' . s:localtime()
   call add(tasks, task)
 
-  let next_version = kronos#sync#bump_version()
-  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
+  call kronos#database#write({'tasks': tasks})
 
   return task
 endfunction
@@ -44,8 +45,7 @@ function! kronos#task#update(id, task)
   let prev_task = tasks[position]
   let tasks[position] = kronos#utils#assign(tasks[position], a:task)
 
-  let next_version = kronos#sync#bump_version()
-  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
+  call kronos#database#write({'tasks': tasks})
 
   return prev_task
 endfunction
@@ -56,8 +56,7 @@ function! kronos#task#delete(id)
   let index = tasks[position].index
   call remove(tasks, position)
 
-  let next_version = kronos#sync#bump_version()
-  call kronos#database#write({'tasks': tasks, 'sync_version': next_version})
+  call kronos#database#write({'tasks': tasks})
 
   return index
 endfunction
@@ -91,14 +90,14 @@ endfunction
 function! s:start(task)
   return kronos#task#update(a:task.id, {
     \'active': 1,
-    \'start': a:task.start + [localtime()],
+    \'start': a:task.start + [s:localtime()],
   \})
 endfunction
 
 function! s:stop(task)
   return kronos#task#update(a:task.id, {
     \'active': 0,
-    \'stop': a:task.stop + [localtime()],
+    \'stop': a:task.stop + [s:localtime()],
   \})
 endfunction
 
@@ -110,7 +109,7 @@ endfunction
 " --------------------------------------------------------------------- # Done #
 
 function! kronos#task#done(id)
-  let date_ref = localtime()
+  let date_ref = s:localtime()
   let task = kronos#task#read(a:id)
 
   let update = {
@@ -121,7 +120,7 @@ function! kronos#task#done(id)
   if task.active
     let update = kronos#utils#assign(update, {
       \'active': 0,
-      \'stop': task.stop + [localtime()],
+      \'stop': task.stop + [s:localtime()],
     \})
   endif
 
@@ -173,7 +172,7 @@ endfunction
 function! kronos#task#to_list_string(task)
   let task = copy(a:task)
 
-  let Print_diff = function('kronos#utils#date_diff', [localtime()])
+  let Print_diff = function('kronos#utils#date_diff', [s:localtime()])
   let Print_interval  = function('kronos#utils#date_interval')
 
   let task.tags = join(task.tags, ' ')
