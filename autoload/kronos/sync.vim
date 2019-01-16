@@ -50,8 +50,6 @@ function! kronos#sync#handle_data(data_raw)
     return kronos#utils#error_log('sync: ' . data.error)
   endif
 
-  echom data.version
-  echom s:version
   if data.type == 'login'
     let s:user_id = data.user_id
     let s:device_id = data.device_id

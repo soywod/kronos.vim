@@ -6,7 +6,6 @@ let s:secs_in_sec   = 1
 let s:secs_in_min   = 60
 let s:mins_in_hour  = 60
 let s:hours_in_day  = 24
-let s:days_in_week  = 7
 let s:days_in_month = 32
 let s:days_in_year  = 366
 
@@ -20,7 +19,6 @@ let s:config = {
     \'min'  : 1000 * s:secs_in_min,
     \'hour' : 1000 * s:secs_in_min * s:mins_in_hour,
     \'day'  : 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day,
-    \'week' : 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_week,
     \'month': 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_month,
     \'year' : 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_year,
   \},
@@ -32,7 +30,6 @@ let s:config = {
       \'min'  : '%dmin',
       \'hour' : '%dh',
       \'day'  : '%dd',
-      \'week' : '%dw',
       \'month': '%dmo',
       \'year' : '%dy',
     \},
@@ -177,8 +174,7 @@ function! kronos#utils#date_diff(datesrc, datedest)
     \['sec'  , 'min'  ],
     \['min'  , 'hour' ],
     \['hour' , 'day'  ],
-    \['day'  , 'week' ],
-    \['week' , 'month'],
+    \['day'  , 'month' ],
     \['month', 'year' ],
     \['year' , 'year' ],
   \]
@@ -188,7 +184,7 @@ function! kronos#utils#date_diff(datesrc, datedest)
     let secmax = s:config.msec_in[max]
 
     if datediff < secmax || min == 'year'
-      let value   = datediff / secmin + 1
+      let value   = datediff / secmin
       let unitfmt = s:config.label.unit[min]
       let unitstr = printf(unitfmt, value)
       let diffstr = printf(difffmt, unitstr)
@@ -202,7 +198,7 @@ function! kronos#utils#date_interval(interval)
   let interval = a:interval
   let diffarr  = []
 
-  for unit in ['year', 'month', 'week', 'day', 'hour', 'min', 'sec']
+  for unit in ['year', 'month', 'day', 'hour', 'min', 'sec']
     let nbsec = s:config.msec_in[unit]
     let ratio = interval / nbsec
 
