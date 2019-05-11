@@ -1,5 +1,5 @@
-# Kronos.vim [![Build Status](https://travis-ci.org/kronos-io/kronos.vim.svg?branch=master)](https://travis-ci.org/kronos-io/kronos.vim)
-A synchronized cross-platform task and time manager.
+# Kronos.vim [![Build Status](https://travis-ci.org/soywod/kronos.vim.svg?branch=master)](https://travis-ci.org/soywod/kronos.vim)
+A simple task and time manager.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/10437171/50441115-77205f80-08f9-11e9-97d4-b7b64741d8f2.png"></img>
@@ -19,24 +19,9 @@ A synchronized cross-platform task and time manager.
     * [Context](#context)
     * [Worktime](#worktime)
     * [Delete](#delete)
-  * [Config](#config)
-    * [Context](#context-1)
-    * [Database](#database)
-    * [Hide done tasks](#hide-done-tasks-1)
-    * [Sync](#sync)
-    * [Sync host](#sync-host)
   * [Contributing](#contributing)
   * [Changelog](#changelog)
   * [Credits](#credits)
-
-## Introduction
-
-*Kronos* is a synchronized, cross-platform task and time manager.
-
-*Kronos.vim* is a Vim8/Neovim client for [Kronos
-protocol](https://github.com/kronos-io/kronos) that allows you to manange your
-tasks directly from a Vim buffer (a bit like
-[Vimwiki](https://github.com/vimwiki/vimwiki)).
 
 ## Mappings
 
@@ -65,12 +50,29 @@ will automatically readjust when you save the buffer (`:w`).
 
 To create a task, you can:
 
-- Write a full table line `|id|desc|tags|active|due|`
-- Write a [Kronos create format](https://github.com/kronos-io/kronos#create):
-  `my task +with-tag :18`
+- Write or copy a full table line `|id|desc|tags|active|due|`
+- Write a Kronos create format (`<desc> <+tag> <:due>`):
 
 ![Create
 task](https://user-images.githubusercontent.com/10437171/50438709-61a63800-08ef-11e9-8f49-aa02b6da7f3b.gif)
+
+A tag should start by a `+`, and a due by a `:`.
+
+A due should start by a `:`, and should follow this pattern: `:DDMMYY:HHMM`.
+Not all digits are required. Actually, Kronos tries to find the closest date
+matching your due pattern. Here some use cases:
+
+| Current date (DD/MM/YYYY HH:MM) | Given pattern | Output |
+| --- | --- | --- |
+| 03/03/2019 21:42 | `:4` | 04/03/2019 00:00 |
+| 03/03/2019 21:42 | `:2` | 02/04/2019 00:00 |
+| 03/03/2019 21:42 | `:0304` | 03/04/2019 00:00 |
+| 03/03/2019 21:42 | `:3004` | 30/04/2019 00:00 |
+| 03/03/2019 21:42 | `:0202` | 02/02/2020 00:00 |
+| 03/03/2019 21:42 | `:020221` | 02/02/2021 00:00 |
+| 03/03/2019 21:42 | `::22` | 03/03/2019 22:00 |
+| 03/03/2019 21:42 | `::19` | 04/03/2019 19:00 |
+| 03/03/2019 21:42 | `:4:2150` | 04/03/2019 21:50 |
 
 ### Read
 
@@ -87,7 +89,7 @@ To update a task, just edit the cell and save:
 task](https://user-images.githubusercontent.com/10437171/50439213-7e436f80-08f1-11e9-8180-965d52ab7d52.gif)
 
 For the `due` field, you need to use the date [Kronos create
-format](https://github.com/kronos-io/kronos#create) (eg: `:18`, `:20:1230`...).
+format](https://github.com/soywod/kronos.vim#create) (eg: `:18`, `:20:1230`...).
 
 ### Start/stop
 
@@ -112,7 +114,7 @@ tasks](https://user-images.githubusercontent.com/10437171/50440820-278d6400-08f8
 
 ### Context
 
-The context is a filter over tags. Once setup:
+The context filters tasks by a list of tags. Once setup:
 
 - You will see only tasks containing at least one tag of your context
 - When you [create](#create) a task, all tags in your context will be assigned
@@ -140,59 +142,6 @@ shown](#hide-done-tasks):
 ![Delete
 task](https://user-images.githubusercontent.com/10437171/50439349-0295f280-08f2-11e9-8c26-e9f67698c59c.gif)
 
-## Config
-### Context
-
-Define a context by default:
-
-```vim
-g:kronos_context = <string[]>
-```
-
-Default: `[]`
-
-### Database
-
-Path to the database file:
-
-```vim
-g:kronos_database = <path>
-```
-
-Default: `<KRONOS_ROOT_DIR>/.database`
-
-### Hide done tasks
-
-Hide done tasks by default:
-
-```vim
-g:kronos_hide_done = <boolean>
-```
-
-Default: `1`
-
-### Sync
-
-Enable sync feature:
-
-```vim
-g:kronos_sync = <boolean>
-```
-
-Default: `0`
-
-See [Kronos protocol](https://github.com/kronos-io/kronos#enable-sync).
-
-### Sync host
-
-Set sync host:
-
-```vim
-g:kronos_sync_host = <string>
-```
-
-Default: `localhost:5000`
-
 ## Contributing
 
 Git commit messages follow the [Angular
@@ -210,13 +159,14 @@ proposing a pull request.
 
 ## Changelog
 
+- `May. 11, 2019` - Remove sync support due to over complications
 - `Dec. 31, 2018` - Worktime is now calculated also per day
 - `Dec. 26, 2018` - Refactor interface
   ([Vimwiki](https://github.com/vimwiki/vimwiki) like)
-- `Oct. 18, 2018` - Refactor code to match the [Kronos
-  protocol](https://github.com/kronos-io/kronos)
+- `Oct. 18, 2018` - ~Refactor code to match the [Kronos
+  protocol](https://github.com/soywod/kronos)~
 - `Jul. 05, 2018` - Add context by tags
-- `Jun. 26, 2018` - Implement Gist sync feature
+- `Jun. 26, 2018` - ~Implement Gist sync feature~
 - `Jun. 25, 2018` - Add ability to mark tasks as undone
 - `Jun. 24, 2018` - Add option to show or hide done tasks
 - `Jun. 23, 2018` - Init changelog
