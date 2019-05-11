@@ -1,3 +1,5 @@
+let s:assign = function('kronos#utils#assign')
+
 " --------------------------------------------------------------------- # Read #
 
 function! kronos#database#read()
@@ -23,7 +25,7 @@ function! s:read_from_scratch()
   return {
     \'tasks': [],
     \'context': [],
-    \'hide_done': 0,
+    \'hide_done': 1,
   \}
 endfunction
 
@@ -31,7 +33,7 @@ endfunction
 
 function! kronos#database#write(data)
   try
-    let data = kronos#utils#assign(kronos#database#read(), a:data)
+    let data = s:assign(kronos#database#read(), a:data)
     return s:write_to_file(data)
   catch
     throw 'write database failed'

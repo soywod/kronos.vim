@@ -1,6 +1,17 @@
-let s:localtime = function('kronos#utils#date#localtime')
+let s:assign = function('kronos#utils#assign')
 let s:compose = function('kronos#utils#compose')
-let s:date_interval = function('kronos#utils#date_interval')
+let s:sum = function('kronos#utils#sum')
+let s:trim = function('kronos#utils#trim')
+let s:date_interval = function('kronos#utils#date#interval')
+let s:localtime = function('kronos#utils#date#localtime')
+let s:parse_due = function('kronos#utils#date#parse_due')
+let s:worktime = function('kronos#utils#date#worktime')
+let s:log_error = function('kronos#utils#log#error')
+
+let s:max_widths = []
+let s:buff_name = 'Kronos'
+
+" ------------------------------------------------------------------- # Config #
 
 let s:config = {
   \'info': {
@@ -28,14 +39,11 @@ let s:config = {
   \},
 \}
 
-let s:max_widths = []
-let s:buff_name = 'Kronos'
-
 " --------------------------------------------------------------------- # Info #
 
 function! kronos#ui#info()
   let task = s:get_focused_task()
-  let task = kronos#task#to_info_string(task.id)
+  let task = kronos#task#to_info_string(task)
   let lines = map(
     \copy(s:config.info.keys),
     \'{"key": s:config.labels[v:val], "value": task[v:val]}',
@@ -52,22 +60,22 @@ endfunction
 " --------------------------------------------------------------------- # List #
 
 function! kronos#ui#list()
-  let prevpos = getpos('.')
+  let prev_pos = getpos('.')
 
   call s:refresh_buff_name()
   let tasks = kronos#task#list()
   let lines = map(copy(tasks), 'kronos#task#to_list_string(v:val)')
 
-  redir => buflist | silent! ls | redir END
+  redir => buf_list | silent! ls | redir END
   execute 'silent! edit ' . s:buff_name
 
-  if match(buflist, '"Kronos') > -1
+  if match(buf_list, '"Kronos') > -1
     execute '0,$d'
   endif
 
   call append(0, s:render('list', lines))
   execute '$d'
-  call setpos('.', prevpos)
+  call setpos('.', prev_pos)
   setlocal filetype=klist
   let &modified = 0
   echo
@@ -85,11 +93,11 @@ function! kronos#ui#toggle()
     call kronos#database#write({'tasks': tasks})
     call kronos#ui#list()
   catch 'task not found'
-    return kronos#utils#error_log('task not found')
+    return s:log_error('task not found')
   catch 'task already active'
-    return kronos#utils#error_log('task already active')
+    return s:log_error('task already active')
   catch
-    return kronos#utils#error_log('task start failed')
+    return s:log_error('task start failed')
   endtry
 endfunction
 
@@ -98,21 +106,21 @@ endfunction
 function! kronos#ui#context()
   try
     let args = input('Go to context: ')
-    let g:kronos_context = split(kronos#utils#trim(args), ' ')
+    let g:kronos_context = split(s:trim(args), ' ')
     call kronos#ui#list()
   catch
-    return kronos#utils#error_log('context failed')
+    return s:log_error('context failed')
   endtry
 endfunction
 
 " --------------------------------------------------------- # Toggle hide done #
 
-function! kronos#ui#toggle_hide_done()
+function! kronos#ui#hide_done()
   try
     let g:kronos_hide_done = !g:kronos_hide_done
     call kronos#ui#list()
   catch
-    return kronos#utils#error_log('toggle hide done failed')
+    return s:log_error('toggle hide done failed')
   endtry
 endfunction
 
@@ -120,14 +128,14 @@ endfunction
 
 function! kronos#ui#worktime()
   let args = input('Worktime for: ')
-  let tags = split(kronos#utils#trim(args), ' ')
+  let tags = split(s:trim(args), ' ')
   let tasks = kronos#task#read_all()
-  let worktimes = kronos#utils#worktime(tasks, tags, s:localtime())
+  let worktimes = s:worktime(tasks, tags, s:localtime())
 
   let days  = s:compose('sort', 'keys')(worktimes)
   let total = s:compose(
-    \'kronos#utils#date_interval',
-    \'kronos#utils#sum',
+    \s:date_interval,
+    \s:sum,
     \'values'
   \)(worktimes)
 
@@ -212,14 +220,12 @@ function kronos#ui#parse_buffer()
   endfor
 
   for curr_task in curr_tasks
-    if !has_key(curr_task, 'id')
+    if !has_key(curr_task, 'id') || !s:exists_in(prev_tasks_id, curr_task.id)
       let next_tasks += [kronos#task#create(next_tasks, curr_task)]
-    elseif !s:exists_in(prev_tasks_id, curr_task.id)
-      let next_tasks += [curr_task]
     else
       let prev_pos = kronos#task#get_position(prev_tasks, curr_task.id)
       let prev_task = prev_tasks[prev_pos]
-      let next_tasks += [kronos#utils#assign(prev_task, curr_task)]
+      let next_tasks += [s:assign(prev_task, curr_task)]
     endif
   endfor
 
@@ -230,7 +236,7 @@ endfunction
 
 function s:parse_buffer_line(index, line)
   if match(a:line, '^|-\=\d\{-1,}\s\{-}|.*|.\{-}|.\{-}|.\{-}|$') == -1
-    let [desc, tags, due] = s:parse_args(s:localtime(), kronos#utils#trim(a:line))
+    let [desc, tags, due] = s:parse_args(s:localtime(), s:trim(a:line))
 
     return {
       \'desc': desc,
@@ -243,10 +249,10 @@ function s:parse_buffer_line(index, line)
     \}
   else
     let cells = split(a:line, '|')
-    let id = +kronos#utils#trim(cells[0])
-    let desc = kronos#utils#trim(join(cells[1:-4], ''))
-    let tags = split(kronos#utils#trim(cells[-3]), ' ')
-    let due = kronos#utils#trim(cells[-1])
+    let id = +s:trim(cells[0])
+    let desc = s:trim(join(cells[1:-4], ''))
+    let tags = split(s:trim(cells[-3]), ' ')
+    let due = s:trim(cells[-1])
 
     try
       let task = kronos#task#read(id)
@@ -269,10 +275,10 @@ function s:parse_buffer_line(index, line)
       if cells[-1] != '' | let due = task.due
       else | let due = 0 | endif
     else
-      let due = kronos#utils#parse_due(s:localtime(), due)
+      let due = s:parse_due(s:localtime(), due)
     endif
 
-    return kronos#utils#assign(task, {
+    return s:assign(task, {
       \'desc': desc,
       \'tags': tags,
       \'due': due,
@@ -295,7 +301,7 @@ function! s:parse_args(date_ref, args)
     elseif arg =~ '^-\w'
       call add(tags_old, arg[1:])
     elseif arg =~ '^:\w*'
-      let due = kronos#utils#parse_due(a:date_ref, arg)
+      let due = s:parse_due(a:date_ref, arg)
     else
       call add(desc, arg)
     endif

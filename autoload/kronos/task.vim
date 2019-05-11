@@ -1,7 +1,10 @@
+let s:assign = function('kronos#utils#assign')
 let s:localtime = function('kronos#utils#date#localtime')
+let s:strftime = function('kronos#utils#date#strftime', ['%c'])
+let s:date_diff = function('kronos#utils#date#diff')
 
 " --------------------------------------------------------------------- # CRUD #
-"
+
 function! kronos#task#create(tasks, task)
   let task = copy(a:task)
 
@@ -36,7 +39,7 @@ endfunction
 function! kronos#task#update(task, update)
   let tasks = kronos#database#read().tasks
   let position = kronos#task#get_position(tasks, a:task.id)
-  let tasks[position] = kronos#utils#assign(a:task, a:update)
+  let tasks[position] = s:assign(a:task, a:update)
 
   call kronos#database#write({'tasks': tasks})
 endfunction
@@ -76,7 +79,7 @@ function! kronos#task#toggle(task)
     \'start': a:task.start + [s:localtime()],
   \}
 
-  return kronos#utils#assign(a:task, update)
+  return s:assign(a:task, update)
 endfunction
 
 " --------------------------------------------------------------------- # Done #
@@ -84,13 +87,13 @@ endfunction
 function! kronos#task#done(task)
   let date_ref = s:localtime()
 
-  let task = kronos#utils#assign(a:task, {
+  let task = s:assign(a:task, {
     \'done': date_ref,
     \'id': a:task.index,
   \})
 
   if a:task.active
-    let task = kronos#utils#assign(task, {
+    let task = s:assign(task, {
       \'active': 0,
       \'stop': task.stop + [s:localtime()],
     \})
@@ -136,22 +139,19 @@ function! kronos#task#to_info_string(task)
 
   let task.tags   = join(task.tags, ' ')
   let task.active = task.active ? 'true' : 'false'
-  let task.done = task.done ? kronos#utils#date(task.done) : ''
-  let task.due  = task.due  ? kronos#utils#date(task.due)  : ''
+  let task.done = task.done ? s:strftime(task.done) : ''
+  let task.due  = task.due  ? s:strftime(task.due)  : ''
   return task
 endfunction
 
 function! kronos#task#to_list_string(task)
   let task = copy(a:task)
+  let PrintDiff = function(s:date_diff, [s:localtime()])
 
-  let Print_diff = function('kronos#utils#date_diff', [s:localtime()])
-  let Print_interval  = function('kronos#utils#date_interval')
-
-  let task.tags = join(task.tags, ' ')
-
-  let task.active = task.active ? Print_diff(task.start[-1])  : ''
-  let task.done   = task.done   ? Print_diff(task.done)       : ''
-  let task.due    = task.due    ? Print_diff(task.due)        : ''
+  let task.tags   = join(task.tags, ' ')
+  let task.active = task.active ? PrintDiff(task.start[-1])  : ''
+  let task.done   = task.done   ? PrintDiff(task.done)       : ''
+  let task.due    = task.due    ? PrintDiff(task.due)        : ''
 
   return task
 endfunction
