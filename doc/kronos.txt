@@ -48,10 +48,27 @@ CREATE                                                         *kronos-create*
 
 To create a task, you can:
 
- - Write a full table line `|id|desc|tags|active|due|`
- - Write a Kronos create format {1}: `my task +with-tag :18`
+ - Write a full table line: `|id|desc|tags|active|due|`
+ - Write a Kronos create format: <desc> <tag> <due>
 
-                                {1} https://github.com/kronos-io/kronos#create
+A tag should start by a `+`, and a due by a `:`.
+
+A due should start by a `:`, and should follow this pattern: `:DDMMYY:HHMM`.
+Not all digits are required. Actually, Kronos tries to find the closest date
+matching your due pattern. Here some use cases:
+
+Note: the date format is `DD/MM/YYYY HH:MM`
+
+Current date     | Given pattern | Output
+03/03/2019 21:42 | `:4`            | 04/03/2019 00:00
+03/03/2019 21:42 | `:2`            | 02/04/2019 00:00
+03/03/2019 21:42 | `:0304` or `:034` | 03/04/2019 00:00
+03/03/2019 21:42 | `:3004` or `304`  | 30/04/2019 00:00
+03/03/2019 21:42 | `:0202`         | 02/02/2020 00:00
+03/03/2019 21:42 | `:020221`       | 02/02/2021 00:00
+03/03/2019 21:42 | `::22`          | 03/03/2019 22:00
+03/03/2019 21:42 | `::19`          | 04/03/2019 19:00
+03/03/2019 21:42 | `:4:2150`       | 04/03/2019 21:50
 
 ------------------------------------------------------------------------------
 READ                                                             *kronos-read*
@@ -63,10 +80,8 @@ UPDATE                                                         *kronos-update*
 
 To update a task, just edit the cell and save.
 
-For the `due` field, you need to use the date Kronos create format {1} (eg:
-`:18`, `:20:1230`...).
-
-                                {1} https://github.com/kronos-io/kronos#create
+For the `due` field, you need to use the date Kronos create format (eg: `:18`,
+`:20:1230`...).
 
 ------------------------------------------------------------------------------
 START-STOP                                                 *kronos-start-stop*
@@ -156,16 +171,15 @@ before proposing a pull request (via the script `tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
+  `May. 11, 2019` - Remove sync support due to too many complications
   `Dec. 31, 2018` - Worktime is now calculated also per day
   `Dec. 26, 2018` - Refactor interface (Vimwiki like {1})
-  `Oct. 18, 2018` - Refactor code to match the `Kronos protocol` {2}
   `Jul. 05, 2018` - Add context by tags
   `Jun. 25, 2018` - Add ability to mark tasks as undone
   `Jun. 24, 2018` - Add option to show or hide done tasks
   `Jun. 23, 2018` - Init changelog
 
                                         https://github.com/vimwiki/vimwiki {1}
-                                       https://github.com/kronos-io/kronos {2}
 
 ==============================================================================
 CREDITS                                                       *kronos-credits*

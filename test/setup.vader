@@ -1,6 +1,6 @@
 Before:
   let g:kronos_database = '/tmp/.kronos.database'
-  let g_date_ref = 1526397300000 "15/05/2018 15:15 UTC
+  let g_date_ref = 1526397300 "15/05/2018 15:15 UTC
 
   let g_data = {
     \'tasks': [],
@@ -16,7 +16,7 @@ Before:
     \'id': 1,
     \'desc': 'desc 1',
     \'tags': ['tag_1', 'tag2'],
-    \'due': 1526397300000,
+    \'due': 1526397300,
     \'active': 0,
     \'done': 0,
   \}
@@ -25,7 +25,7 @@ Before:
     \'id': 1,
     \'desc': 'desc 1 updated',
     \'tags': ['tag_1', 'tag2', 'tag-3'],
-    \'due': 1526397300000,
+    \'due': 1526397300,
     \'active': 0,
     \'done': 0,
   \}

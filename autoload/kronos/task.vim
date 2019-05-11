@@ -1,6 +1,6 @@
 let s:assign = function('kronos#utils#assign')
 let s:localtime = function('kronos#utils#date#localtime')
-let s:strftime = function('kronos#utils#date#strftime', ['%c'])
+let s:strftime = function('strftime', ['%c'])
 let s:date_diff = function('kronos#utils#date#diff')
 
 " --------------------------------------------------------------------- # CRUD #

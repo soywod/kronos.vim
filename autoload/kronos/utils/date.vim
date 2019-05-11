@@ -1,5 +1,3 @@
-let s:strftime = function('kronos#utils#date#strftime')
-
 " ------------------------------------------------------------------- # Config #
 
 let s:secs_in_sec   = 1
@@ -15,12 +13,12 @@ let s:parse_due_regex =
 let s:config = {
   \'date_format': '%c',
   \'msec_in': {
-    \'sec'  : 1000 * s:secs_in_sec,
-    \'min'  : 1000 * s:secs_in_min,
-    \'hour' : 1000 * s:secs_in_min * s:mins_in_hour,
-    \'day'  : 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day,
-    \'month': 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_month,
-    \'year' : 1000 * s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_year,
+    \'sec'  : s:secs_in_sec,
+    \'min'  : s:secs_in_min,
+    \'hour' : s:secs_in_min * s:mins_in_hour,
+    \'day'  : s:secs_in_min * s:mins_in_hour * s:hours_in_day,
+    \'month': s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_month,
+    \'year' : s:secs_in_min * s:mins_in_hour * s:hours_in_day * s:days_in_year,
   \},
   \'label': {
     \'ago': '%s ago',
@@ -45,18 +43,6 @@ endfunction
 function! kronos#utils#date#localtime()
   return localtime() * 1000
 endfunction
-
-" ----------------------------------------------------------------- # Strftime #
-
-function! kronos#utils#date#strftime(format, time)
-  return strftime(a:format, a:time[:9])
-endfunction
-
-" ----------------------------------------------------------------- #  #
-
-" function! kronos#utils#date(date)
-"   return s:strftime(s:config.date_format, a:date)
-" endfunction
 
 " --------------------------------------------------------------------- # Diff #
 "
@@ -113,7 +99,7 @@ endfunction
 function! kronos#utils#date#parse_due(date_ref, due_str)
   let matches = matchlist(a:due_str, s:parse_due_regex)
   let due  = s:parse_due(a:date_ref, 0, matches[1:5])
-  let due -= s:strftime('%S', due)
+  let due -= strftime('%S', due)
 
   return due
 endfunction
@@ -121,14 +107,14 @@ endfunction
 function! s:parse_due(dateref, dateapprox, payload)
   let [day, month, year, hour, min] = a:payload
   let [dayref, monthref, yearref, hourref, minref] = split(
-    \s:strftime('%d/%m/%y/%H/%M', a:dateref),
+    \strftime('%d/%m/%y/%H/%M', a:dateref),
     \'/',
   \)
 
   let daymatch   = day   == '' ? dayref   : +day
   let monthmatch = month == '' ? monthref : +month
   let yearmatch  = year  == '' ? yearref  : +year
-  let hourmatch  = hour  == '' ? hourref  : +hour
+  let hourmatch  = hour  == '' ? 0        : +hour
   let minmatch   = min   == '' ? 0        : +min
 
   let daydiff   = (daymatch - dayref)     * s:config.msec_in.day
@@ -151,22 +137,29 @@ function! s:parse_due(dateref, dateapprox, payload)
 
   let dateapprox = a:dateref + diff
 
-  if day != ''
-    let delta       = day - s:strftime('%d', dateapprox)
+  if monthdiff
+    let delta       = month - strftime('%m', dateapprox)
+    let dateapprox += delta * s:config.msec_in.month
+  endif
+
+  if monthdiff || daydiff
+    let delta       = day - strftime('%d', dateapprox)
     let dateapprox += delta * s:config.msec_in.day
   endif
 
-  let delta       = hour - s:strftime('%H', dateapprox)
+  let delta       = hour - strftime('%H', dateapprox)
   let dateapprox += delta * s:config.msec_in.hour
 
-  if  dateapprox == a:dateapprox | return dateapprox | endif
+  if dateapprox == a:dateapprox
+    return dateapprox
+  endif
 
   return s:parse_due(a:dateref, dateapprox, [
-    \day,
-    \s:strftime('%m', dateapprox),
-    \s:strftime('%y', dateapprox),
+    \strftime('%d', dateapprox),
+    \strftime('%m', dateapprox),
+    \strftime('%y', dateapprox),
     \hour,
-    \s:strftime('%M', dateapprox),
+    \strftime('%M', dateapprox),
   \])
 endfunction
 
@@ -188,7 +181,7 @@ function! kronos#utils#date#worktime(tasks, tags, date_ref)
       let stop  = stops[index]
 
       while end_of_day < stop
-        let [key, hour, min] = split(s:strftime('%d/%m/%y#%H#%M', start), '#')
+        let [key, hour, min] = split(strftime('%d/%m/%y#%H#%M', start), '#')
 
         let end_hour = (23 - hour) * s:config.msec_in.hour
         let end_min = (59 - min) * s:config.msec_in.min
