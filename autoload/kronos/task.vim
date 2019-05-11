@@ -1,11 +1,9 @@
 let s:localtime = function('kronos#utils#date#localtime')
 
 " --------------------------------------------------------------------- # CRUD #
-
-function! kronos#task#create(task)
-  let database = kronos#database#read()
+"
+function! kronos#task#create(tasks, task)
   let task = copy(a:task)
-  let tasks = database.tasks
 
   for tag in copy(g:kronos_context)
     if index(task.tags, tag) == -1
@@ -14,15 +12,12 @@ function! kronos#task#create(task)
   endfor
 
   if has_key(task, 'id')
-    call s:throw_if_exists(task, tasks)
+    call s:throw_if_exists(task, a:tasks)
   else
-    let task.id = kronos#task#generate_id(tasks)
+    let task.id = kronos#task#generate_id(a:tasks)
   endif
 
-  let task.index = -(task.id . s:localtime())
-  call add(tasks, task)
-
-  call kronos#database#write({'tasks': tasks})
+  let task.index = -(s:localtime() . task.id)
 
   return task
 endfunction
@@ -38,26 +33,12 @@ function! kronos#task#read_all()
   return kronos#database#read().tasks
 endfunction
 
-function! kronos#task#update(id, task)
+function! kronos#task#update(task, update)
   let tasks = kronos#database#read().tasks
-  let position = kronos#task#get_position(tasks, a:id)
-  let prev_task = tasks[position]
-  let tasks[position] = kronos#utils#assign(tasks[position], a:task)
+  let position = kronos#task#get_position(tasks, a:task.id)
+  let tasks[position] = kronos#utils#assign(a:task, a:update)
 
   call kronos#database#write({'tasks': tasks})
-
-  return prev_task
-endfunction
-
-function! kronos#task#delete(id)
-  let tasks = kronos#database#read().tasks
-  let position = kronos#task#get_position(tasks, a:id)
-  let index = tasks[position].index
-  call remove(tasks, position)
-
-  call kronos#database#write({'tasks': tasks})
-
-  return index
 endfunction
 
 " --------------------------------------------------------------------- # List #
@@ -86,44 +67,36 @@ endfunction
 
 " ------------------------------------------------------------------- # Toggle #
 
-function! s:start(task)
-  return kronos#task#update(a:task.id, {
-    \'active': 1,
-    \'start': a:task.start + [s:localtime()],
-  \})
-endfunction
-
-function! s:stop(task)
-  return kronos#task#update(a:task.id, {
+function! kronos#task#toggle(task)
+  let update = a:task.active ? {
     \'active': 0,
     \'stop': a:task.stop + [s:localtime()],
-  \})
-endfunction
+  \} : {
+    \'active': 1,
+    \'start': a:task.start + [s:localtime()],
+  \}
 
-function! kronos#task#toggle(id)
-  let task = kronos#task#read(a:id)
-  return task.active ? s:stop(task) : s:start(task)
+  return kronos#utils#assign(a:task, update)
 endfunction
 
 " --------------------------------------------------------------------- # Done #
 
-function! kronos#task#done(id)
+function! kronos#task#done(task)
   let date_ref = s:localtime()
-  let task = kronos#task#read(a:id)
 
-  let update = {
+  let task = kronos#utils#assign(a:task, {
     \'done': date_ref,
-    \'id': task.index,
-  \}
+    \'id': a:task.index,
+  \})
 
-  if task.active
-    let update = kronos#utils#assign(update, {
+  if a:task.active
+    let task = kronos#utils#assign(task, {
       \'active': 0,
       \'stop': task.stop + [s:localtime()],
     \})
   endif
 
-  return kronos#task#update(a:id, update)
+  return task
 endfunction
 
 " -------------------------------------------------------------------- # Utils #
@@ -137,7 +110,7 @@ function! s:throw_if_exists(task, tasks)
 endfunction
 
 function! kronos#task#generate_id(tasks)
-  let ids = map(copy(a:tasks), 'v:val.id')
+  let ids = map(copy(a:tasks), "has_key(v:val, 'id') ? v:val.id : -1")
   let id_new = 1
 
   while index(ids, id_new) != -1
@@ -176,9 +149,9 @@ function! kronos#task#to_list_string(task)
 
   let task.tags = join(task.tags, ' ')
 
-  let task.active = task.active ? Print_diff(task.start[-1]) : ''
-  let task.done   = task.done   ? Print_diff(task.done)      : ''
-  let task.due    = task.due    ? Print_diff(task.due)       : ''
+  let task.active = task.active ? Print_diff(task.start[-1])  : ''
+  let task.done   = task.done   ? Print_diff(task.done)       : ''
+  let task.due    = task.due    ? Print_diff(task.due)        : ''
 
   return task
 endfunction

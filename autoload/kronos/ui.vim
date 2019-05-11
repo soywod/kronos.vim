@@ -34,8 +34,8 @@ let s:buff_name = 'Kronos'
 " --------------------------------------------------------------------- # Info #
 
 function! kronos#ui#info()
-  let id = s:get_focused_task_id()
-  let task = s:compose('kronos#task#to_info_string', 'kronos#task#read')(id)
+  let task = s:get_focused_task()
+  let task = kronos#task#to_info_string(task.id)
   let lines = map(
     \copy(s:config.info.keys),
     \'{"key": s:config.labels[v:val], "value": task[v:val]}',
@@ -77,8 +77,12 @@ endfunction
 
 function! kronos#ui#toggle()
   try
-    let id = s:get_focused_task_id()
-    call kronos#task#toggle(id)
+    let task = s:get_focused_task()
+    let tasks = kronos#task#list()
+    let position = kronos#task#get_position(tasks, task.id)
+    let tasks[position] = kronos#task#toggle(task)
+
+    call kronos#database#write({'tasks': tasks})
     call kronos#ui#list()
   catch 'task not found'
     return kronos#utils#error_log('task not found')
@@ -95,11 +99,9 @@ function! kronos#ui#context()
   try
     let args = input('Go to context: ')
     let g:kronos_context = split(kronos#utils#trim(args), ' ')
-
-    call s:refresh_buff_name()
     call kronos#ui#list()
   catch
-    return kronos#utils#error_log('task context failed')
+    return kronos#utils#error_log('context failed')
   endtry
 endfunction
 
@@ -108,11 +110,9 @@ endfunction
 function! kronos#ui#toggle_hide_done()
   try
     let g:kronos_hide_done = !g:kronos_hide_done
-
-    call s:refresh_buff_name()
     call kronos#ui#list()
   catch
-    return kronos#utils#error_log('task toggle hide done failed')
+    return kronos#utils#error_log('toggle hide done failed')
   endtry
 endfunction
 
@@ -194,40 +194,36 @@ endfunction
 " -------------------------------------------------------------- # Parse utils #
 
 function kronos#ui#parse_buffer()
-  let tasks_old = kronos#task#list()
-  let tasks_new = map(getline(2, '$'), 's:parse_buffer_line(v:key, v:val)')
+  let prev_tasks = kronos#task#list()
+  let curr_tasks = map(getline(2, '$'), 's:parse_buffer_line(v:key, v:val)')
+  let next_tasks = []
 
-  let task_old_ids = map(copy(tasks_old), 'v:val.id')
-  let task_new_ids = map(
-    \filter(copy(tasks_new), 'has_key(v:val, ''id'')'),
+  let prev_tasks_id = map(copy(prev_tasks), 'v:val.id')
+  let next_tasks_id = map(
+    \filter(copy(curr_tasks), 'has_key(v:val, ''id'')'),
     \'v:val.id',
   \)
 
-  for task in tasks_old
-    if index(task_new_ids, task.id) > -1 | continue | endif
-    if task.done
-      call kronos#task#delete(task.id)
-    else
-      call kronos#task#done(task.id)
+  for prev_task in prev_tasks
+    if s:exists_in(next_tasks_id, prev_task.id) | continue | endif
+    if !prev_task.done
+      call add(curr_tasks, kronos#task#done(prev_task))
     endif
   endfor
 
-  for task in tasks_new
-    if !has_key(task, 'id')
-      call kronos#task#create(task)
-      continue
-    endif
-
-    let index = index(task_old_ids, task.id)
-    if  index > -1 && task == tasks_old[index] | continue | endif
-
-    if index == -1
-      call kronos#task#create(task)
+  for curr_task in curr_tasks
+    if !has_key(curr_task, 'id')
+      let next_tasks += [kronos#task#create(next_tasks, curr_task)]
+    elseif !s:exists_in(prev_tasks_id, curr_task.id)
+      let next_tasks += [curr_task]
     else
-      call kronos#task#update(task.id)
+      let prev_pos = kronos#task#get_position(prev_tasks, curr_task.id)
+      let prev_task = prev_tasks[prev_pos]
+      let next_tasks += [kronos#utils#assign(prev_task, curr_task)]
     endif
   endfor
 
+  call kronos#database#write({'tasks': next_tasks})
   call kronos#ui#list()
   let &modified = 0
 endfunction
@@ -352,12 +348,12 @@ function! s:get_max_widths(tasks, columns)
   return max_widths
 endfunction
 
-function! s:get_focused_task_id()
+function! s:get_focused_task()
   let tasks = kronos#task#list()
   let index = line('.') - 2
   if  index == -1 | throw 'task not found' | endif
 
-  return +get(tasks, index).id
+  return get(tasks, index)
 endfunction
 
 function! s:refresh_buff_name()
@@ -376,4 +372,8 @@ function! s:refresh_buff_name()
     execute 'silent! bdelete ' . s:buff_name
     let s:buff_name = buff_name
   endif
+endfunction
+
+function! s:exists_in(list, item)
+  return index(a:list, a:item) > -1
 endfunction
