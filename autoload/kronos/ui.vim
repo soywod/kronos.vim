@@ -1,6 +1,6 @@
 let s:localtime = function('kronos#utils#date#localtime')
-
-" ------------------------------------------------------------------- # Config #
+let s:compose = function('kronos#utils#compose')
+let s:date_interval = function('kronos#utils#date_interval')
 
 let s:config = {
   \'info': {
@@ -31,9 +31,6 @@ let s:config = {
 let s:max_widths = []
 let s:buff_name = 'Kronos'
 
-let s:compose = function('kronos#utils#compose')
-let s:date_interval = function('kronos#utils#date_interval')
-
 " --------------------------------------------------------------------- # Info #
 
 function! kronos#ui#info()
@@ -57,6 +54,7 @@ endfunction
 function! kronos#ui#list()
   let prevpos = getpos('.')
 
+  call s:refresh_buff_name()
   let tasks = kronos#task#list()
   let lines = map(copy(tasks), 'kronos#task#to_list_string(v:val)')
 
@@ -80,11 +78,7 @@ endfunction
 function! kronos#ui#toggle()
   try
     let id = s:get_focused_task_id()
-    call kronos#sync#send({
-      \'type': 'update',
-      \'task_id': id,
-      \'task': kronos#task#toggle(id),
-    \})
+    call kronos#task#toggle(id)
     call kronos#ui#list()
   catch 'task not found'
     return kronos#utils#error_log('task not found')
@@ -212,25 +206,15 @@ function kronos#ui#parse_buffer()
   for task in tasks_old
     if index(task_new_ids, task.id) > -1 | continue | endif
     if task.done
-      call kronos#sync#send({
-        \'type': 'delete',
-        \'task_index': kronos#task#delete(task.id),
-      \})
+      call kronos#task#delete(task.id)
     else
-      call kronos#sync#send({
-        \'type': 'update',
-        \'task_id': task.id,
-        \'task': kronos#task#done(task.id),
-      \})
+      call kronos#task#done(task.id)
     endif
   endfor
 
   for task in tasks_new
     if !has_key(task, 'id')
-      call kronos#sync#send({
-        \'type': 'create',
-        \'task': kronos#task#create(task),
-      \})
+      call kronos#task#create(task)
       continue
     endif
 
@@ -238,16 +222,9 @@ function kronos#ui#parse_buffer()
     if  index > -1 && task == tasks_old[index] | continue | endif
 
     if index == -1
-      call kronos#sync#send({
-        \'type': 'create',
-        \'task': kronos#task#create(task),
-      \})
+      call kronos#task#create(task)
     else
-      call kronos#sync#send({
-        \'type': 'update',
-        \'task_id': task.id,
-        \'task': kronos#task#update(task.id, task),
-      \})
+      call kronos#task#update(task.id)
     endif
   endfor
 

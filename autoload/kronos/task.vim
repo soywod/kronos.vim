@@ -6,7 +6,6 @@ function! kronos#task#create(task)
   let database = kronos#database#read()
   let task = copy(a:task)
   let tasks = database.tasks
-  let user_id = database.sync_user_id
 
   for tag in copy(g:kronos_context)
     if index(task.tags, tag) == -1
@@ -20,7 +19,7 @@ function! kronos#task#create(task)
     let task.id = kronos#task#generate_id(tasks)
   endif
 
-  let task.index = user_id . '#' . task.id . '#' . s:localtime()
+  let task.index = -(task.id . s:localtime())
   call add(tasks, task)
 
   call kronos#database#write({'tasks': tasks})
@@ -114,7 +113,7 @@ function! kronos#task#done(id)
 
   let update = {
     \'done': date_ref,
-    \'id': -(a:id . date_ref),
+    \'id': task.index,
   \}
 
   if task.active

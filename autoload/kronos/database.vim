@@ -2,8 +2,8 @@
 
 function! kronos#database#read()
   try
-    let file_readable = filereadable(g:kronos_database)
-    return file_readable ? s:read_from_file() : s:read_from_scratch()
+    let file_exists = filereadable(g:kronos_database)
+    return file_exists ? s:read_from_file() : s:read_from_scratch()
   catch
     throw 'read database failed'
   endtry
@@ -13,25 +13,17 @@ function! s:read_from_file()
   let data = readfile(g:kronos_database)
 
   return {
-    \'tasks': map(data[6:], 'eval(v:val)'),
-    \'hide_done': !!data[0],
-    \'enable_sync': !!data[1],
-    \'sync_host': data[2],
-    \'sync_user_id': data[3],
-    \'sync_device_id': data[4],
-    \'sync_version': +data[5],
+    \'tasks': map(data[2:], 'eval(v:val)'),
+    \'context': eval(data[0]),
+    \'hide_done': !!data[1],
   \}
 endfunction
 
 function! s:read_from_scratch()
   return {
     \'tasks': [],
-    \'hide_done': g:kronos_hide_done,
-    \'enable_sync': g:kronos_sync,
-    \'sync_host': g:kronos_sync_host,
-    \'sync_user_id': '',
-    \'sync_device_id': '',
-    \'sync_version': 0,
+    \'context': [],
+    \'hide_done': 0,
   \}
 endfunction
 
@@ -48,14 +40,7 @@ endfunction
 
 function! s:write_to_file(data)
   let tasks  = map(copy(a:data.tasks), 'string(v:val)')
-  let config = [
-    \a:data.hide_done,
-    \a:data.enable_sync,
-    \a:data.sync_host,
-    \a:data.sync_user_id,
-    \a:data.sync_device_id,
-    \a:data.sync_version,
-  \]
+  let config = [string(a:data.context), a:data.hide_done]
 
   return writefile(config + tasks, g:kronos_database, 's')
 endfunction
