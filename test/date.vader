@@ -19,9 +19,9 @@ Execute (Parse due (date)):
 Then (should parse date):
   for [due, date; _] in scenarios
     if date == 'throw'
-      AssertThrow kronos#utils#parse_due(g_date_ref, due)
+      AssertThrow kronos#utils#date#parse_due(g_date_ref, due)
     else
-      AssertEqual date, kronos#utils#parse_due(g_date_ref, due)
+      AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
     endif
   endfor
 
@@ -42,7 +42,7 @@ Execute (Parse due (time)):
 
 Then (should parse time):
   for [due, date; _] in scenarios
-    AssertEqual date, kronos#utils#parse_due(g_date_ref, due)
+    AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
   endfor
 
 Execute (Parse due (date&time)):
@@ -57,23 +57,22 @@ Execute (Parse due (date&time)):
 Then (should parse date and time):
   for [due, date; _] in scenarios
     if date == 'throw'
-      AssertThrow kronos#utils#parse_due(g_date_ref, due)
+      AssertThrow kronos#utils#date#parse_due(g_date_ref, due)
     else
-      AssertEqual date, kronos#utils#parse_due(g_date_ref, due)
+      AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
     endif
   endfor
 
 # ----------------------------------------------------------- # Print interval #
 
 Execute (Print interval):
-  let Interval = function('kronos#utils#date_interval')
-  let d = kronos#utils#config().msec_in
+  let Interval = function('kronos#utils#date#interval')
+  let d = kronos#utils#date#config().msec_in
 
   let scenarios = [
     \['1h 1min 1s', Interval(d.hour   + d.min    + d.sec)  ],
     \['1y 1mo 2d' , Interval(d.year   + d.month  + d.day*2)],
     \['1d 5h 2s'  , Interval(d.day    + d.hour*5 + d.sec*2)],
-    \['3w 55s'    , Interval(d.week*3 + d.sec*55)          ],
   \]
 
 Then (should print interval):
@@ -84,13 +83,12 @@ Then (should print interval):
 # --------------------------------------------------------------- # Print diff #
 
 Execute (Print diff):
-  let sec   = kronos#utils#config().msec_in.sec
-  let min   = kronos#utils#config().msec_in.min
-  let hour  = kronos#utils#config().msec_in.hour
-  let day   = kronos#utils#config().msec_in.day
-  let week  = kronos#utils#config().msec_in.week
-  let month = kronos#utils#config().msec_in.month
-  let year  = kronos#utils#config().msec_in.year
+  let sec   = kronos#utils#date#config().msec_in.sec
+  let min   = kronos#utils#date#config().msec_in.min
+  let hour  = kronos#utils#date#config().msec_in.hour
+  let day   = kronos#utils#date#config().msec_in.day
+  let month = kronos#utils#date#config().msec_in.month
+  let year  = kronos#utils#date#config().msec_in.year
 
   let scenarios = [
     \[g_date_ref       , g_date_ref+sec*42 , 'in 43s'  ],
@@ -101,9 +99,6 @@ Execute (Print diff):
     \[g_date_ref+hour  , g_date_ref        , '2h ago'  ],
     \[g_date_ref       , g_date_ref+day-1  , 'in 24h'  ],
     \[g_date_ref+day   , g_date_ref        , '2d ago'  ],
-    \[g_date_ref       , g_date_ref+week-1 , 'in 7d'   ],
-    \[g_date_ref+week  , g_date_ref        , '2w ago'  ],
-    \[g_date_ref       , g_date_ref+month-1, 'in 5w'   ],
     \[g_date_ref+month , g_date_ref        , '2mo ago' ],
     \[g_date_ref       , g_date_ref+year-1 , 'in 12mo' ],
     \[g_date_ref+year  , g_date_ref        , '2y ago'  ],
@@ -112,13 +107,13 @@ Execute (Print diff):
 
 Then (should print diff):
   for [date_src, date_dest, diff] in scenarios
-    AssertEqual diff, kronos#utils#date_diff(date_src, date_dest)
+    AssertEqual diff, kronos#utils#date#diff(date_src, date_dest)
   endfor
 
 # ----------------------------------------------------------------- # Worktime #
 
 Execute (Worktime):
-  let s = kronos#utils#config().msec_in
+  let s = kronos#utils#date#config().msec_in
 
   let now = kronos#utils#date#localtime()
   let d16_at_h15 = 1526482800000 " 16/05/2018, 15:00 GMT
@@ -177,7 +172,7 @@ Execute (Worktime):
 
 Then (should calculate worktimes per day):
   for [date_ref, tags, tasks, worktimes] in scenarios
-    AssertEqual worktimes, kronos#utils#worktime(tasks, tags, date_ref)
+    AssertEqual worktimes, kronos#utils#date#worktime(tasks, tags, date_ref)
   endfor
 
   unlet s now d16_at_h15 d16_at_h18 d16_at_h20 d16_at_h22 d17_at_h15

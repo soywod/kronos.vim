@@ -79,7 +79,7 @@ function! kronos#utils#date#diff(datesrc, datedest)
     if datediff < secmax || min == 'year'
       let value   = datediff / secmin
       let unitfmt = s:config.label.unit[min]
-      let unitstr = printf(unitfmt, value)
+      let unitstr = printf(unitfmt, value + 1)
       let diffstr = printf(difffmt, unitstr)
 
       return diffstr
