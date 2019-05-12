@@ -19,14 +19,25 @@ if sys.argv[1] == 'taskwarrior':
     database_out = open('.database', 'w')
 
     def parse_due(raw_due):
-        due = datetime.strptime(raw_due, '%Y%m%dT%H%M%SZ')
-        return due.strftime('%s')
+        if raw_due:
+            due = datetime.strptime(raw_due, '%Y%m%dT%H%M%SZ')
+            return due.strftime('%s')
+        return raw_due
+
+    def parse_status(status):
+        if status == 'completed' or status == 'deleted':
+            return 1
+        return 0
 
     for line in database_in.read().split('\n'):
         try:
             task = json.loads(line)
-            if task['status'] != 'pending':
-                continue
+
+            if 'tags' not in task.keys():
+                task['tags'] = []
+
+            if 'due' not in task.keys():
+                task['due'] = ''
 
             tasks[task['uuid']] = {
                 'desc': task['description'],
@@ -36,7 +47,7 @@ if sys.argv[1] == 'taskwarrior':
                 'start': [],
                 'stop': [],
                 'active': 0,
-                'done': 0,
+                'done': parse_status(task['status'])
             }
 
         except:
