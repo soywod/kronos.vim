@@ -1,7 +1,8 @@
 let s:assign = function('kronos#utils#assign')
-let s:localtime = function('kronos#utils#date#localtime')
+let s:sum = function('kronos#utils#sum')
 let s:strftime = function('strftime', ['%c'])
 let s:date_diff = function('kronos#utils#date#diff')
+let s:date_interval = function('kronos#utils#date#interval')
 
 " --------------------------------------------------------------------- # CRUD #
 
@@ -20,7 +21,7 @@ function! kronos#task#create(tasks, task)
     let task.id = kronos#task#generate_id(a:tasks)
   endif
 
-  let task.index = -(s:localtime() . task.id)
+  let task.index = -(localtime() . task.id)
 
   return task
 endfunction
@@ -73,10 +74,10 @@ endfunction
 function! kronos#task#toggle(task)
   let update = a:task.active ? {
     \'active': 0,
-    \'stop': a:task.stop + [s:localtime()],
+    \'stop': a:task.stop + [localtime()],
   \} : {
     \'active': 1,
-    \'start': a:task.start + [s:localtime()],
+    \'start': a:task.start + [localtime()],
   \}
 
   return s:assign(a:task, update)
@@ -85,7 +86,7 @@ endfunction
 " --------------------------------------------------------------------- # Done #
 
 function! kronos#task#done(task)
-  let date_ref = s:localtime()
+  let date_ref = localtime()
 
   let task = s:assign(a:task, {
     \'done': date_ref,
@@ -95,7 +96,7 @@ function! kronos#task#done(task)
   if a:task.active
     let task = s:assign(task, {
       \'active': 0,
-      \'stop': task.stop + [s:localtime()],
+      \'stop': task.stop + [localtime()],
     \})
   endif
 
@@ -137,16 +138,21 @@ endfunction
 function! kronos#task#to_info_string(task)
   let task = copy(a:task)
 
+  let starts = task.start
+  let stops  = task.active ? task.stop + [localtime()] : task.stop
+
   let task.tags   = join(task.tags, ' ')
   let task.active = task.active ? 'true' : 'false'
   let task.done = task.done ? s:strftime(task.done) : ''
   let task.due  = task.due  ? s:strftime(task.due)  : ''
+  let task.worktime = s:date_interval(s:sum(stops) - s:sum(starts))
+
   return task
 endfunction
 
 function! kronos#task#to_list_string(task)
   let task = copy(a:task)
-  let PrintDiff = function(s:date_diff, [s:localtime()])
+  let PrintDiff = function(s:date_diff, [localtime()])
 
   let task.tags   = join(task.tags, ' ')
   let task.active = task.active ? PrintDiff(task.start[-1])  : ''

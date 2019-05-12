@@ -117,6 +117,15 @@ The worktime allows you to check how much time you spent on one or many tags,
 grouped by day. Press {gw} (for `go to worktime`), and type the tags you want
 to calculate the total worktime.
 
+You can also add a beginning date with `>DDMMYY:HHMM` and a ending date with
+`<DDMMYY:HHMM`. Here some valid options:
+
+  - `tag1 tag2 >18 <20`: worktime for tag1, tag2 between the 18th and the 20th
+    of the current month
+  - `tag1 >:10 `: worktime for tag1 starting at 10AM of the current day
+  - `tag2 <18:22 `: worktime for tag2 ending at 10PM of the 18th of the current
+    month
+
 ------------------------------------------------------------------------------
 DELETE                                                         *kronos-delete*
 

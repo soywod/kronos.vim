@@ -121,6 +121,15 @@ to calculate the total worktime:
 
 ![Worktime](https://user-images.githubusercontent.com/10437171/50560067-2182f300-0cfd-11e9-95bc-6b3ce1f23535.gif)
 
+You can also add a beginning date with `>DDMMYY:HHMM` and a ending date with
+`<DDMMYY:HHMM`. Here some valid options:
+
+  - `tag1 tag2 >18 <20`: worktime for tag1, tag2 between the 18th and the 20th
+    of the current month
+  - `tag1 >:10 `: worktime for tag1 starting at 10AM of the current day
+  - `tag2 <18:22 `: worktime for tag2 ending at 10PM of the 18th of the current
+    month
+
 ### Delete
 
 To delete a task, delete the line when [done tasks are

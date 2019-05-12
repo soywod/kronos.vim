@@ -2,52 +2,30 @@ Include: setup.vader
 
 # ---------------------------------------------------------------- # Parse due #
 
-Execute (Parse due (date)):
+Execute (Parse due):
   let scenarios = [
-    \[':15'    , 1526428800, '16/05/18 00:00'],
-    \[':10'    , 1528588800, '10/06/18 00:00'],
-    \[':20'    , 1526774400, '20/06/18 00:00'],
-    \[':153'   , 1552608000, '15/03/19 00:00'],
-    \[':102'   , 1549756800, '10/02/19 00:00'],
-    \[':201'   , 1547942400, '20/01/19 00:00'],
-    \[':158'   , 1534291200, '15/08/18 00:00'],
-    \[':108'   , 1533859200, '10/08/18 00:00'],
-    \[':2010'  , 1539993600, '20/10/18 00:00'],
-    \[':0202'  , 1549065600, '02/02/19 00:00'],
-    \[':140117', 'throw'   , '14/01/17 00:00'],
-  \]
-
-Then (should parse date):
-  for [due, date; _] in scenarios
-    if date == 'throw'
-      AssertThrow kronos#utils#date#parse_due(g_date_ref, due)
-    else
-      AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
-    endif
-  endfor
-
-Execute (Parse due (time)):
-  let scenarios = [
-    \['::15'  , 1526482800, '16/05/18 15:00'],
-    \['::10'  , 1526464800, '16/05/18 10:00'],
-    \['::20'  , 1526414400, '15/05/18 20:00'],
-    \['::1515', 1526397300, '15/05/18 15:15'],
-    \['::1530', 1526398200, '15/05/18 15:30'],
-    \['::12'  , 1526472000, '16/05/18 12:00'],
-    \['::080' , 1526457600, '16/05/18 08:00'],
-    \['::0130', 1526434200, '16/05/18 01:30'],
-    \['::16'  , 1526400000, '15/05/18 16:00'],
-    \['::2000', 1526414400, '15/05/18 20:00'],
-    \['::2330', 1526427000, '15/05/18 23:30'],
-  \]
-
-Then (should parse time):
-  for [due, date; _] in scenarios
-    AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
-  endfor
-
-Execute (Parse due (date&time)):
-  let scenarios = [
+    \[':15'         , 1526428800, '16/05/18 00:00'],
+    \[':10'         , 1528588800, '10/06/18 00:00'],
+    \[':20'         , 1526774400, '20/06/18 00:00'],
+    \[':153'        , 1552608000, '15/03/19 00:00'],
+    \[':102'        , 1549756800, '10/02/19 00:00'],
+    \[':201'        , 1547942400, '20/01/19 00:00'],
+    \[':158'        , 1534291200, '15/08/18 00:00'],
+    \[':108'        , 1533859200, '10/08/18 00:00'],
+    \[':2010'       , 1539993600, '20/10/18 00:00'],
+    \[':0202'       , 1549065600, '02/02/19 00:00'],
+    \[':140117'     , 'throw'   , '14/01/17 00:00'],
+    \['::15'        , 1526482800, '16/05/18 15:00'],
+    \['::10'        , 1526464800, '16/05/18 10:00'],
+    \['::20'        , 1526414400, '15/05/18 20:00'],
+    \['::1515'      , 1526397300, '15/05/18 15:15'],
+    \['::1530'      , 1526398200, '15/05/18 15:30'],
+    \['::12'        , 1526472000, '16/05/18 12:00'],
+    \['::080'       , 1526457600, '16/05/18 08:00'],
+    \['::0130'      , 1526434200, '16/05/18 01:30'],
+    \['::16'        , 1526400000, '15/05/18 16:00'],
+    \['::2000'      , 1526414400, '15/05/18 20:00'],
+    \['::2330'      , 1526427000, '15/05/18 23:30'],
     \[':155:15'     , 1526482800, '16/05/18 15:00'],
     \[':160719:1821', 1563301260, '16/07/19 18:21'],
     \[':146:1420'   , 1528986000, '14/06/18 14:20'],
@@ -56,13 +34,35 @@ Execute (Parse due (date&time)):
     \[':100118:1001', 'throw'   , '10/01/18 10:01'],
   \]
 
-Then (should parse date and time):
+Then (should parse due):
   for [due, date; _] in scenarios
     if date == 'throw'
       AssertThrow kronos#utils#date#parse_due(g_date_ref, due)
     else
       AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
     endif
+  endfor
+
+Execute (Parse due strict):
+  let scenarios = [
+    \[':15'     , 1526342400, '15/05/18 00:00'],
+    \[':10'     , 1525910400, '10/05/18 00:00'],
+    \[':20'     , 1526774400, '20/05/18 00:00'],
+    \[':035'    , 1525305600, '03/05/18 00:00'],
+    \[':034'    , 1522713600, '03/04/18 00:00'],
+    \[':036'    , 1527984000, '03/06/18 00:00'],
+    \[':030518' , 1525305600, '03/05/18 00:00'],
+    \[':030517' , 1493769600, '03/05/17 00:00'],
+    \[':030519' , 1556841600, '03/05/19 00:00'],
+    \['::15'    , 1526396400, '15/05/18 15:00'],
+    \['::20'    , 1526414400, '15/05/18 20:00'],
+    \['::10'    , 1526378400, '15/05/18 10:00'],
+    \['::1010'  , 1526379000, '15/05/18 10:10'],
+  \]
+
+Then (should parse due strict):
+  for [due, date; _] in scenarios
+    AssertEqual date, kronos#utils#date#parse_due_strict(g_date_ref, due)
   endfor
 
 # ----------------------------------------------------------- # Print interval #
@@ -117,7 +117,7 @@ Then (should print diff):
 Execute (Worktime):
   let s = kronos#utils#date#config().msec_in
 
-  let now = kronos#utils#date#localtime()
+  let now = localtime()
   let d16_at_h15 = 1526482800 " 16/05/2018, 15:00 GMT
   let d16_at_h18 = 1526493600 " 16/05/2018, 18:00 GMT
   let d16_at_h20 = 1526500800 " 16/05/2018, 20:00 GMT
@@ -126,55 +126,80 @@ Execute (Worktime):
 
   let scenarios = [
     \[
-      \now, ['tag/a'],
+      \now, ['tag/a'], -1, -1,
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
       \{'16/05/18': s.hour * 5},
     \],
     \[
-      \now, ['tag/c'],
-      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
-      \{},
-    \],
-    \[
-      \now, ['tag/a', 'tag/c'],
+      \now, ['tag/c'], -1, -1,
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
       \{},
     \],
     \[
-      \now, [],
+      \now, ['tag/a', 'tag/c'], -1, -1,
+      \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
+      \{},
+    \],
+    \[
+      \now, [], -1, -1,
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': []}],
       \{'16/05/18': s.hour * 5},
     \],
     \[
-      \d16_at_h18, [],
+      \d16_at_h18, [], -1, -1,
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': []}],
       \{'16/05/18': s.hour * 5},
     \],
     \[
-      \d16_at_h22, [],
+      \d16_at_h22, [], -1, -1,
       \[{'active': 1, 'start': [d16_at_h15], 'stop': [], 'tags': []}],
       \{'16/05/18': s.hour * 7},
     \],
     \[
-      \d16_at_h18, [],
+      \d16_at_h18, [], -1, -1,
       \[{'active': 1, 'start': [d16_at_h15], 'stop': [], 'tags': []}],
       \{'16/05/18': s.hour * 3},
     \],
     \[
-      \d16_at_h22, [],
+      \d16_at_h22, [], -1, -1,
       \[{'active': 1, 'start': [d16_at_h15, d16_at_h20], 'stop': [d16_at_h18], 'tags': []}],
       \{'16/05/18': s.hour * 5},
     \],
     \[
-      \now, [],
+      \now, [], -1, -1,
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d17_at_h15], 'tags': []}],
       \{'16/05/18': s.hour * 8 + s.min * 59, '17/05/18': s.hour * 15},
+    \],
+    \[
+      \now, [], d17_at_h15, d17_at_h15 + 30,
+      \[{'active': 1, 'start': [d16_at_h15], 'stop': [], 'tags': []}],
+      \{'17/05/18': 30},
+    \],
+    \[
+      \now, [], d17_at_h15, d17_at_h15 + 30,
+      \[{'active': 1, 'start': [d16_at_h15], 'stop': [d16_at_h18], 'tags': []}],
+      \{},
+    \],
+    \[
+      \now, [], d16_at_h18, d17_at_h15,
+      \[{'active': 1, 'start': [d16_at_h15], 'stop': [], 'tags': []}],
+      \{'16/05/18': s.hour * 5 + s.min * 59, '17/05/18': s.hour * 15},
+    \],
+    \[
+      \now, [], d16_at_h15, d17_at_h15,
+      \[{'active': 1, 'start': [d16_at_h18], 'stop': [d16_at_h20], 'tags': []}],
+      \{'16/05/18': s.hour * 2},
+    \],
+    \[
+      \now, [], d16_at_h15, d16_at_h20,
+      \[{'active': 1, 'start': [d16_at_h18], 'stop': [d17_at_h15], 'tags': []}],
+      \{'16/05/18': s.hour * 2},
     \],
   \]
 
 Then (should calculate worktimes per day):
-  for [date_ref, tags, tasks, worktimes] in scenarios
-    AssertEqual worktimes, kronos#utils#date#worktime(tasks, tags, date_ref)
+  for [date_ref, tags, min, max, tasks, worktimes] in scenarios
+    AssertEqual worktimes, kronos#utils#date#worktime(tasks, tags, min, max, date_ref)
   endfor
 
   unlet s now d16_at_h15 d16_at_h18 d16_at_h20 d16_at_h22 d17_at_h15

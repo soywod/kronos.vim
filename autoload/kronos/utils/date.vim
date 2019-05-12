@@ -7,8 +7,9 @@ let s:hours_in_day  = 24
 let s:days_in_month = 32
 let s:days_in_year  = 366
 
+let s:timezone_regex = '^\([-+]\)\(\d\{2}\)\(\d\{2}\)$'
 let s:parse_due_regex =
-  \'^:\(\d\{0,2}\)\(\d\{0,2}\)\(\d\{2}\)\?:\?\(\d\{0,2}\)\(\d\{0,2}\)$'
+  \'^[:<>]\(\d\{0,2}\)\(\d\{0,2}\)\(\d\{2}\)\?:\?\(\d\{0,2}\)\(\d\{0,2}\)$'
 
 let s:config = {
   \'date_format': '%c',
@@ -38,14 +39,8 @@ function! kronos#utils#date#config()
   return s:config
 endfunction
 
-" ---------------------------------------------------------------- # Localtime #
-
-function! kronos#utils#date#localtime()
-  return localtime() * 1000
-endfunction
-
 " --------------------------------------------------------------------- # Diff #
-"
+
 function! kronos#utils#date#diff(datesrc, datedest)
   let datediff  = abs(a:datesrc - a:datedest)
   let difffmt   = s:config.label[a:datesrc < a:datedest ? 'in' : 'ago']
@@ -95,6 +90,65 @@ function! kronos#utils#date#interval(interval)
 endfunction
 
 " ---------------------------------------------------------------- # Parse due #
+" TODO set in common parse_due and parse_due_strict
+
+function! kronos#utils#date#parse_due_strict(date_ref, due_str)
+  let matches = matchlist(a:due_str, s:parse_due_regex)
+  let due  = s:parse_due_strict(a:date_ref, 0, matches[1:5])
+  let due -= strftime('%S', due)
+
+  return due
+endfunction
+
+function! s:parse_due_strict(dateref, dateapprox, payload)
+  let [day, month, year, hour, min] = a:payload
+  let [dayref, monthref, yearref, hourref, minref] = split(
+    \strftime('%d/%m/%y/%H/%M', a:dateref),
+    \'/',
+  \)
+
+  let daymatch   = day   == '' ? dayref   : +day
+  let monthmatch = month == '' ? monthref : +month
+  let yearmatch  = year  == '' ? yearref  : +year
+  let hourmatch  = hour  == '' ? 0        : +hour
+  let minmatch   = min   == '' ? 0        : +min
+
+  let daydiff   = (daymatch - dayref)     * s:config.msec_in.day
+  let monthdiff = (monthmatch - monthref) * s:config.msec_in.month
+  let yeardiff  = (yearmatch - yearref)   * s:config.msec_in.year
+  let hourdiff  = (hourmatch - hourref)   * s:config.msec_in.hour
+  let mindiff   = (minmatch - minref)     * s:config.msec_in.min
+
+  let diff = daydiff + monthdiff + yeardiff + mindiff + hourdiff
+  if  diff == 0 | return a:dateref | endif
+
+  let dateapprox = a:dateref + diff
+
+  if monthdiff
+    let delta       = month - strftime('%m', dateapprox)
+    let dateapprox += delta * s:config.msec_in.month
+  endif
+
+  if monthdiff || daydiff
+    let delta       = day - strftime('%d', dateapprox)
+    let dateapprox += delta * s:config.msec_in.day
+  endif
+
+  let delta       = hour - strftime('%H', dateapprox)
+  let dateapprox += delta * s:config.msec_in.hour
+
+  if dateapprox == a:dateapprox
+    return dateapprox
+  endif
+
+  return s:parse_due_strict(a:dateref, dateapprox, [
+    \strftime('%d', dateapprox),
+    \strftime('%m', dateapprox),
+    \strftime('%y', dateapprox),
+    \strftime('%H', dateapprox),
+    \strftime('%M', dateapprox),
+  \])
+endfunction
 
 function! kronos#utils#date#parse_due(date_ref, due_str)
   let matches = matchlist(a:due_str, s:parse_due_regex)
@@ -158,14 +212,14 @@ function! s:parse_due(dateref, dateapprox, payload)
     \strftime('%d', dateapprox),
     \strftime('%m', dateapprox),
     \strftime('%y', dateapprox),
-    \hour,
+    \strftime('%H', dateapprox),
     \strftime('%M', dateapprox),
   \])
 endfunction
 
 " ----------------------------------------------------------------- # Worktime #
 
-function! kronos#utils#date#worktime(tasks, tags, date_ref)
+function! kronos#utils#date#worktime(tasks, tags, min, max, date_ref)
   let worktimes = {}
 
   for task in a:tasks
@@ -177,10 +231,20 @@ function! kronos#utils#date#worktime(tasks, tags, date_ref)
 
     for index in range(len(starts))
       let end_of_day = 0
-      let start = starts[index]
-      let stop  = stops[index]
+      let start = copy(starts[index])
+      let stop  = copy(stops[index])
 
       while end_of_day < stop
+        if a:max > -1
+          if start > a:max | return worktimes | endif
+          if stop > a:max | let stop = a:max | endif
+        endif
+
+        if a:min > -1
+          if start < a:min | let start = a:min | endif
+          if stop < a:min | break | endif
+        endif
+
         let [key, hour, min] = split(strftime('%d/%m/%y#%H#%M', start), '#')
 
         let end_hour = (23 - hour) * s:config.msec_in.hour

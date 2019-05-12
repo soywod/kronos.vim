@@ -3,8 +3,8 @@ let s:compose = function('kronos#utils#compose')
 let s:sum = function('kronos#utils#sum')
 let s:trim = function('kronos#utils#trim')
 let s:date_interval = function('kronos#utils#date#interval')
-let s:localtime = function('kronos#utils#date#localtime')
 let s:parse_due = function('kronos#utils#date#parse_due')
+let s:parse_due_strict = function('kronos#utils#date#parse_due_strict')
 let s:worktime = function('kronos#utils#date#worktime')
 let s:log_error = function('kronos#utils#log#error')
 
@@ -16,7 +16,7 @@ let s:buff_name = 'Kronos'
 let s:config = {
   \'info': {
     \'columns': ['key', 'value'],
-    \'keys': ['id', 'desc', 'tags', 'active', 'due', 'done'],
+    \'keys': ['id', 'desc', 'tags', 'active', 'due', 'done', 'worktime'],
   \},
   \'list': {
     \'columns': ['id', 'desc', 'tags', 'active', 'due'],
@@ -128,9 +128,9 @@ endfunction
 
 function! kronos#ui#worktime()
   let args = input('Worktime for: ')
-  let tags = split(s:trim(args), ' ')
+  let [tags, min, max] = s:parse_worktime_args(localtime(), args)
   let tasks = kronos#task#read_all()
-  let worktimes = s:worktime(tasks, tags, s:localtime())
+  let worktimes = s:worktime(tasks, tags, min, max, localtime())
 
   let days  = s:compose('sort', 'keys')(worktimes)
   let total = s:compose(
@@ -162,6 +162,26 @@ function! kronos#ui#worktime()
   normal! ddgg
   setlocal filetype=kwtime
   echo
+endfunction
+
+function s:parse_worktime_args(date_ref, args)
+  let args = split(s:trim(a:args), ' ')
+
+  let min  = -1
+  let max  = -1
+  let tags = []
+
+  for arg in args
+    if arg =~ '^>\w*'
+      let min = s:parse_due_strict(a:date_ref, arg)
+    elseif arg =~ '^<\w*'
+      let max = s:parse_due_strict(a:date_ref, arg)
+    else
+      call add(tags, arg)
+    endif
+  endfor
+
+  return [tags, min, max]
 endfunction
 
 " ---------------------------------------------------------- # Cell management #
@@ -236,7 +256,7 @@ endfunction
 
 function s:parse_buffer_line(index, line)
   if match(a:line, '^|-\=\d\{-1,}\s\{-}|.*|.\{-}|.\{-}|.\{-}|$') == -1
-    let [desc, tags, due] = s:parse_args(s:localtime(), s:trim(a:line))
+    let [desc, tags, due] = s:parse_args(localtime(), s:trim(a:line))
 
     return {
       \'desc': desc,
@@ -275,7 +295,7 @@ function s:parse_buffer_line(index, line)
       if cells[-1] != '' | let due = task.due
       else | let due = 0 | endif
     else
-      let due = s:parse_due(s:localtime(), due)
+      let due = s:parse_due(localtime(), due)
     endif
 
     return s:assign(task, {
