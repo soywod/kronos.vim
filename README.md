@@ -152,17 +152,35 @@ If you want to import your Taskwarrior tasks into Kronos, you can use the
 
 ## Mappings
 
+Here the default mappings:
+
 | Function | Mapping |
 | --- | --- |
-| Jump to the next cell | `<Tab>`, `<C-n>` |
-| Jump to the prev cell | `<S-Tab>`, `<C-p>` |
+| Toggle task | `<CR>` |
+| [Show task infos](#read) | `K` |
+| [Set context](#context) | `gc` |
+| [Hide/show done tasks](#hide-done-tasks) | `gh` |
+| [Show worktime](#worktime) | `gw` |
+| Jump to the next cell | `<C-n>` |
+| Jump to the prev cell | `<C-p>` |
+| Delete in cell | `dic` |
 | Change in cell | `cic` |
 | Visual in cell | `vic` |
-| Delete in cell | `dic` |
-| [Show task infos](#read) | `K` |
-| [Hide/show done tasks](#hide-done-tasks) | `gh` |
-| [Set context](#context) | `gc` |
-| [Show worktime](#worktime) | `gw` |
+
+You can customize them:
+
+```vim
+nmap <cr>   <plug>(kronos-toggle)
+nmap K      <plug>(kronos-info)
+nmap gc     <plug>(kronos-context)
+nmap gh     <plug>(kronos-hide-done)
+nmap gw     <plug>(kronos-worktime)
+nmap <c-n>  <plug>(kronos-next-cell)
+nmap <c-p>  <plug>(kronos-prev-cell)
+nmap dic    <plug>(kronos-delete-in-cell)
+nmap cic    <plug>(kronos-change-in-cell)
+nmap vic    <plug>(kronos-visual-in-cell)
+```
 
 ## Contributing
 
@@ -181,6 +199,7 @@ proposing a pull request.
 
 ## Changelog
 
+- **May. 13, 2019** - Add custom mapping
 - **May. 12, 2019** - Add script to import tasks from taskwarrior (thanks to [KevCui](https://github.com/KevCui))
 - **May. 11, 2019** - Remove sync support due to too many complications
 - **Dec. 31, 2018** - Worktime is now calculated also per day

@@ -10,7 +10,6 @@
 TABLE OF CONTENTS                                            *kronos-contents*
 
   Introduction ...................................................... |kronos|
-  Mappings ................................................  |kronos-mappings|
   Usage ....................................................... |kronos-usage|
    - Create .................................................  |kronos-create|
    - Read ...................................................... |kronos-read|
@@ -20,23 +19,12 @@ TABLE OF CONTENTS                                            *kronos-contents*
    - Context ................................................ |kronos-context|
    - Worktime .............................................. |kronos-worktime|
    - Delete .................................................. |kronos-delete|
+  Import ....................................................  |kronos-import|
+  Mappings ................................................  |kronos-mappings|
   License ................................................... |kronos-license|
   Contributing ......................................... |kronos-contributing|
   Changelog ............................................... |kronos-changelog|
   Credits ................................................... |kronos-credits|
-
-==============================================================================
-MAPPINGS                                                    *kronos-mappings* 
-
-Jump to the next cell      <Tab>, <C-n> 
-Jump to the prev cell      <S-Tab>, <C-p>
-Change in cell             {cic}
-Visual in cell             {vic}
-Delete in cell             {dic}
-Show task infos            {K}
-Hide/show done tasks       {gh}
-Set context                {gc}
-Show worktime              {gw}
 
 ==============================================================================
 USAGE                                                           *kronos-usage* 
@@ -132,6 +120,48 @@ DELETE                                                         *kronos-delete*
 To delete a task, delete the line when done tasks are shown.
 
 ==============================================================================
+IMPORT                                                         *kronos-import* 
+
+If you want to import your Taskwarrior tasks into Kronos, you can use the
+`import.py` script at the root folder of the plugin. Usage:
+
+>
+  ./import.py taskwarrior ./path/to/your/backlog.data
+<
+
+Note: this will erase the current database
+
+==============================================================================
+MAPPINGS                                                     *kronos-mappings* 
+
+Here the default mappings:
+
+Toggle task                 <CR>
+Show task infos             {K}
+Set context                 {gc}
+Hide/show done tasks        {gh}
+Show worktime               {gw}
+Jump to the next cell       <C-n> 
+Jump to the prev cell       <C-p>
+Delete in cell              {dic}
+Change in cell              {cic}
+Visual in cell              {vic}
+
+You can customize them:
+>
+  nmap <cr>   <plug>(kronos-toggle)
+  nmap K      <plug>(kronos-info)
+  nmap gc     <plug>(kronos-context)
+  nmap gh     <plug>(kronos-hide-done)
+  nmap gw     <plug>(kronos-worktime)
+  nmap <c-n>  <plug>(kronos-next-cell)
+  nmap <c-p>  <plug>(kronos-prev-cell)
+  nmap dic    <plug>(kronos-delete-in-cell)
+  nmap cic    <plug>(kronos-change-in-cell)
+  nmap vic    <plug>(kronos-visual-in-cell)
+<
+==============================================================================
+
 LICENSE                                                       *kronos-license*
 
 MIT License
@@ -180,6 +210,8 @@ before proposing a pull request (via the script `tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
+  `May. 13, 2019` - Add custom mapping
+  `May. 12, 2019` - Add script to import tasks from taskwarrior
   `May. 11, 2019` - Remove sync support due to too many complications
   `Dec. 31, 2018` - Worktime is now calculated also per day
   `Dec. 26, 2018` - Refactor interface (Vimwiki like {1})
