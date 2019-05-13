@@ -1,5 +1,13 @@
 let s:assign = function('kronos#utils#assign')
 
+" --------------------------------------------------------------------- # Open #
+
+function! kronos#database#open()
+  let database = kronos#database#read()
+  let g:kronos_context = database.context
+  let g:kronos_hide_done = database.hide_done
+endfunction
+
 " --------------------------------------------------------------------- # Read #
 
 function! kronos#database#read()
@@ -45,4 +53,13 @@ function! s:write_to_file(data)
   let config = [string(a:data.context), a:data.hide_done]
 
   return writefile(config + tasks, g:kronos_database, 's')
+endfunction
+
+" -------------------------------------------------------------------- # Close #
+
+function! kronos#database#close()
+  call kronos#database#write({
+    \'context': g:kronos_context,
+    \'hide_done': g:kronos_hide_done
+  \})
 endfunction
