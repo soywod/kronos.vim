@@ -63,21 +63,21 @@ Then (should parse due strict):
     AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
   endfor
 
-# ----------------------------------------------------------- # Worktime light #
+# ----------------------------------------------------------------- # Duration #
 
-Execute (Worktime light):
-  let Worktime = function('kronos#utils#date#worktime_light')
+Execute (Duration):
+  let Duration = function('kronos#utils#date#duration')
   let d = kronos#utils#date#config().msec_in
 
   let scenarios = [
-    \['1h 1min 1s', Worktime(d.hour   + d.min    + d.sec)  ],
-    \['1y 1mo 2d' , Worktime(d.year   + d.month  + d.day*2)],
-    \['1d 5h 2s'  , Worktime(d.day    + d.hour*5 + d.sec*2)],
+    \['1h 1min 1s', Duration(d.hour + d.min    + d.sec)  ],
+    \['1y 1mo 2d' , Duration(d.year + d.month  + d.day*2)],
+    \['1d 5h 2s'  , Duration(d.day  + d.hour*5 + d.sec*2)],
   \]
 
-Then (should print worktime light):
-  for [printed, worktime] in scenarios
-    AssertEqual printed, worktime
+Then (should print duration):
+  for [printed, duration] in scenarios
+    AssertEqual printed, duration
   endfor
 
 # --------------------------------------------------------------- # Print diff #
@@ -107,7 +107,7 @@ Execute (Print diff):
 
 Then (should print diff):
   for [date_src, date_dest, diff] in scenarios
-    AssertEqual diff, kronos#utils#date#diff(date_src, date_dest)
+    AssertEqual diff, kronos#utils#date#relative(date_src, date_dest)
   endfor
 
 # ----------------------------------------------------------------- # Worktime #

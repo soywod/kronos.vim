@@ -5,7 +5,7 @@ let s:trim = function('kronos#utils#trim')
 let s:approx_due = function('kronos#utils#date#approx_due')
 let s:parse_due = function('kronos#utils#date#parse_due')
 let s:worktime = function('kronos#utils#date#worktime')
-let s:worktime_light = function('kronos#utils#date#worktime_light')
+let s:duration = function('kronos#utils#date#duration')
 let s:log_error = function('kronos#utils#log#error')
 
 let s:max_widths = []
@@ -134,14 +134,14 @@ function! kronos#ui#worktime()
 
   let days  = s:compose('sort', 'keys')(worktimes)
   let total = s:compose(
-    \s:worktime_light,
+    \s:duration,
     \s:sum,
     \'values'
   \)(worktimes)
 
   let worktimes_lines = map(
     \copy(days),
-    \'{"date": v:val, "worktime": s:worktime_light(worktimes[v:val])}',
+    \'{"date": v:val, "worktime": s:duration(worktimes[v:val])}',
   \)
 
   let empty_line = {'date': '---', 'worktime': '---'}

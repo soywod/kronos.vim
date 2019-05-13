@@ -72,19 +72,36 @@ def approx_due(date_ref, due_str):
 
     return int(date_due.timestamp())
 
-def worktime_light(total_seconds):
-    worktime = []
+def duration(total_secs):
+    duration = []
 
     for unit in ['year', 'month', 'day', 'hour', 'min', 'sec']:
-        curr_seconds = config['msec_in'][unit]
-        ratio = int(total_seconds / curr_seconds)
+        curr_secs = config['msec_in'][unit]
+        ratio = int(total_secs / curr_secs)
 
         if ratio == 0:
             continue
 
         unit_format = config['label']['unit'][unit]
-        worktime += [unit_format % ratio]
-        total_seconds -= ratio * curr_seconds
+        duration += [unit_format % ratio]
+        total_secs -= ratio * curr_secs
 
-    return ' '.join(worktime)
+    return ' '.join(duration)
 
+def relative(date_src, date_dest):
+    total_secs = abs(date_src - date_dest)
+    relative_fmt  = config['label']['in' if date_src < date_dest else 'ago']
+
+    for unit in ['year', 'month', 'day', 'hour', 'min', 'sec']:
+        curr_secs = config['msec_in'][unit]
+        ratio = int(total_secs / curr_secs)
+
+        if ratio == 0:
+            continue
+
+        unit_format = config['label']['unit'][unit]
+        duration_str = unit_format % (ratio + 1)
+
+        return relative_fmt % duration_str
+
+    return ''

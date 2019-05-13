@@ -37,55 +37,35 @@ function! kronos#utils#date#config()
   return s:config
 endfunction
 
-" --------------------------------------------------------------------- # Diff #
+" ----------------------------------------------------------------- # Duration #
 
-function! kronos#utils#date#diff(datesrc, datedest)
-  let datediff  = abs(a:datesrc - a:datedest)
-  let difffmt   = s:config.label[a:datesrc < a:datedest ? 'in' : 'ago']
-  let intervals = [
-    \['sec'  , 'min'  ],
-    \['min'  , 'hour' ],
-    \['hour' , 'day'  ],
-    \['day'  , 'month' ],
-    \['month', 'year' ],
-    \['year' , 'year' ],
-  \]
+function! kronos#utils#date#duration(seconds)
+  let cmd = printf('duration(%d)', a:seconds)
+  return py3eval(cmd)
+endfunction
 
-  for [min, max] in intervals
-    let secmin = s:config.msec_in[min]
-    let secmax = s:config.msec_in[max]
+" ----------------------------------------------------------------- # Relative #
 
-    if datediff < secmax || min == 'year'
-      let value   = datediff / secmin
-      let unitfmt = s:config.label.unit[min]
-      let unitstr = printf(unitfmt, value + 1)
-      let diffstr = printf(difffmt, unitstr)
-
-      return diffstr
-    endif
-  endfor
+function! kronos#utils#date#relative(date_src, date_dest)
+  let cmd = printf('relative(%d, %d)', a:date_src, a:date_dest)
+  return py3eval(cmd)
 endfunction
 
 " ---------------------------------------------------------------- # Parse due #
 
 function! kronos#utils#date#parse_due(date_ref, due_str)
   let date_ref = strftime('%Y-%m-%d %H:%M', a:date_ref)
-  let command = printf("parse_due('%s', '%s')", date_ref, a:due_str)
-  return py3eval(command)
+  let cmd = printf("parse_due('%s', '%s')", date_ref, a:due_str)
+  return py3eval(cmd)
 endfunction
 
 function! kronos#utils#date#approx_due(date_ref, due_str)
   let date_ref = strftime('%Y-%m-%d %H:%M', a:date_ref)
-  let command = printf("approx_due('%s', '%s')", date_ref, a:due_str)
-  return py3eval(command)
+  let cmd = printf("approx_due('%s', '%s')", date_ref, a:due_str)
+  return py3eval(cmd)
 endfunction
 
 " ----------------------------------------------------------------- # Worktime #
-
-function! kronos#utils#date#worktime_light(seconds)
-  let command = printf('worktime_light(%d)', a:seconds)
-  return py3eval(command)
-endfunction
 
 function! kronos#utils#date#worktime(tasks, tags, min, max, date_ref)
   let worktimes = {}
