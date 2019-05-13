@@ -1,8 +1,9 @@
-from re import findall
+from re import findall, match
 from datetime import datetime
 from datetime import timedelta
 
-due_regex = r'^[:<>](\d{0,2})(\d{0,2})(\d{2})?:?(\d{0,2})(\d{0,2})$'
+fix_due_regex = r'^[:<>](\d{0,2})(\d{0,2})(\d{2})?:?(\d{0,2})(\d{0,2})$'
+rel_due_regex = r'^:(?:(\d+)y)?(?:(\d+)mo)?(?:(\d+)w)?(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?$'
 
 secs_in_sec   = 1
 secs_in_min   = 60
@@ -34,8 +35,8 @@ config = dict({
   },
 })
 
-def _parse_due(date_ref, due_str):
-    matches = findall(due_regex, due_str)[0]
+def _parse_fix_due(date_ref, due_str):
+    matches = findall(fix_due_regex, due_str)[0]
     day = int(matches[0]) if matches[0] else date_ref.day
     month = int(matches[1]) if matches[1] else date_ref.month
     year = datetime.strptime(matches[2], '%y').year if matches[2] else date_ref.year
@@ -46,31 +47,53 @@ def _parse_due(date_ref, due_str):
 
 def parse_due(date_ref, due_str):
     date_ref = datetime.fromisoformat(date_ref)
-    date_due = _parse_due(date_ref, due_str)
+    date_due = _parse_fix_due(date_ref, due_str)
 
     return int(date_due.timestamp())
 
 def approx_due(date_ref, due_str):
     date_ref = datetime.fromisoformat(date_ref)
-    date_due = _parse_due(date_ref, due_str)
+    
+    if match(fix_due_regex, due_str):
+        date_due = _parse_fix_due(date_ref, due_str)
 
-    if date_due >= date_ref:
+        if date_due >= date_ref:
+            return int(date_due.timestamp())
+        elif date_due.year < date_ref.year:
+            raise Exception('invalid date')
+        elif date_due.month < date_ref.month:
+            date_due = date_due.replace(year=date_due.year + 1)
+        elif date_due.day < date_ref.day:
+            if date_due.month == 12:
+                date_due = date_due.replace(month=1, year=date_due.year + 1)
+            else:
+                date_due = date_due.replace(month=date_due.month + 1)
+        elif date_due.hour < date_ref.hour:
+            date_due += timedelta(days=1)
+        elif date_due.minute < date_ref.minute:
+            date_due += timedelta(days=1)
+
         return int(date_due.timestamp())
-    elif date_due.year < date_ref.year:
-        raise Exception('invalid date')
-    elif date_due.month < date_ref.month:
-        date_due = date_due.replace(year=date_due.year + 1)
-    elif date_due.day < date_ref.day:
-        if date_due.month == 12:
-            date_due = date_due.replace(month=1, year=date_due.year + 1)
-        else:
-            date_due = date_due.replace(month=date_due.month + 1)
-    elif date_due.hour < date_ref.hour:
-        date_due += timedelta(days=1)
-    elif date_due.minute < date_ref.minute:
-        date_due += timedelta(days=1)
 
-    return int(date_due.timestamp())
+    elif match(rel_due_regex, due_str):
+        date_due = date_ref
+        matches = findall(rel_due_regex, due_str)[0]
+        years = int(matches[0]) if matches[0] else 0
+        months = int(matches[1]) if matches[1] else 0
+        weeks = int(matches[2]) if matches[2] else 0
+        days = int(matches[3]) if matches[3] else 0
+        hours = int(matches[4]) if matches[4] else 0
+        minutes = int(matches[5]) if matches[5] else 0
+        
+        date_due += timedelta(days=7 * weeks + days, hours=hours, minutes=minutes)
+
+        next_months = (date_due.month + months) % 12
+        next_years = date_due.year + years + int((date_due.month + months) / 12)
+        date_due = date_due.replace(month=next_months, year=next_years)
+
+        return int(date_due.timestamp())
+    else:
+        raise Exception('invalid due')
 
 def duration(total_secs):
     duration = []
