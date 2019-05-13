@@ -4,6 +4,36 @@ from datetime import timedelta
 
 due_regex = r'^[:<>](\d{0,2})(\d{0,2})(\d{2})?:?(\d{0,2})(\d{0,2})$'
 
+secs_in_sec   = 1
+secs_in_min   = 60
+mins_in_hour  = 60
+hours_in_day  = 24
+days_in_month = 32
+days_in_year  = 366
+
+config = dict({
+  'msec_in': {
+    'sec'  : secs_in_sec,
+    'min'  : secs_in_min,
+    'hour' : secs_in_min * mins_in_hour,
+    'day'  : secs_in_min * mins_in_hour * hours_in_day,
+    'month': secs_in_min * mins_in_hour * hours_in_day * days_in_month,
+    'year' : secs_in_min * mins_in_hour * hours_in_day * days_in_year,
+  },
+  'label': {
+    'ago': '%s ago',
+    'in': 'in %s',
+    'unit': {
+      'sec'  : '%ds',
+      'min'  : '%dmin',
+      'hour' : '%dh',
+      'day'  : '%dd',
+      'month': '%dmo',
+      'year' : '%dy',
+    },
+  },
+})
+
 def _parse_due(date_ref, due_str):
     matches = findall(due_regex, due_str)[0]
     day = int(matches[0]) if matches[0] else date_ref.day
@@ -41,3 +71,20 @@ def approx_due(date_ref, due_str):
         date_due += timedelta(days=1)
 
     return int(date_due.timestamp())
+
+def worktime_light(total_seconds):
+    worktime = []
+
+    for unit in ['year', 'month', 'day', 'hour', 'min', 'sec']:
+        curr_seconds = config['msec_in'][unit]
+        ratio = int(total_seconds / curr_seconds)
+
+        if ratio == 0:
+            continue
+
+        unit_format = config['label']['unit'][unit]
+        worktime += [unit_format % ratio]
+        total_seconds -= ratio * curr_seconds
+
+    return ' '.join(worktime)
+

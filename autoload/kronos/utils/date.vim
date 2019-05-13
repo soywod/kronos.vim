@@ -66,27 +66,6 @@ function! kronos#utils#date#diff(datesrc, datedest)
   endfor
 endfunction
 
-" ----------------------------------------------------------------- # Interval #
-
-function! kronos#utils#date#interval(interval)
-  let interval = a:interval
-  let diffarr  = []
-
-  for unit in ['year', 'month', 'day', 'hour', 'min', 'sec']
-    let nbsec = s:config.msec_in[unit]
-    let ratio = interval / nbsec
-
-    if ratio != 0
-      let unitfmt   = s:config.label.unit[unit]
-      let unitstr   = printf(unitfmt, ratio)
-      let diffarr  += [unitstr]
-      let interval -= (ratio * nbsec)
-    endif
-  endfor
-
-  return join(diffarr, ' ')
-endfunction
-
 " ---------------------------------------------------------------- # Parse due #
 
 function! kronos#utils#date#parse_due(date_ref, due_str)
@@ -102,6 +81,11 @@ function! kronos#utils#date#approx_due(date_ref, due_str)
 endfunction
 
 " ----------------------------------------------------------------- # Worktime #
+
+function! kronos#utils#date#worktime_light(seconds)
+  let command = printf('worktime_light(%d)', a:seconds)
+  return py3eval(command)
+endfunction
 
 function! kronos#utils#date#worktime(tasks, tags, min, max, date_ref)
   let worktimes = {}

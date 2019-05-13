@@ -63,21 +63,21 @@ Then (should parse due strict):
     AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
   endfor
 
-# ----------------------------------------------------------- # Print interval #
+# ----------------------------------------------------------- # Worktime light #
 
-Execute (Print interval):
-  let Interval = function('kronos#utils#date#interval')
+Execute (Worktime light):
+  let Worktime = function('kronos#utils#date#worktime_light')
   let d = kronos#utils#date#config().msec_in
 
   let scenarios = [
-    \['1h 1min 1s', Interval(d.hour   + d.min    + d.sec)  ],
-    \['1y 1mo 2d' , Interval(d.year   + d.month  + d.day*2)],
-    \['1d 5h 2s'  , Interval(d.day    + d.hour*5 + d.sec*2)],
+    \['1h 1min 1s', Worktime(d.hour   + d.min    + d.sec)  ],
+    \['1y 1mo 2d' , Worktime(d.year   + d.month  + d.day*2)],
+    \['1d 5h 2s'  , Worktime(d.day    + d.hour*5 + d.sec*2)],
   \]
 
-Then (should print interval):
-  for [printed, interval] in scenarios
-    AssertEqual printed, interval
+Then (should print worktime light):
+  for [printed, worktime] in scenarios
+    AssertEqual printed, worktime
   endfor
 
 # --------------------------------------------------------------- # Print diff #

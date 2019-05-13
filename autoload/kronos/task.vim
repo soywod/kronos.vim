@@ -2,7 +2,7 @@ let s:assign = function('kronos#utils#assign')
 let s:sum = function('kronos#utils#sum')
 let s:strftime = function('strftime', ['%c'])
 let s:date_diff = function('kronos#utils#date#diff')
-let s:date_interval = function('kronos#utils#date#interval')
+let s:worktime_light = function('kronos#utils#date#worktime_light')
 
 " --------------------------------------------------------------------- # CRUD #
 
@@ -145,7 +145,7 @@ function! kronos#task#to_info_string(task)
   let task.active = task.active ? 'true' : 'false'
   let task.done = task.done ? s:strftime(task.done) : ''
   let task.due  = task.due  ? s:strftime(task.due)  : ''
-  let task.worktime = s:date_interval(s:sum(stops) - s:sum(starts))
+  let task.worktime = s:worktime_light(s:sum(stops) - s:sum(starts))
 
   return task
 endfunction
