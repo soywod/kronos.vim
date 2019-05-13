@@ -3,32 +3,45 @@ setlocal cursorline
 setlocal nowrap
 setlocal startofline
 
+let mappings = [
+  \['n', '<space>', 'list'          ],
+  \['n', '<cr>',    'toggle'        ],
+  \['n', 'K',       'info'          ],
+  \['n', 'gc',      'context'       ],
+  \['n', 'gh',      'hide-done'     ],
+  \['n', 'gw',      'worktime'      ],
+  \['n', '<c-n>',   'next-cell'     ],
+  \['n', '<c-p>',   'prev-cell'     ],
+  \['n', 'dic',     'delete-in-cell'],
+  \['n', 'cic',     'change-in-cell'],
+  \['n', 'vic',     'visual-in-cell'],
+\]
+
+nnoremap <silent> <plug>(kronos-list)      :call kronos#ui#list()     <cr>
+nnoremap <silent> <plug>(kronos-toggle)    :call kronos#ui#toggle()   <cr>
+nnoremap <silent> <plug>(kronos-info)      :call kronos#ui#info()     <cr>
+nnoremap <silent> <plug>(kronos-context)   :call kronos#ui#context()  <cr>
+nnoremap <silent> <plug>(kronos-hide-done) :call kronos#ui#hide_done()<cr>
+nnoremap <silent> <plug>(kronos-worktime)  :call kronos#ui#worktime() <cr>
+
+nnoremap <silent> <plug>(kronos-next-cell) :call kronos#ui#select_next_cell()<cr>
+nnoremap <silent> <plug>(kronos-prev-cell) :call kronos#ui#select_prev_cell()<cr>
+vnoremap <silent> <plug>(kronos-next-cell) :call kronos#ui#select_next_cell()<cr>
+vnoremap <silent> <plug>(kronos-prev-cell) :call kronos#ui#select_prev_cell()<cr>
+
+nnoremap <silent> <plug>(kronos-delete-in-cell)  :call kronos#ui#delete_in_cell()<cr>
+nnoremap <silent> <plug>(kronos-change-in-cell)  :call kronos#ui#change_in_cell()<cr>
+nnoremap <silent> <plug>(kronos-visual-in-cell)  :call kronos#ui#visual_in_cell()<cr>
+
+for [mode, key, plug] in mappings
+  let plug = printf('<plug>(kronos-%s)', plug)
+
+  if !hasmapto(plug, mode)
+    execute printf('%smap <nowait> <buffer> %s %s', mode, key, plug)
+  endif
+endfor
+
 augroup klist
   autocmd! * <buffer>
   autocmd  BufWriteCmd <buffer> call kronos#ui#parse_buffer()
 augroup end
-
-" ------------------------------------------------------------ # Main commands #
-
-nnoremap <buffer> <nowait> <silent> <space> :call kronos#ui#list()     <cr>
-nnoremap <buffer> <nowait> <silent> <cr>    :call kronos#ui#toggle()   <cr>
-nnoremap <buffer> <nowait> <silent> K       :call kronos#ui#info()     <cr>
-nnoremap <buffer> <nowait>          gc      :call kronos#ui#context()  <cr>
-nnoremap <buffer> <nowait> <silent> gh      :call kronos#ui#hide_done()<cr>
-nnoremap <buffer> <nowait> <silent> gw      :call kronos#ui#worktime() <cr>
-
-" ---------------------------------------------------------- # Cell management #
-
-nnoremap <buffer> <silent> <tab> :call kronos#ui#select_next_cell()<cr>
-nnoremap <buffer> <silent> <c-n> :call kronos#ui#select_next_cell()<cr>
-vnoremap <buffer> <silent> <tab> :call kronos#ui#select_next_cell()<cr>
-vnoremap <buffer> <silent> <c-n> :call kronos#ui#select_next_cell()<cr>
-
-nnoremap <buffer> <silent> <s-tab> :call kronos#ui#select_prev_cell()<cr>
-nnoremap <buffer> <silent> <c-p>   :call kronos#ui#select_prev_cell()<cr>
-vnoremap <buffer> <silent> <s-tab> :call kronos#ui#select_prev_cell()<cr>
-vnoremap <buffer> <silent> <c-p>   :call kronos#ui#select_prev_cell()<cr>
-
-nnoremap <buffer> <silent> dic :call kronos#ui#delete_in_cell()<cr>
-nnoremap <buffer> <silent> cic :call kronos#ui#change_in_cell()<cr>
-nnoremap <buffer> <silent> vic :call kronos#ui#visual_in_cell()<cr>
