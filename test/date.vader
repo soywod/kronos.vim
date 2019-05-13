@@ -1,12 +1,10 @@
 Include: setup.vader
 
-# ---------------------------------------------------------------- # Parse due #
-
-Execute (Parse due):
+Execute (Approx due):
   let scenarios = [
     \[':15'         , 1526428800, '16/05/18 00:00'],
     \[':10'         , 1528588800, '10/06/18 00:00'],
-    \[':20'         , 1526774400, '20/06/18 00:00'],
+    \[':20'         , 1526774400, '20/05/18 00:00'],
     \[':153'        , 1552608000, '15/03/19 00:00'],
     \[':102'        , 1549756800, '10/02/19 00:00'],
     \[':201'        , 1547942400, '20/01/19 00:00'],
@@ -34,12 +32,12 @@ Execute (Parse due):
     \[':100118:1001', 'throw'   , '10/01/18 10:01'],
   \]
 
-Then (should parse due):
+Then (should approx due):
   for [due, date; _] in scenarios
     if date == 'throw'
-      AssertThrow kronos#utils#date#parse_due(g_date_ref, due)
+      AssertThrow kronos#utils#date#approx_due(g_date_ref, due)
     else
-      AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
+      AssertEqual date, kronos#utils#date#approx_due(g_date_ref, due)
     endif
   endfor
 
@@ -62,7 +60,7 @@ Execute (Parse due strict):
 
 Then (should parse due strict):
   for [due, date; _] in scenarios
-    AssertEqual date, kronos#utils#date#parse_due_strict(g_date_ref, due)
+    AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
   endfor
 
 # ----------------------------------------------------------- # Print interval #

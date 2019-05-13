@@ -1,15 +1,13 @@
 " ------------------------------------------------------------------- # Config #
 
+exec 'py3file ' . resolve(expand('<sfile>:h') . '/date.py')
+
 let s:secs_in_sec   = 1
 let s:secs_in_min   = 60
 let s:mins_in_hour  = 60
 let s:hours_in_day  = 24
 let s:days_in_month = 32
 let s:days_in_year  = 366
-
-let s:timezone_regex = '^\([-+]\)\(\d\{2}\)\(\d\{2}\)$'
-let s:parse_due_regex =
-  \'^[:<>]\(\d\{0,2}\)\(\d\{0,2}\)\(\d\{2}\)\?:\?\(\d\{0,2}\)\(\d\{0,2}\)$'
 
 let s:config = {
   \'date_format': '%c',
@@ -90,131 +88,17 @@ function! kronos#utils#date#interval(interval)
 endfunction
 
 " ---------------------------------------------------------------- # Parse due #
-" TODO set in common parse_due and parse_due_strict
-
-function! kronos#utils#date#parse_due_strict(date_ref, due_str)
-  let matches = matchlist(a:due_str, s:parse_due_regex)
-  let due  = s:parse_due_strict(a:date_ref, 0, matches[1:5])
-  let due -= strftime('%S', due)
-
-  return due
-endfunction
-
-function! s:parse_due_strict(dateref, dateapprox, payload)
-  let [day, month, year, hour, min] = a:payload
-  let [dayref, monthref, yearref, hourref, minref] = split(
-    \strftime('%d/%m/%y/%H/%M', a:dateref),
-    \'/',
-  \)
-
-  let daymatch   = day   == '' ? dayref   : +day
-  let monthmatch = month == '' ? monthref : +month
-  let yearmatch  = year  == '' ? yearref  : +year
-  let hourmatch  = hour  == '' ? 0        : +hour
-  let minmatch   = min   == '' ? 0        : +min
-
-  let daydiff   = (daymatch - dayref)     * s:config.msec_in.day
-  let monthdiff = (monthmatch - monthref) * s:config.msec_in.month
-  let yeardiff  = (yearmatch - yearref)   * s:config.msec_in.year
-  let hourdiff  = (hourmatch - hourref)   * s:config.msec_in.hour
-  let mindiff   = (minmatch - minref)     * s:config.msec_in.min
-
-  let diff = daydiff + monthdiff + yeardiff + mindiff + hourdiff
-  if  diff == 0 | return a:dateref | endif
-
-  let dateapprox = a:dateref + diff
-
-  if monthdiff
-    let delta       = month - strftime('%m', dateapprox)
-    let dateapprox += delta * s:config.msec_in.month
-  endif
-
-  if monthdiff || daydiff
-    let delta       = day - strftime('%d', dateapprox)
-    let dateapprox += delta * s:config.msec_in.day
-  endif
-
-  let delta       = hour - strftime('%H', dateapprox)
-  let dateapprox += delta * s:config.msec_in.hour
-
-  if dateapprox == a:dateapprox
-    return dateapprox
-  endif
-
-  return s:parse_due_strict(a:dateref, dateapprox, [
-    \strftime('%d', dateapprox),
-    \strftime('%m', dateapprox),
-    \strftime('%y', dateapprox),
-    \strftime('%H', dateapprox),
-    \strftime('%M', dateapprox),
-  \])
-endfunction
 
 function! kronos#utils#date#parse_due(date_ref, due_str)
-  let matches = matchlist(a:due_str, s:parse_due_regex)
-  let due  = s:parse_due(a:date_ref, 0, matches[1:5])
-  let due -= strftime('%S', due)
-
-  return due
+  let date_ref = strftime('%Y-%m-%d %H:%M', a:date_ref)
+  let command = printf("parse_due('%s', '%s')", date_ref, a:due_str)
+  return py3eval(command)
 endfunction
 
-function! s:parse_due(dateref, dateapprox, payload)
-  let [day, month, year, hour, min] = a:payload
-  let [dayref, monthref, yearref, hourref, minref] = split(
-    \strftime('%d/%m/%y/%H/%M', a:dateref),
-    \'/',
-  \)
-
-  let daymatch   = day   == '' ? dayref   : +day
-  let monthmatch = month == '' ? monthref : +month
-  let yearmatch  = year  == '' ? yearref  : +year
-  let hourmatch  = hour  == '' ? 0        : +hour
-  let minmatch   = min   == '' ? 0        : +min
-
-  let daydiff   = (daymatch - dayref)     * s:config.msec_in.day
-  let monthdiff = (monthmatch - monthref) * s:config.msec_in.month
-  let yeardiff  = (yearmatch - yearref)   * s:config.msec_in.year
-  let hourdiff  = (hourmatch - hourref)   * s:config.msec_in.hour
-  let mindiff   = (minmatch - minref)     * s:config.msec_in.min
-
-  let diff = daydiff + monthdiff + yeardiff + mindiff + hourdiff
-  if  diff == 0 | return a:dateref | endif
-
-  if diff < 0
-    if     yeardiff  < 0 | throw 'invalid-date'
-    elseif monthdiff < 0 | let diff += s:config.msec_in.year
-    elseif daydiff   < 0 | let diff += s:config.msec_in.month
-    elseif hourdiff  < 0 | let diff += s:config.msec_in.day
-    elseif mindiff   < 0 | let diff += s:config.msec_in.day
-    endif
-  endif
-
-  let dateapprox = a:dateref + diff
-
-  if monthdiff
-    let delta       = month - strftime('%m', dateapprox)
-    let dateapprox += delta * s:config.msec_in.month
-  endif
-
-  if monthdiff || daydiff
-    let delta       = day - strftime('%d', dateapprox)
-    let dateapprox += delta * s:config.msec_in.day
-  endif
-
-  let delta       = hour - strftime('%H', dateapprox)
-  let dateapprox += delta * s:config.msec_in.hour
-
-  if dateapprox == a:dateapprox
-    return dateapprox
-  endif
-
-  return s:parse_due(a:dateref, dateapprox, [
-    \strftime('%d', dateapprox),
-    \strftime('%m', dateapprox),
-    \strftime('%y', dateapprox),
-    \strftime('%H', dateapprox),
-    \strftime('%M', dateapprox),
-  \])
+function! kronos#utils#date#approx_due(date_ref, due_str)
+  let date_ref = strftime('%Y-%m-%d %H:%M', a:date_ref)
+  let command = printf("approx_due('%s', '%s')", date_ref, a:due_str)
+  return py3eval(command)
 endfunction
 
 " ----------------------------------------------------------------- # Worktime #

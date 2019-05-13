@@ -3,8 +3,8 @@ let s:compose = function('kronos#utils#compose')
 let s:sum = function('kronos#utils#sum')
 let s:trim = function('kronos#utils#trim')
 let s:date_interval = function('kronos#utils#date#interval')
+let s:approx_due = function('kronos#utils#date#approx_due')
 let s:parse_due = function('kronos#utils#date#parse_due')
-let s:parse_due_strict = function('kronos#utils#date#parse_due_strict')
 let s:worktime = function('kronos#utils#date#worktime')
 let s:log_error = function('kronos#utils#log#error')
 
@@ -173,9 +173,9 @@ function s:parse_worktime_args(date_ref, args)
 
   for arg in args
     if arg =~ '^>\w*'
-      let min = s:parse_due_strict(a:date_ref, arg)
+      let min = s:approx_due_strict(a:date_ref, arg)
     elseif arg =~ '^<\w*'
-      let max = s:parse_due_strict(a:date_ref, arg)
+      let max = s:approx_due_strict(a:date_ref, arg)
     else
       call add(tags, arg)
     endif
@@ -295,7 +295,7 @@ function s:parse_buffer_line(index, line)
       if cells[-1] != '' | let due = task.due
       else | let due = 0 | endif
     else
-      let due = s:parse_due(localtime(), due)
+      let due = s:approx_due(localtime(), due)
     endif
 
     return s:assign(task, {
@@ -321,7 +321,7 @@ function! s:parse_args(date_ref, args)
     elseif arg =~ '^-\w'
       call add(tags_old, arg[1:])
     elseif arg =~ '^:\w*'
-      let due = s:parse_due(a:date_ref, arg)
+      let due = s:approx_due(a:date_ref, arg)
     else
       call add(desc, arg)
     endif
