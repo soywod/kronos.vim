@@ -2,10 +2,10 @@ let s:assign = function('kronos#utils#assign')
 let s:compose = function('kronos#utils#compose')
 let s:sum = function('kronos#utils#sum')
 let s:trim = function('kronos#utils#trim')
-let s:date_interval = function('kronos#utils#date#interval')
+let s:approx_due = function('kronos#utils#date#approx_due')
 let s:parse_due = function('kronos#utils#date#parse_due')
-let s:parse_due_strict = function('kronos#utils#date#parse_due_strict')
 let s:worktime = function('kronos#utils#date#worktime')
+let s:duration = function('kronos#utils#date#duration')
 let s:log_error = function('kronos#utils#log#error')
 
 let s:max_widths = []
@@ -130,18 +130,18 @@ function! kronos#ui#worktime()
   let args = input('Worktime for: ')
   let [tags, min, max] = s:parse_worktime_args(localtime(), args)
   let tasks = kronos#task#read_all()
-  let worktimes = s:worktime(tasks, tags, min, max, localtime())
+  let worktimes = s:worktime(localtime(), tasks, tags, min, max)
 
   let days  = s:compose('sort', 'keys')(worktimes)
   let total = s:compose(
-    \s:date_interval,
+    \s:duration,
     \s:sum,
     \'values'
   \)(worktimes)
 
   let worktimes_lines = map(
     \copy(days),
-    \'{"date": v:val, "worktime": s:date_interval(worktimes[v:val])}',
+    \'{"date": v:val, "worktime": s:duration(worktimes[v:val])}',
   \)
 
   let empty_line = {'date': '---', 'worktime': '---'}
@@ -173,9 +173,9 @@ function s:parse_worktime_args(date_ref, args)
 
   for arg in args
     if arg =~ '^>\w*'
-      let min = s:parse_due_strict(a:date_ref, arg)
+      let min = s:approx_due_strict(a:date_ref, arg)
     elseif arg =~ '^<\w*'
-      let max = s:parse_due_strict(a:date_ref, arg)
+      let max = s:approx_due_strict(a:date_ref, arg)
     else
       call add(tags, arg)
     endif
@@ -295,7 +295,7 @@ function s:parse_buffer_line(index, line)
       if cells[-1] != '' | let due = task.due
       else | let due = 0 | endif
     else
-      let due = s:parse_due(localtime(), due)
+      let due = s:approx_due(localtime(), due)
     endif
 
     return s:assign(task, {
@@ -321,7 +321,7 @@ function! s:parse_args(date_ref, args)
     elseif arg =~ '^-\w'
       call add(tags_old, arg[1:])
     elseif arg =~ '^:\w*'
-      let due = s:parse_due(a:date_ref, arg)
+      let due = s:approx_due(a:date_ref, arg)
     else
       call add(desc, arg)
     endif

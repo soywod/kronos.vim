@@ -1,12 +1,10 @@
 Include: setup.vader
 
-# ---------------------------------------------------------------- # Parse due #
-
-Execute (Parse due):
+Execute (Approx due):
   let scenarios = [
     \[':15'         , 1526428800, '16/05/18 00:00'],
     \[':10'         , 1528588800, '10/06/18 00:00'],
-    \[':20'         , 1526774400, '20/06/18 00:00'],
+    \[':20'         , 1526774400, '20/05/18 00:00'],
     \[':153'        , 1552608000, '15/03/19 00:00'],
     \[':102'        , 1549756800, '10/02/19 00:00'],
     \[':201'        , 1547942400, '20/01/19 00:00'],
@@ -32,14 +30,20 @@ Execute (Parse due):
     \[':1406:1420'  , 1528986000, '14/06/18 14:20'],
     \[':1001:1001'  , 1547114460, '10/01/19 10:01'],
     \[':100118:1001', 'throw'   , '10/01/18 10:01'],
+    \[':1m'         , 1526397360, '15/05/18 15:16'],
+    \[':1h1m'       , 1526400960, '15/05/18 16:16'],
+    \[':18d'        , 1527952500, '02/06/18 15:15'],
+    \[':2w1m'       , 1527606960, '31/05/18 15:16'],
+    \[':15mo'       , 1565882100, '15/08/19 15:15'],
+    \[':2y13mo'     , 1623770100, '15/06/21 15:15'],
   \]
 
-Then (should parse due):
+Then (should approx due):
   for [due, date; _] in scenarios
     if date == 'throw'
-      AssertThrow kronos#utils#date#parse_due(g_date_ref, due)
+      AssertThrow kronos#utils#date#approx_due(g_date_ref, due)
     else
-      AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
+      AssertEqual date, kronos#utils#date#approx_due(g_date_ref, due)
     endif
   endfor
 
@@ -62,24 +66,24 @@ Execute (Parse due strict):
 
 Then (should parse due strict):
   for [due, date; _] in scenarios
-    AssertEqual date, kronos#utils#date#parse_due_strict(g_date_ref, due)
+    AssertEqual date, kronos#utils#date#parse_due(g_date_ref, due)
   endfor
 
-# ----------------------------------------------------------- # Print interval #
+# ----------------------------------------------------------------- # Duration #
 
-Execute (Print interval):
-  let Interval = function('kronos#utils#date#interval')
+Execute (Duration):
+  let Duration = function('kronos#utils#date#duration')
   let d = kronos#utils#date#config().msec_in
 
   let scenarios = [
-    \['1h 1min 1s', Interval(d.hour   + d.min    + d.sec)  ],
-    \['1y 1mo 2d' , Interval(d.year   + d.month  + d.day*2)],
-    \['1d 5h 2s'  , Interval(d.day    + d.hour*5 + d.sec*2)],
+    \['1h 1min 1s', Duration(d.hour + d.min    + d.sec)  ],
+    \['1y 1mo 2d' , Duration(d.year + d.month  + d.day*2)],
+    \['1d 5h 2s'  , Duration(d.day  + d.hour*5 + d.sec*2)],
   \]
 
-Then (should print interval):
-  for [printed, interval] in scenarios
-    AssertEqual printed, interval
+Then (should print duration):
+  for [printed, duration] in scenarios
+    AssertEqual printed, duration
   endfor
 
 # --------------------------------------------------------------- # Print diff #
@@ -109,7 +113,7 @@ Execute (Print diff):
 
 Then (should print diff):
   for [date_src, date_dest, diff] in scenarios
-    AssertEqual diff, kronos#utils#date#diff(date_src, date_dest)
+    AssertEqual diff, kronos#utils#date#relative(date_src, date_dest)
   endfor
 
 # ----------------------------------------------------------------- # Worktime #
@@ -138,7 +142,7 @@ Execute (Worktime):
     \[
       \now, ['tag/a', 'tag/c'], -1, -1,
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
-      \{},
+      \{'16/05/18': s.hour * 5},
     \],
     \[
       \now, [], -1, -1,
@@ -199,7 +203,7 @@ Execute (Worktime):
 
 Then (should calculate worktimes per day):
   for [date_ref, tags, min, max, tasks, worktimes] in scenarios
-    AssertEqual worktimes, kronos#utils#date#worktime(tasks, tags, min, max, date_ref)
+    AssertEqual worktimes, kronos#utils#date#worktime(date_ref, tasks, tags, min, max)
   endfor
 
   unlet s now d16_at_h15 d16_at_h18 d16_at_h20 d16_at_h22 d17_at_h15

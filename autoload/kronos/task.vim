@@ -1,8 +1,8 @@
 let s:assign = function('kronos#utils#assign')
 let s:sum = function('kronos#utils#sum')
 let s:strftime = function('strftime', ['%c'])
-let s:date_diff = function('kronos#utils#date#diff')
-let s:date_interval = function('kronos#utils#date#interval')
+let s:duration = function('kronos#utils#date#duration')
+let s:relative = function('kronos#utils#date#relative')
 
 " --------------------------------------------------------------------- # CRUD #
 
@@ -145,19 +145,19 @@ function! kronos#task#to_info_string(task)
   let task.active = task.active ? 'true' : 'false'
   let task.done = task.done ? s:strftime(task.done) : ''
   let task.due  = task.due  ? s:strftime(task.due)  : ''
-  let task.worktime = s:date_interval(s:sum(stops) - s:sum(starts))
+  let task.worktime = s:duration(s:sum(stops) - s:sum(starts))
 
   return task
 endfunction
 
 function! kronos#task#to_list_string(task)
   let task = copy(a:task)
-  let PrintDiff = function(s:date_diff, [localtime()])
+  let now = localtime()
 
   let task.tags   = join(task.tags, ' ')
-  let task.active = task.active ? PrintDiff(task.start[-1])  : ''
-  let task.done   = task.done   ? PrintDiff(task.done)       : ''
-  let task.due    = task.due    ? PrintDiff(task.due)        : ''
+  let task.active = task.active ? s:relative(now, task.start[-1]) : ''
+  let task.done   = task.done   ? s:relative(now, task.done)      : ''
+  let task.due    = task.due    ? s:relative(now, task.due)       : ''
 
   return task
 endfunction
