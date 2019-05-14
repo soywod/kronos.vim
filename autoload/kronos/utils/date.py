@@ -2,7 +2,7 @@ from re import findall, match
 from datetime import datetime
 from datetime import timedelta
 
-fix_due_regex = r'^[:<>](\d{0,2})(\d{0,2})(\d{2})?:?(\d{0,2})(\d{0,2})$'
+abs_due_regex = r'^[:<>](\d{0,2})(\d{0,2})(\d{2})?:?(\d{0,2})(\d{0,2})$'
 rel_due_regex = r'^:(?:(\d+)y)?(?:(\d+)mo)?(?:(\d+)w)?(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?$'
 
 secs_in_sec   = 1
@@ -36,7 +36,7 @@ config = dict({
 })
 
 def _parse_fix_due(date_ref, due_str):
-    matches = findall(fix_due_regex, due_str)[0]
+    matches = findall(abs_due_regex, due_str)[0]
     day = int(matches[0]) if matches[0] else date_ref.day
     month = int(matches[1]) if matches[1] else date_ref.month
     year = datetime.strptime(matches[2], '%y').year if matches[2] else date_ref.year
@@ -54,7 +54,7 @@ def parse_due(date_ref, due_str):
 def approx_due(date_ref, due_str):
     date_ref = datetime.fromisoformat(date_ref)
     
-    if match(fix_due_regex, due_str):
+    if match(abs_due_regex, due_str):
         date_due = _parse_fix_due(date_ref, due_str)
 
         if date_due >= date_ref:

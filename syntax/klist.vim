@@ -4,7 +4,7 @@ endif
 
 syntax match kronos_separator /|/
 
-syntax match kronos_due /:\%(\d\{1,6}\%(:\d\{1,4}\)\=\|\d\{,6}:\d\{1,4}\)/
+syntax match kronos_due /:\%(\%(\d\+\%(y\|mo\|w\|d\|h\|m\)\)\+\|\d\{1,6}\%(:\d\{1,4}\)\=\|\d\{,6}:\d\{1,4}\)/
 syntax match kronos_tag /+[a-zA-Z0-9\-_]\+/
 
 syntax match kronos_table_id     /^|.\{-}|/                              contains=kronos_separator
