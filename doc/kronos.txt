@@ -9,7 +9,7 @@
 ==============================================================================
 TABLE OF CONTENTS                                            *kronos-contents*
 
-  Introduction ...................................................... |kronos|
+  Requirements ......................................... |kronos-requirements|
   Usage ....................................................... |kronos-usage|
    - Create .................................................  |kronos-create|
    - Read ...................................................... |kronos-read|
@@ -27,6 +27,12 @@ TABLE OF CONTENTS                                            *kronos-contents*
   Credits ................................................... |kronos-credits|
 
 ==============================================================================
+REQUIREMENTS                                             *kronos-requirements* 
+
+  - VIM v8+ or NVIM v0.3.4+ (not tested on lower versions)
+  - Python v3.3+ (`:echo has('python3')`, `:!python3 --version`)
+
+==============================================================================
 USAGE                                                           *kronos-usage* 
 >
   :Kronos
@@ -37,26 +43,41 @@ CREATE                                                         *kronos-create*
 To create a task, you can:
 
  - Write a full table line: `|id|desc|tags|active|due|`
- - Write a Kronos create format: <desc> <tag> <due>
+ - Write a Kronos format: <desc> <tags> <due>
 
-A tag should start by a `+`, and a due by a `:`.
+A tag should start by a `+`. You can add as many tags as you need.
 
-A due should start by a `:`, and should follow this pattern: `:DDMMYY:HHMM`.
-Not all digits are required. Actually, Kronos tries to find the closest date
-matching your due pattern. Here some use cases:
+A due should start by a `:`. There is 3 kinds of due:
+
+  - The absolute due: `:DDMMYY:HHMM`, which correspond to a specific date.
+
+  - The approximative due, which is a non-complete absolute, for eg. `:DD`,
+    `::HH`, `:DDM:M`. Kronos will try to find the closest date matching this
+    due.
+
+  - The relative due, which is relative to the current date. For eg. `:1y`,
+    `:2mo`, `:4h`. Available units: `y, mo, w, d, h, m`.
+
+    Note: unit order should be respected, from the biggest to the smallest.
+    `2y4mo24m` is valid, `3m4d` is not.
+
+Here some use cases:
+
+Current date     | Given pattern  | Output
+03/03/2019 21:42 | `:4`             | 04/03/2019 00:00
+03/03/2019 21:42 | `:2`             | 02/04/2019 00:00
+03/03/2019 21:42 | `:0304` or `:034`  | 03/04/2019 00:00
+03/03/2019 21:42 | `:3004` or `:304`  | 30/04/2019 00:00
+03/03/2019 21:42 | `:0202`          | 02/02/2020 00:00
+03/03/2019 21:42 | `:020221`        | 02/02/2021 00:00
+03/03/2019 21:42 | `::22`           | 03/03/2019 22:00
+03/03/2019 21:42 | `::19`           | 04/03/2019 19:00
+03/03/2019 21:42 | `:4:2150`        | 04/03/2019 21:50
+03/03/2019 21:42 | `:2d`            | 05/03/2019 21:42
+03/03/2019 21:42 | `:1w10m`         | 10/03/2019 21:52
+03/03/2019 21:42 | `:1y13mo1h`      | 03/04/2021 22:42
 
 Note: the date format is `DD/MM/YYYY HH:MM`
-
-Current date     | Given pattern | Output
-03/03/2019 21:42 | `:4`            | 04/03/2019 00:00
-03/03/2019 21:42 | `:2`            | 02/04/2019 00:00
-03/03/2019 21:42 | `:0304` or `:034` | 03/04/2019 00:00
-03/03/2019 21:42 | `:3004` or `304`  | 30/04/2019 00:00
-03/03/2019 21:42 | `:0202`         | 02/02/2020 00:00
-03/03/2019 21:42 | `:020221`       | 02/02/2021 00:00
-03/03/2019 21:42 | `::22`          | 03/03/2019 22:00
-03/03/2019 21:42 | `::19`          | 04/03/2019 19:00
-03/03/2019 21:42 | `:4:2150`       | 04/03/2019 21:50
 
 ------------------------------------------------------------------------------
 READ                                                             *kronos-read*
@@ -68,8 +89,8 @@ UPDATE                                                         *kronos-update*
 
 To update a task, just edit the cell and save.
 
-For the `due` field, you need to use the date Kronos create format (eg: `:18`,
-`:20:1230`...).
+For the `due` field, you need to use the Kronos due format (`:18`, `:20:1230`,
+`2w`...).
 
 ------------------------------------------------------------------------------
 START-STOP                                                 *kronos-start-stop*
@@ -106,7 +127,8 @@ grouped by day. Press {gw} (for `go to worktime`), and type the tags you want
 to calculate the total worktime.
 
 You can also add a beginning date with `>DDMMYY:HHMM` and a ending date with
-`<DDMMYY:HHMM`. Here some valid options:
+`<DDMMYY:HHMM`. (they can be absolute dues or approximative dues, but not
+relative dues). Here some valid options:
 
   - `tag1 tag2 >18 <20`: worktime for tag1, tag2 between the 18th and the 20th
     of the current month
@@ -161,7 +183,6 @@ You can customize them:
   nmap vic    <plug>(kronos-visual-in-cell)
 <
 ==============================================================================
-
 LICENSE                                                       *kronos-license*
 
 MIT License
@@ -210,6 +231,7 @@ before proposing a pull request (via the script `tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
+  `May. 14, 2019` - Add relative due + rewrite datetime part in python3
   `May. 13, 2019` - Add custom mapping
   `May. 12, 2019` - Add script to import tasks from taskwarrior
   `May. 11, 2019` - Remove sync support due to too many complications

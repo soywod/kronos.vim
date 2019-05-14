@@ -7,6 +7,7 @@ A simple task and time manager.
 
 ## Table of contents
 
+  * [Requirements](#requirements)
   * [Usage](#usage)
     * [Create](#create)
     * [Read](#read)
@@ -23,6 +24,11 @@ A simple task and time manager.
   * [Changelog](#changelog)
   * [Credits](#credits)
 
+## Requirements
+
+  - VIM v8+ or NVIM v0.3.4+ (not tested on lower versions)
+  - Python v3.3+ (check it with `:echo has('python3')` and `:!python3 --version`)
+
 ## Usage
 
 ```vim
@@ -37,18 +43,25 @@ will automatically readjust when you save the buffer (`:w`).
 To create a task, you can:
 
 - Write or copy a full table line: `|id|desc|tags|active|due|`
-- Write a Kronos create format: `<desc> <+tag> <:due>`
+- Write a Kronos format: `<desc> <tags> <due>`
 
 ![Create
 task](https://user-images.githubusercontent.com/10437171/50438709-61a63800-08ef-11e9-8f49-aa02b6da7f3b.gif)
 
-A tag should start by a `+`, and a due by a `:`.
+A tag should start by a `+`. You can add as many tags as you need.
 
-A due should start by a `:`, and should follow this pattern: `:DDMMYY:HHMM`.
-Not all digits are required. Actually, Kronos tries to find the closest date
-matching your due pattern. Here some use cases:
+A due should start by a `:`. There is 3 kinds of due:
 
-*Note: the date format is DD/MM/YYYY HH:MM*
+  - The absolute due: `:DDMMYY:HHMM`, which correspond to a specific date.
+  - The approximative due, which is a non-complete absolute, for eg. `:DD`,
+    `::HH`, `:DDM:M`. Kronos will try to find the closest date matching this
+    due.
+  - The relative due, which is relative to the current date. For eg. `:1y`,
+    `:2mo`, `:4h`. Available units: `y, mo, w, d, h, m`.<br />
+    *Note: unit order should be respected, from the biggest to the smallest.
+    `2y4mo24m` is valid, `3m4d` is not.*
+
+Here some use cases:
 
 | Current date | Given pattern | Output |
 | --- | --- | --- |
@@ -61,6 +74,11 @@ matching your due pattern. Here some use cases:
 | 03/03/2019 21:42 | `::22` | 03/03/2019 22:00 |
 | 03/03/2019 21:42 | `::19` | 04/03/2019 19:00 |
 | 03/03/2019 21:42 | `:4:2150` | 04/03/2019 21:50 |
+| 03/03/2019 21:42 | `:2d` | 05/03/2019 21:42 |
+| 03/03/2019 21:42 | `:1w10m` | 10/03/2019 21:52 |
+| 03/03/2019 21:42 | `:1y13mo1h` | 03/04/2021 22:42 |
+
+*Note: the date format is DD/MM/YYYY HH:MM*
 
 ### Read
 
@@ -76,8 +94,8 @@ To update a task, just edit the cell and save:
 ![Update
 task](https://user-images.githubusercontent.com/10437171/50439213-7e436f80-08f1-11e9-8180-965d52ab7d52.gif)
 
-For the `due` field, you need to use the date [Kronos create
-format](https://github.com/soywod/kronos.vim#create) (eg: `:18`, `:20:1230`...).
+For the `due` field, you need to use the Kronos due format (`:18`,
+`:20:1230`, `2w`...).
 
 ### Start/stop
 
@@ -123,7 +141,8 @@ to calculate the total worktime:
 ![Worktime](https://user-images.githubusercontent.com/10437171/50560067-2182f300-0cfd-11e9-95bc-6b3ce1f23535.gif)
 
 You can also add a beginning date with `>DDMMYY:HHMM` and a ending date with
-`<DDMMYY:HHMM`. Here some valid options:
+`<DDMMYY:HHMM`. (they can be absolute dues or approximative dues, but not
+relative dues). Here some valid options:
 
   - `tag1 tag2 >18 <20`: worktime for tag1, tag2 between the 18th and the 20th
     of the current month
@@ -199,6 +218,7 @@ proposing a pull request.
 
 ## Changelog
 
+- **May. 14, 2019** - Add relative due + rewrite datetime part in python3
 - **May. 13, 2019** - Add custom mapping
 - **May. 12, 2019** - Add script to import tasks from taskwarrior (thanks to [KevCui](https://github.com/KevCui))
 - **May. 11, 2019** - Remove sync support due to too many complications
