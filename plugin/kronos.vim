@@ -1,3 +1,5 @@
+if !has('python3') | throw 'python3 is missing' | endif
+
 let s:database = resolve(expand('<sfile>:h:h') . '/.database')
 
 let g:kronos_database   = get(g:, 'kronos_database' , s:database)
