@@ -130,7 +130,7 @@ function! kronos#ui#worktime()
   let args = input('Worktime for: ')
   let [tags, min, max] = s:parse_worktime_args(localtime(), args)
   let tasks = kronos#task#read_all()
-  let worktimes = s:worktime(tasks, tags, min, max, localtime())
+  let worktimes = s:worktime(localtime(), tasks, tags, min, max)
 
   let days  = s:compose('sort', 'keys')(worktimes)
   let total = s:compose(

@@ -46,13 +46,13 @@ def _parse_fix_due(date_ref, due_str):
     return datetime(year, month, day, hour, minute)
 
 def parse_due(date_ref, due_str):
-    date_ref = datetime.fromisoformat(date_ref)
+    date_ref = datetime.fromtimestamp(date_ref)
     date_due = _parse_fix_due(date_ref, due_str)
 
     return int(date_due.timestamp())
 
 def approx_due(date_ref, due_str):
-    date_ref = datetime.fromisoformat(date_ref)
+    date_ref = datetime.fromtimestamp(date_ref)
     
     if match(abs_due_regex, due_str):
         date_due = _parse_fix_due(date_ref, due_str)
@@ -128,3 +128,41 @@ def relative(date_src, date_dest):
         return relative_fmt % duration_str
 
     return ''
+
+def worktime(date_ref, tasks, tags, date_min, date_max):
+    worktimes = {}
+
+    for task in tasks:
+        if tags and not set(task['tags']).intersection(tags):
+            continue
+
+        starts = task['start']
+        stops  = task['stop'] if not task['active'] else task['stop'] + [date_ref]
+
+        for index in range(len(starts)):
+            end_of_day = 0
+            start = starts[index]
+            stop  = stops[index]
+
+            while end_of_day < stop:
+                if date_max > -1:
+                  if start > date_max: return worktimes
+                  if stop > date_max: stop = date_max
+
+                if date_min > -1:
+                    if start < date_min: start = date_min
+                    if stop < date_min: break
+
+                date_start = datetime.fromtimestamp(start)
+                key = date_start.strftime('%d/%m/%y')
+
+                end_hour = (23 - date_start.hour) * config['msec_in']['hour']
+                end_min = (59 - date_start.minute) * config['msec_in']['min']
+                end_of_day = start + end_hour + end_min
+                min_stop = stop if stop < end_of_day else end_of_day
+
+                if key not in worktimes: worktimes[key] = 0
+                worktimes[key] += (min_stop - start)
+                start = end_of_day + config['msec_in']['min']
+
+    return worktimes

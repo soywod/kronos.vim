@@ -142,7 +142,7 @@ Execute (Worktime):
     \[
       \now, ['tag/a', 'tag/c'], -1, -1,
       \[{'active': 0, 'start': [d16_at_h15], 'stop': [d16_at_h20], 'tags': ['tag/a', 'tag/b']}],
-      \{},
+      \{'16/05/18': s.hour * 5},
     \],
     \[
       \now, [], -1, -1,
@@ -203,7 +203,7 @@ Execute (Worktime):
 
 Then (should calculate worktimes per day):
   for [date_ref, tags, min, max, tasks, worktimes] in scenarios
-    AssertEqual worktimes, kronos#utils#date#worktime(tasks, tags, min, max, date_ref)
+    AssertEqual worktimes, kronos#utils#date#worktime(date_ref, tasks, tags, min, max)
   endfor
 
   unlet s now d16_at_h15 d16_at_h18 d16_at_h20 d16_at_h22 d17_at_h15
