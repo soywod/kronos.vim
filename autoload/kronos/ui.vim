@@ -49,7 +49,7 @@ function! kronos#ui#info()
     \'{"key": s:config.labels[v:val], "value": task[v:val]}',
   \)
 
-  silent! bdelete 'Kronos Info'
+  silent! bwipeout 'Kronos Info'
   silent! botright new Kronos Info
 
   call append(0, s:render('info', lines))
@@ -395,7 +395,7 @@ function! s:refresh_buff_name()
   endif
 
   if buff_name != s:buff_name
-    execute 'silent! bdelete ' . s:buff_name
+    execute 'silent! bwipeout ' . s:buff_name
     let s:buff_name = buff_name
   endif
 endfunction
