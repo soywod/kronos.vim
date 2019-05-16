@@ -127,7 +127,7 @@ def relative(date_src, date_dest):
 
         return relative_fmt % duration_str
 
-    return ''
+    return 'just now'
 
 def worktime(date_ref, tasks, tags, date_min, date_max):
     worktimes = {}

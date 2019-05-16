@@ -3,6 +3,7 @@ let s:sum = function('kronos#utils#sum')
 let s:strftime = function('strftime', ['%c'])
 let s:duration = function('kronos#utils#date#duration')
 let s:relative = function('kronos#utils#date#relative')
+let s:match_one = function('kronos#utils#match_one')
 
 " --------------------------------------------------------------------- # CRUD #
 
@@ -51,7 +52,7 @@ function! kronos#task#list()
   let tasks = kronos#database#read().tasks
 
   if (!empty(g:kronos_context))
-    let tasks = filter(copy(tasks), 's:match_one_tag(v:val, g:kronos_context)')
+    let tasks = filter(copy(tasks), 's:match_one(v:val.tags, g:kronos_context)')
   endif
 
   if (g:kronos_hide_done)
@@ -59,14 +60,6 @@ function! kronos#task#list()
   endif
 
   return tasks
-endfunction
-
-function! s:match_one_tag(task, tags)
-  for tag in a:task.tags
-    if index(a:tags, tag) > -1 | return 1 | endif
-  endfor
-
-  return 0
 endfunction
 
 " ------------------------------------------------------------------- # Toggle #

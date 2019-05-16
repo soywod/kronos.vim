@@ -56,3 +56,17 @@ function! kronos#utils#sum(array)
 
   return total
 endfunction
+
+" ----------------------------------------------------------- # Match one item #
+
+function! kronos#utils#match_one(list_src, list_dest)
+  if empty(a:list_dest)
+    return 1
+  endif
+
+  for item in a:list_src
+    if index(a:list_dest, item) > -1 | return 1 | endif
+  endfor
+
+  return 0
+endfunction

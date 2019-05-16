@@ -7,6 +7,7 @@ let s:parse_due = function('kronos#utils#date#parse_due')
 let s:worktime = function('kronos#utils#date#worktime')
 let s:duration = function('kronos#utils#date#duration')
 let s:log_error = function('kronos#utils#log#error')
+let s:match_one = function('kronos#utils#match_one')
 
 let s:max_widths = []
 let s:buff_name = 'Kronos'
@@ -86,7 +87,7 @@ endfunction
 function! kronos#ui#toggle()
   try
     let task = s:get_focused_task()
-    let tasks = kronos#task#list()
+    let tasks = copy(kronos#database#read().tasks)
     let position = kronos#task#get_position(tasks, task.id)
     let tasks[position] = kronos#task#toggle(task)
 
@@ -222,30 +223,32 @@ endfunction
 " -------------------------------------------------------------- # Parse utils #
 
 function kronos#ui#parse_buffer()
-  let prev_tasks = kronos#task#list()
-  let curr_tasks = map(getline(2, '$'), 's:parse_buffer_line(v:key, v:val)')
-  let next_tasks = []
+  let prev_tasks  = kronos#database#read().tasks
+  let next_tasks  = map(getline(2, '$'), 's:parse_buffer_line(v:key, v:val)')
 
+  " Update existing tasks and create new ones
   let prev_tasks_id = map(copy(prev_tasks), 'v:val.id')
-  let next_tasks_id = map(
-    \filter(copy(curr_tasks), 'has_key(v:val, ''id'')'),
-    \'v:val.id',
-  \)
+  for i in range(len(next_tasks))
+    let next_task = next_tasks[i]
 
-  for prev_task in prev_tasks
-    if s:exists_in(next_tasks_id, prev_task.id) | continue | endif
-    if !prev_task.done
-      call add(curr_tasks, kronos#task#done(prev_task))
+    if !has_key(next_task, 'id') || !s:exists_in(prev_tasks_id, next_task.id)
+      let next_tasks[i] = kronos#task#create(prev_tasks, next_task)
+    else
+      let prev_task_index = index(prev_tasks_id, next_task.id)
+      let next_tasks[i] = s:assign(prev_tasks[prev_task_index], next_task)
     endif
   endfor
 
-  for curr_task in curr_tasks
-    if !has_key(curr_task, 'id') || !s:exists_in(prev_tasks_id, curr_task.id)
-      let next_tasks += [kronos#task#create(next_tasks, curr_task)]
-    else
-      let prev_pos = kronos#task#get_position(prev_tasks, curr_task.id)
-      let prev_task = prev_tasks[prev_pos]
-      let next_tasks += [s:assign(prev_task, curr_task)]
+  " Mark as done or delete missing ones
+  let next_tasks_id = map(copy(next_tasks), 'v:val.id')
+  for prev_task in prev_tasks
+    if s:exists_in(next_tasks_id, prev_task.id) | continue | endif
+    if !s:match_one(prev_task.tags, g:kronos_context)
+      call add(next_tasks, prev_task) | continue
+    endif
+
+    if !prev_task.done
+      call add(next_tasks, kronos#task#done(prev_task))
     endif
   endfor
 
