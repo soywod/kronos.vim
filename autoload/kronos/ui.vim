@@ -226,12 +226,16 @@ function kronos#ui#parse_buffer()
   let prev_tasks  = kronos#database#read().tasks
   let next_tasks  = map(getline(2, '$'), 's:parse_buffer_line(v:key, v:val)')
 
-  " Update existing tasks and create new ones
   let prev_tasks_id = map(copy(prev_tasks), 'v:val.id')
+  let next_tasks_id = map(filter(copy(next_tasks), "has_key(v:val, 'id')"), 'v:val.id')
+
+  " Update existing tasks and create new ones
   for i in range(len(next_tasks))
     let next_task = next_tasks[i]
 
-    if !has_key(next_task, 'id') || !s:exists_in(prev_tasks_id, next_task.id)
+    if !has_key(next_task, 'id')
+      let next_tasks[i] = kronos#task#create(next_tasks, next_task)
+    elseif !s:exists_in(prev_tasks_id, next_task.id)
       let next_tasks[i] = kronos#task#create(prev_tasks, next_task)
     else
       let prev_task_index = index(prev_tasks_id, next_task.id)
@@ -240,14 +244,13 @@ function kronos#ui#parse_buffer()
   endfor
 
   " Mark as done or delete missing ones
-  let next_tasks_id = map(copy(next_tasks), 'v:val.id')
   for prev_task in prev_tasks
     if s:exists_in(next_tasks_id, prev_task.id) | continue | endif
     if !s:match_one(prev_task.tags, g:kronos_context)
       call add(next_tasks, prev_task) | continue
     endif
 
-    if !prev_task.done
+    if g:kronos_hide_done || !prev_task.done
       call add(next_tasks, kronos#task#done(prev_task))
     endif
   endfor
