@@ -401,6 +401,7 @@ function! s:refresh_buff_name()
   endif
 
   if buff_name != s:buff_name
+    execute 'silent! enew'
     execute 'silent! bwipeout ' . s:buff_name
     let s:buff_name = buff_name
   endif
