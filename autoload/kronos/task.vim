@@ -7,7 +7,7 @@ let s:match_one = function('kronos#utils#match_one')
 
 " --------------------------------------------------------------------- # CRUD #
 
-function! kronos#task#create(tasks, task)
+function! kronos#task#create(ids, task)
   let task = copy(a:task)
 
   for tag in copy(g:kronos_context)
@@ -16,12 +16,7 @@ function! kronos#task#create(tasks, task)
     endif
   endfor
 
-  if has_key(task, 'id')
-    call s:throw_if_exists(task, a:tasks)
-  else
-    let task.id = kronos#task#generate_id(a:tasks)
-  endif
-
+  let task.id = has_key(task, 'id') ? task.id : kronos#task#generate_id(a:ids)
   let task.index = -(localtime() . task.id)
 
   return task
@@ -98,19 +93,18 @@ endfunction
 
 " -------------------------------------------------------------------- # Utils #
 
-function! s:throw_if_exists(task, tasks)
-  for task in a:tasks
-    if task.id == a:task.id
+function! s:throw_if_exists(task, ids)
+  for id in a:ids
+    if a:task.id == id
       throw 'task already exist'
     endif
   endfor
 endfunction
 
-function! kronos#task#generate_id(tasks)
-  let ids = map(copy(a:tasks), "has_key(v:val, 'id') ? v:val.id : -1")
+function! kronos#task#generate_id(ids)
   let id_new = 1
 
-  while index(ids, id_new) != -1
+  while index(a:ids, id_new) != -1
     let id_new += 1
   endwhile
 

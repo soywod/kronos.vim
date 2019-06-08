@@ -228,15 +228,18 @@ function kronos#ui#parse_buffer()
 
   let prev_tasks_id = map(copy(prev_tasks), 'v:val.id')
   let next_tasks_id = map(filter(copy(next_tasks), "has_key(v:val, 'id')"), 'v:val.id')
+  let tasks_id = uniq(prev_tasks_id + next_tasks_id)
 
   " Update existing tasks and create new ones
   for i in range(len(next_tasks))
     let next_task = next_tasks[i]
 
     if !has_key(next_task, 'id')
-      let next_tasks[i] = kronos#task#create(next_tasks, next_task)
+      let next_tasks[i] = kronos#task#create(tasks_id, next_task)
+      let tasks_id += [next_tasks[i].id]
     elseif !s:exists_in(prev_tasks_id, next_task.id)
-      let next_tasks[i] = kronos#task#create(prev_tasks, next_task)
+      let next_tasks[i] = kronos#task#create(prev_tasks_id, next_task)
+      let tasks_id += [next_tasks[i].id]
     else
       let prev_task_index = index(prev_tasks_id, next_task.id)
       let next_tasks[i] = s:assign(prev_tasks[prev_task_index], next_task)
@@ -255,9 +258,15 @@ function kronos#ui#parse_buffer()
     endif
   endfor
 
-  call kronos#database#write({'tasks': next_tasks})
+  call kronos#database#write({'tasks': uniq(next_tasks, 's:uniq_by_id')})
   call kronos#ui#list()
   let &modified = 0
+endfunction
+
+function s:uniq_by_id(a, b)
+  if a:a.id > a:b.id | return 1
+  elseif a:a.id < a:b.id | return -1
+  else | return 0 | endif
 endfunction
 
 function s:parse_buffer_line(index, line)
