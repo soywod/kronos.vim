@@ -18,7 +18,8 @@ A simple task and time manager.
     * [Context](#context)
     * [Worktime](#worktime)
     * [Delete](#delete)
-    * [Import](#import)
+  * [Backend](#backend)
+  * [Import](#import)
   * [Mappings](#mappings)
   * [Contributing](#contributing)
   * [Changelog](#changelog)
@@ -158,7 +159,23 @@ shown](#hide-done-tasks):
 ![Delete
 task](https://user-images.githubusercontent.com/10437171/50439349-0295f280-08f2-11e9-8c26-e9f67698c59c.gif)
 
-### Import
+## Backend
+
+By default, Kronos stores tasks in a file
+(`/path/to/vim/pluggins/kronos.vim/.database`). You can define an additionnal
+backend (for now, only Taskwarrior is available):
+
+```vim
+let g:kronos_backend = 'taskwarrior'
+```
+
+This way, tasks will be synchronized with Taskwarrior. It means you can manage
+basic actions with Kronos, and manage advanced ones with Taskwarrior CLI.
+
+*Note: the synchronization is only from Kronos to Taskwarrior. To synchronize
+from Taskwarrior to Kronos, check the [import section below](#import).*
+
+## Import
 
 If you want to import your Taskwarrior tasks into Kronos, you can use the
 `import.py` script at the root folder of the plugin. Usage:
@@ -218,6 +235,7 @@ proposing a pull request.
 
 ## Changelog
 
+- **Jul. 23, 2019** - Add option to use Taskwarrior as backend
 - **May. 14, 2019** - Add relative due + rewrite datetime part in python3
 - **May. 13, 2019** - Add custom mapping
 - **May. 12, 2019** - Add script to import tasks from taskwarrior (thanks to [KevCui](https://github.com/KevCui))

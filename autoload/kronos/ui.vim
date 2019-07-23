@@ -242,7 +242,10 @@ function kronos#ui#parse_buffer()
       let tasks_id += [next_tasks[i].id]
     else
       let prev_task_index = index(prev_tasks_id, next_task.id)
-      let next_tasks[i] = s:assign(prev_tasks[prev_task_index], next_task)
+      let next_tasks[i] = kronos#task#update(
+        \prev_tasks[prev_task_index],
+        \next_task
+      \)
     endif
   endfor
 
