@@ -19,7 +19,9 @@ function! kronos#task#create(ids, task)
   let task.id = has_key(task, 'id') ? task.id : kronos#task#generate_id(a:ids)
   let task.index = -(localtime() . task.id)
 
-  let task.id = kronos#taskwarrior#create(task)
+  if g:kronos_backend == 'taskwarrior'
+    let task.id = kronos#backends#taskwarrior#create(task)
+  endif
 
   return task
 endfunction
@@ -36,7 +38,10 @@ function! kronos#task#read_all()
 endfunction
 
 function! kronos#task#update(prev_task, next_task)
-  call kronos#taskwarrior#update(a:prev_task, a:next_task)
+  if g:kronos_backend == 'taskwarrior'
+    call kronos#backends#taskwarrior#update(a:prev_task, a:next_task)
+  endif
+
   return s:assign(a:prev_task, a:next_task)
 endfunction
 
@@ -67,7 +72,9 @@ function! kronos#task#toggle(task)
     \'start': a:task.start + [localtime()],
   \}
 
-  call kronos#taskwarrior#toggle(a:task)
+  if g:kronos_backend == 'taskwarrior'
+    call kronos#backends#taskwarrior#toggle(a:task)
+  endif
 
   return s:assign(a:task, update)
 endfunction
@@ -77,7 +84,9 @@ endfunction
 function! kronos#task#done(task)
   let date_ref = localtime()
 
-  call kronos#taskwarrior#done(a:task.id)
+  if g:kronos_backend == 'taskwarrior'
+    call kronos#backends#taskwarrior#done(a:task.id)
+  endif
 
   let task = s:assign(a:task, {
     \'done': date_ref,

@@ -5,6 +5,7 @@ let s:database = resolve(expand('<sfile>:h:h') . '/.database')
 let g:kronos_database   = get(g:, 'kronos_database' , s:database)
 let g:kronos_context    = get(g:, 'kronos_context'  , [])
 let g:kronos_hide_done  = get(g:, 'kronos_hide_done', 1)
+let g:kronos_backend    = get(g:, 'kronos_backend', '')
 
 augroup kronos
   autocmd!
