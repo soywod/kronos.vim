@@ -19,6 +19,8 @@ function! kronos#task#create(ids, task)
   let task.id = has_key(task, 'id') ? task.id : kronos#task#generate_id(a:ids)
   let task.index = -(localtime() . task.id)
 
+  let task.id = kronos#taskwarrior#create(task)
+
   return task
 endfunction
 
@@ -33,12 +35,9 @@ function! kronos#task#read_all()
   return kronos#database#read().tasks
 endfunction
 
-function! kronos#task#update(task, update)
-  let tasks = kronos#database#read().tasks
-  let position = kronos#task#get_position(tasks, a:task.id)
-  let tasks[position] = s:assign(a:task, a:update)
-
-  call kronos#database#write({'tasks': tasks})
+function! kronos#task#update(prev_task, next_task)
+  call kronos#taskwarrior#update(a:prev_task, a:next_task)
+  return s:assign(a:prev_task, a:next_task)
 endfunction
 
 " --------------------------------------------------------------------- # List #
@@ -68,6 +67,8 @@ function! kronos#task#toggle(task)
     \'start': a:task.start + [localtime()],
   \}
 
+  call kronos#taskwarrior#toggle(a:task)
+
   return s:assign(a:task, update)
 endfunction
 
@@ -75,6 +76,8 @@ endfunction
 
 function! kronos#task#done(task)
   let date_ref = localtime()
+
+  call kronos#taskwarrior#done(a:task.id)
 
   let task = s:assign(a:task, {
     \'done': date_ref,
