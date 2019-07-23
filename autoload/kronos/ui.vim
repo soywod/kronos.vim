@@ -220,6 +220,29 @@ function! kronos#ui#visual_in_cell()
   execute printf('normal! %svt|', col('.') == 1 ? '' : 'T|')
 endfunction
 
+" ------------------------------------------------------------------ # Sorting #
+
+function! s:sort_by(col, dir, t1, t2)
+  if a:col == 'tags' | return 0 | endif
+  if (a:t1[a:col] < a:t2[a:col]) | return -1 * a:dir
+  elseif (a:t1[a:col] > a:t2[a:col]) | return 1 * a:dir
+  else | return 0 | endif
+endfunction
+
+function kronos#ui#sort(dir)
+  let tasks  = kronos#database#read().tasks
+  let line = getline('.')
+  let pos = getcurpos()[2] - 1
+  let index = len(split(line[pos:], '|'))
+  let index = index == 0 ? 1 : index
+  let col = s:config.list.columns[len(s:config.list.columns) - index]
+  let sorted_tasks = sort(copy(tasks), {a, b -> s:sort_by(col, a:dir, a, b)})
+
+  call kronos#database#write({'tasks': sorted_tasks})
+  call kronos#ui#list()
+  let &modified = 1
+endfunction
+
 " -------------------------------------------------------------- # Parse utils #
 
 function kronos#ui#parse_buffer()

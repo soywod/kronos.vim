@@ -16,6 +16,7 @@ A simple task and time manager.
     * [Done](#done)
     * [Hide done tasks](#hide-done-tasks)
     * [Context](#context)
+    * [Sort](#sort)
     * [Worktime](#worktime)
     * [Delete](#delete)
   * [Backend](#backend)
@@ -133,6 +134,15 @@ want in your context (separated by spaces). Typing an empty context removes it:
 ![Set
 context](https://user-images.githubusercontent.com/10437171/50439628-09713500-08f3-11e9-88e0-a5ed72c9134e.gif)
 
+### Sort
+
+You can sort tasks by pressing `gs` (for ascending) or `gS` (for descending).
+The sort depends on the position of the cursor. For eg, if it's in the `ID`
+column, it will sort the ids.
+
+*Note: once the tasks sorted, the buffer will be considered as modified, no
+matter the result.*
+
 ### Worktime
 
 The worktime allows you to check how much time you spent on one or many tags,
@@ -195,6 +205,8 @@ Here the default mappings:
 | Toggle task | `<CR>` |
 | [Show task infos](#read) | `K` |
 | [Set context](#context) | `gc` |
+| [Sort (asc)](#sort) | `gs` |
+| [Sort (desc)](#sort) | `gS` |
 | [Hide/show done tasks](#hide-done-tasks) | `gh` |
 | [Show worktime](#worktime) | `gw` |
 | Jump to the next cell | `<C-n>` |
@@ -209,6 +221,8 @@ You can customize them:
 nmap <cr>   <plug>(kronos-toggle)
 nmap K      <plug>(kronos-info)
 nmap gc     <plug>(kronos-context)
+nmap gs     <plug>(kronos-sort-asc)
+nmap gS     <plug>(kronos-sort-desc)
 nmap gh     <plug>(kronos-hide-done)
 nmap gw     <plug>(kronos-worktime)
 nmap <c-n>  <plug>(kronos-next-cell)
@@ -235,6 +249,7 @@ proposing a pull request.
 
 ## Changelog
 
+- **Jul. 24, 2019** - Add tasks sorting
 - **Jul. 23, 2019** - Add option to use Taskwarrior as backend
 - **May. 14, 2019** - Add relative due + rewrite datetime part in python3
 - **May. 13, 2019** - Add custom mapping

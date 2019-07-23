@@ -17,6 +17,7 @@ TABLE OF CONTENTS                                            *kronos-contents*
    - Start/stop .........................................  |kronos-start-stop|
    - Hide done tasks ................................ |kronos-hide-done-tasks|
    - Context ................................................ |kronos-context|
+   - Sort ...................................................... |kronos-sort|
    - Worktime .............................................. |kronos-worktime|
    - Delete .................................................. |kronos-delete|
   Backend ..................................................  |kronos-backend|
@@ -121,6 +122,16 @@ want in your context (separated by spaces). Typing an empty context removes
 it.
 
 ------------------------------------------------------------------------------
+SORT                                                             *kronos-sort*
+
+You can sort tasks by pressing {gs} (for ascending) or {gS} (for descending).
+The sort depends on the position of the cursor. For eg, if it's in the `ID`
+column, it will sort the ids.
+
+Note: once the tasks sorted, the buffer will be considered as modified, no
+matter the result.
+
+------------------------------------------------------------------------------
 WORKTIME                                                     *kronos-worktime*
 
 The worktime allows you to check how much time you spent on one or many tags,
@@ -177,6 +188,8 @@ Here the default mappings:
 Toggle task                 <CR>
 Show task infos             {K}
 Set context                 {gc}
+Sort (asc)                  {gs}
+Sort (desc)                 {gS}
 Hide/show done tasks        {gh}
 Show worktime               {gw}
 Jump to the next cell       <C-n> 
@@ -190,6 +203,8 @@ You can customize them:
   nmap <cr>   <plug>(kronos-toggle)
   nmap K      <plug>(kronos-info)
   nmap gc     <plug>(kronos-context)
+  nmap gs     <plug>(kronos-sort-asc)
+  nmap gS     <plug>(kronos-sort-desc)
   nmap gh     <plug>(kronos-hide-done)
   nmap gw     <plug>(kronos-worktime)
   nmap <c-n>  <plug>(kronos-next-cell)
@@ -247,6 +262,7 @@ before proposing a pull request (via the script `tests.sh`)
 ==============================================================================
 CHANGELOG                                                   *kronos-changelog*
 
+  `Jul. 24, 2019` - Add tasks sorting
   `Jul. 23, 2019` - Add option to use Taskwarrior as backend
   `May. 14, 2019` - Add relative due + rewrite datetime part in python3
   `May. 13, 2019` - Add custom mapping
