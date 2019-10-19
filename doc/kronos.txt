@@ -160,7 +160,7 @@ By default, Kronos stores tasks in a file
 (`/path/to/vim/pluggins/kronos.vim/.database`). You can define an additionnal
 backend (for now, only Taskwarrior is available):
 >
-  let g:kronos_backend = 'taskwarrior'
+  let g:kronos_backend = 'file' | 'taskwarrior'
 <
 This way, tasks will be synchronized with Taskwarrior. It means you can manage
 basic actions with Kronos, and manage advanced ones with Taskwarrior CLI.
