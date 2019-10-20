@@ -45,7 +45,7 @@ will automatically readjust when you save the buffer (`:w`).
 To create a task, you can:
 
 - Write or copy a full table line: `|id|desc|tags|active|due|`
-- Write a Kronos format: `<desc> <tags> <due>`
+- Follow the Kronos format: `<desc> <tags> <due>`
 
 ![Create
 task](https://user-images.githubusercontent.com/10437171/50438709-61a63800-08ef-11e9-8f49-aa02b6da7f3b.gif)
@@ -55,17 +55,17 @@ A tag should start by a `+`. You can add as many tags as you need.
 A due should start by a `:`. There is 3 kinds of due:
 
   - The absolute due: `:DDMMYY:HHMM`, which correspond to a specific date.
-  - The approximative due, which is a non-complete absolute, for eg. `:DD`,
+  - The approximative due, which is a partial absolute, for eg. `:DD`,
     `::HH`, `:DDM:M`. Kronos will try to find the closest date matching this
     due.
-  - The relative due, which is relative to the current date. For eg. `:1y`,
-    `:2mo`, `:4h`. Available units: `y, mo, w, d, h, m`.<br />
-    *Note: unit order should be respected, from the biggest to the smallest.
-    `2y4mo24m` is valid, `3m4d` is not.*
+  - The relative due, which is relative to the actual date. For eg. `:1y`,
+    `:2mo`, `:4h`. Available units: `y, mo, w, d, h, m`.<br /> *Note: unit
+    order should be respected, from the biggest to the smallest.  `2y4mo24m` is
+    valid, `3m4d` is not.*
 
 Here some use cases:
 
-| Current date | Given pattern | Output |
+| Actual date | Given pattern | Due |
 | --- | --- | --- |
 | 03/03/2019 21:42 | `:4` | 04/03/2019 00:00 |
 | 03/03/2019 21:42 | `:2` | 02/04/2019 00:00 |
@@ -122,13 +122,13 @@ tasks](https://user-images.githubusercontent.com/10437171/50440820-278d6400-08f8
 
 ### Context
 
-The context filters tasks by a list of tags. Once setup:
+The context filters tasks by a list of tags. Once set up:
 
 - You will see only tasks containing at least one tag of your context
 - When you [create](#create) a task, all tags in your context will be assigned
   to it
 
-To setup a context, press `gc` (for `go to context`), and type all tags you
+To set up a context, press `gc` (for `go to context`), and type all tags you
 want in your context (separated by spaces). Typing an empty context removes it:
 
 ![Set
