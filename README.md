@@ -1,4 +1,7 @@
+⚠️ *Project archived. Have a look at [unfog](https://github.com/unfog-io/unfog-vim), its successor.*
+
 # Kronos.vim [![Build Status](https://travis-ci.org/soywod/kronos.vim.svg?branch=master)](https://travis-ci.org/soywod/kronos.vim)
+
 A simple task and time manager.
 
 <p align="center">
